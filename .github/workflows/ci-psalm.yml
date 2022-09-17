@@ -1,0 +1,28 @@
+name: Psalm
+
+on:
+    - push
+    - fork
+    - pull_request
+
+jobs:
+    tests:
+        runs-on: ubuntu-latest
+        name: "Check Psalm"
+        strategy:
+            fail-fast: false
+        steps:
+            - uses: actions/checkout@v2
+            - name: Cache Composer dependencies
+              uses: actions/cache@v2
+              with:
+                  path: /tmp/composer-cache
+                  key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+            - uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.1'
+                  tools: composer:v2
+            - run: composer install
+              shell: bash
+            - run: composer psalm
+              shell: bash

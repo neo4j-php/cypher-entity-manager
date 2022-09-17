@@ -1,0 +1,14 @@
+{
+  "$schema":"./vendor/phpbench/phpbench/phpbench.schema.json",
+  "runner.bootstrap": "vendor/autoload.php",
+  "runner.path": "benchmark/benchmark",
+  "runner.revs": 1000,
+  "runner.iterations": 10,
+  "runner.time_unit": "milliseconds",
+  "report.outputs": {
+    "csv-file": {
+      "extends": "csv",
+      "file": "benchmark/benchmarks.csv"
+    }
+  }
+}

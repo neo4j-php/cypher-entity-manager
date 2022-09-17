@@ -1,0 +1,40 @@
+name: Unit Test Coverage Report
+
+on:
+    - push
+    - fork
+    - pull_request
+
+jobs:
+    coverage:
+        runs-on: ubuntu-latest
+        name: "Generate unit test coverage report for PHP ${{ matrix.php-version }}"
+        strategy:
+            fail-fast: false
+        env:
+            XDEBUG_MODE: coverage
+        steps:
+            - uses: actions/checkout@v2
+            - name: Cache Composer dependencies
+              uses: actions/cache@v2
+              with:
+                  path: /tmp/composer-cache
+                  key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+            - uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.1'
+                  extensions: xdebug
+                  tools: composer:v2
+            - run: composer install
+              shell: bash
+            - run: composer test:coverage:xml
+              shell: bash
+            - uses: paambaati/codeclimate-action@v3.0.0
+              env:
+                  CC_TEST_REPORTER_ID: e0b199e87a2813189267e9baa3bf44d5354447ca73e8a4b2d8c027360b05523a
+              with:
+                  coverageLocations: coverage.xml:clover
+            - uses: actions/upload-artifact@v2
+              with:
+                  name: coverage.xml
+                  path: coverage.xml

@@ -1,0 +1,9 @@
+/var/
+/vendor/
+coverage.xml
+infection.html
+.phpunit.result.cache
+/phpunit.xml
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+/tmp/

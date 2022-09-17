@@ -1,0 +1,18 @@
+name: Markdown lint
+
+on:
+    - push
+    - fork
+    - pull_request
+
+jobs:
+    yml-lint:
+        runs-on: ubuntu-latest
+        name: "Markdown lint"
+        strategy:
+            fail-fast: false
+        steps:
+            - uses: actions/checkout@v2
+            - run: docker pull tmknom/markdownlint
+            - run: docker run --rm -v $(pwd):/work tmknom/markdownlint '**/*.md' --ignore vendor
+              shell: bash
