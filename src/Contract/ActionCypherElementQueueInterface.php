@@ -12,8 +12,6 @@ interface ActionCypherElementQueueInterface extends Iterator
 
     public function dequeue(): ?ActionCypherElementInterface;
 
-    public function supports(ActionCypherElementInterface $element): bool;
-
     public function preFlush(): self;
 
     public function postFlush(): self;

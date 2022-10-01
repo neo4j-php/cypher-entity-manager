@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Syndesi\CypherEntityManager\Contract;
 
-use Laudis\Neo4j\Client;
+use Laudis\Neo4j\Contracts\ClientInterface;
 use Syndesi\CypherDataStructures\Contract\ConstraintInterface;
 use Syndesi\CypherDataStructures\Contract\IndexInterface;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
@@ -27,5 +27,7 @@ interface EntityManagerInterface
 
     public function replaceQueue(ActionCypherElementQueueInterface $queue): self;
 
-    public function getClient(): Client;
+    public function getClient(): ClientInterface;
+
+    public function run(string $statement): mixed;
 }
