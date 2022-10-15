@@ -1,6 +1,6 @@
 {
-    "name": "",
-    "short_name": "",
+    "name": "CypherEntityManager",
+    "short_name": "CypherEntityManager",
     "icons": [
         {
             "src": "android-chrome-192x192.png",
@@ -13,7 +13,7 @@
             "type": "image/png"
         }
     ],
-    "theme_color": "#ffffff",
-    "background_color": "#ffffff",
+    "theme_color": "#018bff",
+    "background_color": "#018bff",
     "display": "standalone"
 }

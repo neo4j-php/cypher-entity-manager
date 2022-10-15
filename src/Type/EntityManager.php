@@ -5,15 +5,21 @@ declare(strict_types=1);
 namespace Syndesi\CypherEntityManager\Type;
 
 use Laudis\Neo4j\Contracts\ClientInterface;
+use Laudis\Neo4j\Contracts\TransactionInterface;
+use Laudis\Neo4j\Databags\Statement;
 use Psr\Log\LoggerInterface;
 use Syndesi\CypherDataStructures\Contract\ConstraintInterface;
 use Syndesi\CypherDataStructures\Contract\IndexInterface;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
 use Syndesi\CypherDataStructures\Contract\RelationInterface;
+use Syndesi\CypherEntityManager\Contract\ActionCypherElementInterface;
 use Syndesi\CypherEntityManager\Contract\ActionCypherElementQueueInterface;
 use Syndesi\CypherEntityManager\Contract\EntityManagerInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarNodeQueueInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarRelationQueueInterface;
+use Syndesi\CypherEntityManager\Helper\Statement\CreateNodeStatement;
+use Syndesi\CypherEntityManager\Helper\Statement\DeleteNodeStatement;
+use Syndesi\CypherEntityManager\Helper\Statement\MergeNodeStatement;
 
 class EntityManager implements EntityManagerInterface
 {
@@ -21,7 +27,7 @@ class EntityManager implements EntityManagerInterface
     private ?LoggerInterface $logger;
     private ActionCypherElementQueueInterface $queue;
 
-    public function __construct(ClientInterface $client, ?LoggerInterface $logger)
+    public function __construct(ClientInterface $client, ?LoggerInterface $logger = null)
     {
         $this->client = $client;
         $this->logger = $logger;
@@ -57,13 +63,34 @@ class EntityManager implements EntityManagerInterface
         return $this;
     }
 
+    private function getStatementForActionCypherElement(ActionCypherElementInterface $element): ?Statement
+    {
+        $cypherElement = $element->getElement();
+        if ($cypherElement instanceof NodeInterface) {
+            switch ($element->getAction())
+            {
+                case ActionType::CREATE:
+                    return CreateNodeStatement::nodeStatement($cypherElement);
+                case ActionType::MERGE:
+                    return MergeNodeStatement::nodeStatement($cypherElement);
+                case ActionType::DELETE:
+                    return DeleteNodeStatement::nodeStatement($cypherElement);
+            }
+        }
+        return null;
+    }
+
     public function flush(): self
     {
         $this->queue->preFlush();
         foreach ($this->queue as $actionCypherElement) {
             // run pre lifecycle events
-            // create cypher query
-            // run cypher query
+
+            $statement = $this->getStatementForActionCypherElement($actionCypherElement);
+            $this->client->writeTransaction(static function (TransactionInterface $tsx) use ($statement) {
+                $result = $tsx->runStatement($statement);
+            });
+
             // run post lifecycle events
         }
         $this->queue->postFlush();

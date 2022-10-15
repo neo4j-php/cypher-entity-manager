@@ -12,6 +12,11 @@ class SimpleActionCypherElementQueue implements ActionCypherElementQueueInterfac
 {
     private SplQueue $queue;
 
+    public function __construct()
+    {
+        $this->queue = new SplQueue();
+    }
+
     public function enqueue(ActionCypherElementInterface $element): self
     {
         $this->queue->enqueue($element);
