@@ -5,40 +5,38 @@ declare(strict_types=1);
 namespace Syndesi\CypherEntityManager\Tests\FeatureTest;
 
 use Crell\Tukio\Dispatcher;
+use Crell\Tukio\OrderedListenerProvider;
 use Laudis\Neo4j\ClientBuilder;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 use Selective\Container\Container;
 use Syndesi\CypherDataStructures\Type\Node;
 use Syndesi\CypherDataStructures\Type\NodeLabel;
 use Syndesi\CypherDataStructures\Type\PropertyName;
+use Syndesi\CypherEntityManager\EventListener\CreateNodeToStatementEventListener;
 use Syndesi\CypherEntityManager\Type\EntityManager;
 
 class EntityManagerTest extends TestCase
 {
-
     public function testEntityManager(): void
     {
         $container = new Container();
-
 
         $loggerTestHandler = new TestHandler();
         $logger = (new Logger('logger'))
             ->pushHandler($loggerTestHandler);
 
+        $container->set(CreateNodeToStatementEventListener::class, new CreateNodeToStatementEventListener());
 
-        $container->set(LoggerInterface::class, $logger);
-
-        $dispatcher = new Dispatcher(null, $logger);
-
+        $provider = new OrderedListenerProvider($container);
+        $provider->addSubscriber(CreateNodeToStatementEventListener::class, CreateNodeToStatementEventListener::class);
+        $dispatcher = new Dispatcher($provider, $logger);
 
         $client = ClientBuilder::create()
             ->withDriver('bolt', 'bolt://neo4j:password@neo4j')
             ->build();
         $em = new EntityManager($client, $dispatcher, $logger);
-
 
         $nodeA = new Node();
         $nodeA
@@ -69,5 +67,4 @@ class EntityManagerTest extends TestCase
 
         $this->assertTrue(true);
     }
-
 }

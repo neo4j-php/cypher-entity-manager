@@ -58,12 +58,15 @@ class StructureHelper
             throw new InvalidArgumentException('at least one identifier is required');
         }
         $parts = [];
+        /** @psalm-suppress PossiblyNullArgument */
         $parts[] = self::getNodeStructure($relation->getStartNode());
+        /** @psalm-suppress PossiblyNullArgument */
         $parts[] = sprintf(
             "-[%s %s]->",
-            $relation->getRelationType(),
+            (string) $relation->getRelationType(),
             self::identifierStorageToString($relation->getIdentifiers())
         );
+        /** @psalm-suppress PossiblyNullArgument */
         $parts[] = self::getNodeStructure($relation->getEndNode());
 
         return implode('', $parts);

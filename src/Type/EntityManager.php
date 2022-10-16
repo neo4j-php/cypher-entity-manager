@@ -70,19 +70,19 @@ class EntityManager implements EntityManagerInterface
         foreach ($this->queue as $actionCypherElement) {
             // run pre lifecycle events
 
-
             $actionCypherElementToStatementEvent = new ActionCypherElementToStatementEvent($actionCypherElement);
             $actionCypherElementToStatementEvent = $this->dispatcher->dispatch($actionCypherElementToStatementEvent);
 
             if (!($actionCypherElementToStatementEvent instanceof ActionCypherElementToStatementEvent)) {
                 throw new LogicException('event is not of type ActionCypherElementToStatementEvent');
             }
-            if (!$actionCypherElementToStatementEvent->getStatement()) {
+            $statement = $actionCypherElementToStatementEvent->getStatement();
+            if (!$statement) {
                 throw new Exception('No event handler found which can transform action cypher element to statement');
             }
 
-            $this->client->writeTransaction(static function (TransactionInterface $tsx) use ($actionCypherElementToStatementEvent) {
-                $result = $tsx->runStatement($actionCypherElementToStatementEvent->getStatement());
+            $this->client->writeTransaction(static function (TransactionInterface $tsx) use ($statement) {
+                $result = $tsx->runStatement($statement);
             });
 
             // run post lifecycle events
