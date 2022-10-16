@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace Syndesi\CypherEntityManager\Tests\FeatureTest;
 
+use Crell\Tukio\Dispatcher;
 use Laudis\Neo4j\ClientBuilder;
+use Monolog\Handler\TestHandler;
+use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Selective\Container\Container;
 use Syndesi\CypherDataStructures\Type\Node;
 use Syndesi\CypherDataStructures\Type\NodeLabel;
 use Syndesi\CypherDataStructures\Type\PropertyName;
@@ -16,10 +21,23 @@ class EntityManagerTest extends TestCase
 
     public function testEntityManager(): void
     {
+        $container = new Container();
+
+
+        $loggerTestHandler = new TestHandler();
+        $logger = (new Logger('logger'))
+            ->pushHandler($loggerTestHandler);
+
+
+        $container->set(LoggerInterface::class, $logger);
+
+        $dispatcher = new Dispatcher(null, $logger);
+
+
         $client = ClientBuilder::create()
             ->withDriver('bolt', 'bolt://neo4j:password@neo4j')
             ->build();
-        $em = new EntityManager($client);
+        $em = new EntityManager($client, $dispatcher, $logger);
 
 
         $nodeA = new Node();

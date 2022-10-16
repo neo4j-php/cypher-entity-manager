@@ -4,32 +4,33 @@ declare(strict_types=1);
 
 namespace Syndesi\CypherEntityManager\Type;
 
+use Exception;
 use Laudis\Neo4j\Contracts\ClientInterface;
 use Laudis\Neo4j\Contracts\TransactionInterface;
-use Laudis\Neo4j\Databags\Statement;
+use LogicException;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Syndesi\CypherDataStructures\Contract\ConstraintInterface;
 use Syndesi\CypherDataStructures\Contract\IndexInterface;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
 use Syndesi\CypherDataStructures\Contract\RelationInterface;
-use Syndesi\CypherEntityManager\Contract\ActionCypherElementInterface;
 use Syndesi\CypherEntityManager\Contract\ActionCypherElementQueueInterface;
 use Syndesi\CypherEntityManager\Contract\EntityManagerInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarNodeQueueInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarRelationQueueInterface;
-use Syndesi\CypherEntityManager\Helper\Statement\CreateNodeStatement;
-use Syndesi\CypherEntityManager\Helper\Statement\DeleteNodeStatement;
-use Syndesi\CypherEntityManager\Helper\Statement\MergeNodeStatement;
+use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
 
 class EntityManager implements EntityManagerInterface
 {
     private ClientInterface $client;
     private ?LoggerInterface $logger;
     private ActionCypherElementQueueInterface $queue;
+    private EventDispatcherInterface $dispatcher;
 
-    public function __construct(ClientInterface $client, ?LoggerInterface $logger = null)
+    public function __construct(ClientInterface $client, EventDispatcherInterface $dispatcher, ?LoggerInterface $logger = null)
     {
         $this->client = $client;
+        $this->dispatcher = $dispatcher;
         $this->logger = $logger;
         $this->queue = new SimpleActionCypherElementQueue();
     }
@@ -63,32 +64,25 @@ class EntityManager implements EntityManagerInterface
         return $this;
     }
 
-    private function getStatementForActionCypherElement(ActionCypherElementInterface $element): ?Statement
-    {
-        $cypherElement = $element->getElement();
-        if ($cypherElement instanceof NodeInterface) {
-            switch ($element->getAction())
-            {
-                case ActionType::CREATE:
-                    return CreateNodeStatement::nodeStatement($cypherElement);
-                case ActionType::MERGE:
-                    return MergeNodeStatement::nodeStatement($cypherElement);
-                case ActionType::DELETE:
-                    return DeleteNodeStatement::nodeStatement($cypherElement);
-            }
-        }
-        return null;
-    }
-
     public function flush(): self
     {
         $this->queue->preFlush();
         foreach ($this->queue as $actionCypherElement) {
             // run pre lifecycle events
 
-            $statement = $this->getStatementForActionCypherElement($actionCypherElement);
-            $this->client->writeTransaction(static function (TransactionInterface $tsx) use ($statement) {
-                $result = $tsx->runStatement($statement);
+
+            $actionCypherElementToStatementEvent = new ActionCypherElementToStatementEvent($actionCypherElement);
+            $actionCypherElementToStatementEvent = $this->dispatcher->dispatch($actionCypherElementToStatementEvent);
+
+            if (!($actionCypherElementToStatementEvent instanceof ActionCypherElementToStatementEvent)) {
+                throw new LogicException('event is not of type ActionCypherElementToStatementEvent');
+            }
+            if (!$actionCypherElementToStatementEvent->getStatement()) {
+                throw new Exception('No event handler found which can transform action cypher element to statement');
+            }
+
+            $this->client->writeTransaction(static function (TransactionInterface $tsx) use ($actionCypherElementToStatementEvent) {
+                $result = $tsx->runStatement($actionCypherElementToStatementEvent->getStatement());
             });
 
             // run post lifecycle events
