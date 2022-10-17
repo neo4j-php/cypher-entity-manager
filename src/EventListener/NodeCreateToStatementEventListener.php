@@ -8,24 +8,26 @@ use Laudis\Neo4j\Databags\Statement;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
 use Syndesi\CypherDataStructures\Contract\PropertyNameInterface;
 use Syndesi\CypherDataStructures\Helper\ToCypherHelper;
+use Syndesi\CypherEntityManager\Contract\NodeStatementInterface;
+use Syndesi\CypherEntityManager\Contract\OnActionCypherElementToStatementEventListenerInterface;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
 use Syndesi\CypherEntityManager\Type\ActionType;
 
-class CreateNodeToStatementEventListener
+class NodeCreateToStatementEventListener implements OnActionCypherElementToStatementEventListenerInterface, NodeStatementInterface
 {
-    public function onActionCypherElementToStatementEvent(ActionCypherElementToStatementEvent $actionCypherElementToStatementEvent): void
+    public function onActionCypherElementToStatementEvent(ActionCypherElementToStatementEvent $event): void
     {
-        $actionType = $actionCypherElementToStatementEvent->getActionCypherElement()->getAction();
-        $actionElement = $actionCypherElementToStatementEvent->getActionCypherElement()->getElement();
-        if (ActionType::CREATE !== $actionType) {
+        $action = $event->getActionCypherElement()->getAction();
+        $element = $event->getActionCypherElement()->getElement();
+        if (ActionType::CREATE !== $action) {
             return;
         }
-        if (!($actionElement instanceof NodeInterface)) {
+        if (!($element instanceof NodeInterface)) {
             return;
         }
 
-        $actionCypherElementToStatementEvent->setStatement(self::nodeStatement($actionElement));
-        $actionCypherElementToStatementEvent->stopPropagation();
+        $event->setStatement(self::nodeStatement($element));
+        $event->stopPropagation();
     }
 
     public static function nodeStatement(NodeInterface $node): Statement

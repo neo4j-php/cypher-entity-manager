@@ -2,16 +2,34 @@
 
 declare(strict_types=1);
 
-namespace Syndesi\CypherEntityManager\Helper\Statement;
+namespace Syndesi\CypherEntityManager\EventListener;
 
 use Laudis\Neo4j\Databags\Statement;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
 use Syndesi\CypherDataStructures\Contract\PropertyNameInterface;
 use Syndesi\CypherDataStructures\Helper\ToCypherHelper;
 use Syndesi\CypherEntityManager\Contract\NodeStatementInterface;
+use Syndesi\CypherEntityManager\Contract\OnActionCypherElementToStatementEventListenerInterface;
+use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
+use Syndesi\CypherEntityManager\Type\ActionType;
 
-class MergeNodeStatement implements NodeStatementInterface
+class NodeMergeToStatementEventListener implements OnActionCypherElementToStatementEventListenerInterface, NodeStatementInterface
 {
+    public function onActionCypherElementToStatementEvent(ActionCypherElementToStatementEvent $event): void
+    {
+        $action = $event->getActionCypherElement()->getAction();
+        $element = $event->getActionCypherElement()->getElement();
+        if (ActionType::MERGE !== $action) {
+            return;
+        }
+        if (!($element instanceof NodeInterface)) {
+            return;
+        }
+
+        $event->setStatement(self::nodeStatement($element));
+        $event->stopPropagation();
+    }
+
     public static function nodeStatement(NodeInterface $node): Statement
     {
         $identifyingStrings = [];
