@@ -6,7 +6,7 @@ namespace Syndesi\CypherEntityManager\Contract\Event;
 
 use Syndesi\CypherDataStructures\Contract\IndexInterface;
 
-interface IndexPostPersistEventInterface extends PostPersistEventInterface
+interface IndexPostCreateEventInterface extends PostCreateEventInterface
 {
     public function getElement(): IndexInterface;
 }

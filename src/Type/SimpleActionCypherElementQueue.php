@@ -42,6 +42,7 @@ class SimpleActionCypherElementQueue implements ActionCypherElementQueueInterfac
     public function clear(): self
     {
         $this->queue = new SplQueue();
+
         return $this;
     }
 

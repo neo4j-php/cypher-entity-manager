@@ -10,7 +10,7 @@ use Syndesi\CypherDataStructures\Contract\IndexInterface;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
 use Syndesi\CypherDataStructures\Contract\RelationInterface;
 
-interface PrePersistEventInterface extends StoppableEventInterface
+interface PreCreateEventInterface extends StoppableEventInterface
 {
     public function getElement(): NodeInterface|RelationInterface|IndexInterface|ConstraintInterface;
 }

@@ -6,7 +6,7 @@ namespace Syndesi\CypherEntityManager\Contract\Event;
 
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
 
-interface NodePostPersistEventInterface extends PostPersistEventInterface
+interface NodePostCreateEventInterface extends PostCreateEventInterface
 {
     public function getElement(): NodeInterface;
 }
