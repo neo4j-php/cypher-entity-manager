@@ -11,7 +11,8 @@
 [![Code Style](https://github.com/Syndesi/cypher-entity-manager/actions/workflows/ci-code-style.yml/badge.svg)](https://github.com/Syndesi/cypher-entity-manager/actions/workflows/ci-code-style.yml)
 [![YML lint](https://github.com/Syndesi/cypher-entity-manager/actions/workflows/ci-yml-lint.yml/badge.svg)](https://github.com/Syndesi/cypher-entity-manager/actions/workflows/ci-yml-lint.yml)
 [![Markdown lint](https://github.com/Syndesi/cypher-entity-manager/actions/workflows/ci-markdown-lint.yml/badge.svg)](https://github.com/Syndesi/cypher-entity-manager/actions/workflows/ci-markdown-lint.yml)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/ecd3da92ddb4d8ac99a5/test_coverage)](https://codeclimate.com/github/Syndesi/cypher-entity-manager/test_coverage)[![Maintainability](https://api.codeclimate.com/v1/badges/ecd3da92ddb4d8ac99a5/maintainability)](https://codeclimate.com/github/Syndesi/cypher-entity-manager/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/ecd3da92ddb4d8ac99a5/test_coverage)](https://codeclimate.com/github/Syndesi/cypher-entity-manager/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/ecd3da92ddb4d8ac99a5/maintainability)](https://codeclimate.com/github/Syndesi/cypher-entity-manager/maintainability)
 
 # Syndesi's Cypher Entity Manager
 
