@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Syndesi\CypherEntityManager\EventListener;
 
 use Laudis\Neo4j\Databags\Statement;
+use Psr\Log\LoggerInterface;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
 use Syndesi\CypherDataStructures\Contract\PropertyNameInterface;
 use Syndesi\CypherDataStructures\Helper\ToCypherHelper;
@@ -15,6 +16,10 @@ use Syndesi\CypherEntityManager\Type\ActionType;
 
 class NodeDeleteToStatementEventListener implements OnActionCypherElementToStatementEventListenerInterface, NodeStatementInterface
 {
+    public function __construct(private LoggerInterface $logger)
+    {
+    }
+
     public function onActionCypherElementToStatementEvent(ActionCypherElementToStatementEvent $event): void
     {
         $action = $event->getActionCypherElement()->getAction();
@@ -26,8 +31,13 @@ class NodeDeleteToStatementEventListener implements OnActionCypherElementToState
             return;
         }
 
-        $event->setStatement(self::nodeStatement($element));
+        $statement = self::nodeStatement($element);
+        $event->setStatement($statement);
         $event->stopPropagation();
+        $this->logger->debug("Acting on ActionCypherElementToStatementEvent: Created node-delete-statement and stopped propagation.", [
+            'elementClass' => get_class($element),
+            'statement' => $statement,
+        ]);
     }
 
     public static function nodeStatement(NodeInterface $node): Statement

@@ -7,8 +7,6 @@ namespace Syndesi\CypherEntityManager\Tests\Helper\Statement;
 use Laudis\Neo4j\Databags\Statement;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
-use PHPUnit\Framework\TestCase;
-use Prophecy\Prophet;
 use Psr\Log\LoggerInterface;
 use Syndesi\CypherDataStructures\Type\Node;
 use Syndesi\CypherDataStructures\Type\NodeLabel;
@@ -16,21 +14,12 @@ use Syndesi\CypherDataStructures\Type\PropertyName;
 use Syndesi\CypherDataStructures\Type\Relation;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
 use Syndesi\CypherEntityManager\EventListener\NodeCreateToStatementEventListener;
+use Syndesi\CypherEntityManager\Tests\ProphesizeTestCase;
 use Syndesi\CypherEntityManager\Type\ActionCypherElement;
 use Syndesi\CypherEntityManager\Type\ActionType;
 
-class NodeCreateToStatementEventListenerTest extends TestCase
+class NodeCreateToStatementEventListenerTest extends ProphesizeTestCase
 {
-    protected function setUp(): void
-    {
-        $this->prophet = new Prophet();
-    }
-
-    protected function tearDown(): void
-    {
-        $this->prophet->checkPredictions();
-    }
-
     public function testOnActionCypherElementToStatementEvent(): void
     {
         $node = new Node();
@@ -41,7 +30,6 @@ class NodeCreateToStatementEventListenerTest extends TestCase
             ->addIdentifier(new PropertyName('id'));
         $actionCypherElement = new ActionCypherElement(ActionType::CREATE, $node);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
-
         $loggerHandler = new TestHandler();
         $logger = (new Logger('logger'))
             ->pushHandler($loggerHandler);
@@ -49,14 +37,13 @@ class NodeCreateToStatementEventListenerTest extends TestCase
         $eventListener = new NodeCreateToStatementEventListener($logger);
         $eventListener->onActionCypherElementToStatementEvent($event);
 
+        $this->assertTrue($event->isPropagationStopped());
+        $this->assertInstanceOf(Statement::class, $event->getStatement());
         $this->assertCount(1, $loggerHandler->getRecords());
         $logMessage = $loggerHandler->getRecords()[0];
         $this->assertSame('Acting on ActionCypherElementToStatementEvent: Created node-create-statement and stopped propagation.', $logMessage->message);
         $this->assertArrayHasKey('elementClass', $logMessage->context);
         $this->assertArrayHasKey('statement', $logMessage->context);
-
-        $this->assertTrue($event->isPropagationStopped());
-        $this->assertInstanceOf(Statement::class, $event->getStatement());
     }
 
     public function testOnActionCypherElementToStatementEventWithWrongAction(): void

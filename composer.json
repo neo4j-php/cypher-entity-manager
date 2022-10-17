@@ -22,8 +22,7 @@
         "syndesi/cypher-data-structures": "v0.1.2",
         "laudis/neo4j-php-client": "^2.7",
         "psr/log": "^3.0",
-        "psr/event-dispatcher": "^1.0",
-        "symfony/contracts": "^3.1"
+        "psr/event-dispatcher": "^1.0"
     },
     "autoload": {
         "psr-4": {

@@ -5,17 +5,20 @@ declare(strict_types=1);
 namespace Syndesi\CypherEntityManager\Tests\Helper\Statement;
 
 use Laudis\Neo4j\Databags\Statement;
-use PHPUnit\Framework\TestCase;
+use Monolog\Handler\TestHandler;
+use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Syndesi\CypherDataStructures\Type\Node;
 use Syndesi\CypherDataStructures\Type\NodeLabel;
 use Syndesi\CypherDataStructures\Type\PropertyName;
 use Syndesi\CypherDataStructures\Type\Relation;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
 use Syndesi\CypherEntityManager\EventListener\NodeDeleteToStatementEventListener;
+use Syndesi\CypherEntityManager\Tests\ProphesizeTestCase;
 use Syndesi\CypherEntityManager\Type\ActionCypherElement;
 use Syndesi\CypherEntityManager\Type\ActionType;
 
-class NodeDeleteToStatementEventListenerTest extends TestCase
+class NodeDeleteToStatementEventListenerTest extends ProphesizeTestCase
 {
     public function testOnActionCypherElementToStatementEvent(): void
     {
@@ -27,12 +30,20 @@ class NodeDeleteToStatementEventListenerTest extends TestCase
             ->addIdentifier(new PropertyName('id'));
         $actionCypherElement = new ActionCypherElement(ActionType::DELETE, $node);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
+        $loggerHandler = new TestHandler();
+        $logger = (new Logger('logger'))
+            ->pushHandler($loggerHandler);
 
-        $eventListener = new NodeDeleteToStatementEventListener();
+        $eventListener = new NodeDeleteToStatementEventListener($logger);
         $eventListener->onActionCypherElementToStatementEvent($event);
 
         $this->assertTrue($event->isPropagationStopped());
         $this->assertInstanceOf(Statement::class, $event->getStatement());
+        $this->assertCount(1, $loggerHandler->getRecords());
+        $logMessage = $loggerHandler->getRecords()[0];
+        $this->assertSame('Acting on ActionCypherElementToStatementEvent: Created node-delete-statement and stopped propagation.', $logMessage->message);
+        $this->assertArrayHasKey('elementClass', $logMessage->context);
+        $this->assertArrayHasKey('statement', $logMessage->context);
     }
 
     public function testOnActionCypherElementToStatementEventWithWrongAction(): void
@@ -41,7 +52,7 @@ class NodeDeleteToStatementEventListenerTest extends TestCase
         $actionCypherElement = new ActionCypherElement(ActionType::MERGE, $node);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
 
-        $eventListener = new NodeDeleteToStatementEventListener();
+        $eventListener = new NodeDeleteToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
         $eventListener->onActionCypherElementToStatementEvent($event);
 
         $this->assertFalse($event->isPropagationStopped());
@@ -54,7 +65,7 @@ class NodeDeleteToStatementEventListenerTest extends TestCase
         $actionCypherElement = new ActionCypherElement(ActionType::DELETE, $relation);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
 
-        $eventListener = new NodeDeleteToStatementEventListener();
+        $eventListener = new NodeDeleteToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
         $eventListener->onActionCypherElementToStatementEvent($event);
 
         $this->assertFalse($event->isPropagationStopped());
