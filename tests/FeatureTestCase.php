@@ -21,6 +21,9 @@ class FeatureTestCase extends ContainerTestCase
             ->build();
         $client->runStatement(Statement::create("MATCH (n) DETACH DELETE n"));
         $this->container->set(ClientInterface::class, $client);
+        if (false !== getenv("LEAK")) {
+            $this->markTestSkipped();
+        }
     }
 
     protected function tearDown(): void
