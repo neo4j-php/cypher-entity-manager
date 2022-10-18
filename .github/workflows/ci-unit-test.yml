@@ -16,6 +16,13 @@ jobs:
         services: 
             neo4j:
                 image: neo4j
+                env:
+                    NEO4J_AUTH: neo4j/password
+                options: >-
+                    --health-cmd curl -s -o /dev/null -w "%{http_code}" http://neo4j:7474/browser/
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
         steps:
             - uses: actions/checkout@v2
             - name: Cache Composer dependencies

@@ -17,7 +17,7 @@ class FeatureTestCase extends ContainerTestCase
     {
         parent::setUp();
         $client = ClientBuilder::create()
-            ->withDriver('bolt', 'bolt://neo4j:neo4j@neo4j')
+            ->withDriver('bolt', 'bolt://neo4j:password@neo4j')
             ->build();
         $client->runStatement(Statement::create("MATCH (n) DETACH DELETE n"));
         $this->container->set(ClientInterface::class, $client);
