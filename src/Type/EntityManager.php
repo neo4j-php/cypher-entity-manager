@@ -89,6 +89,8 @@ class EntityManager implements EntityManagerInterface
         }
         $this->queue->postFlush();
 
+        $this->clear();
+
         return $this;
     }
 

@@ -55,7 +55,7 @@ class NodeMergeToStatementEventListener implements OnActionCypherElementToStatem
                 );
             } else {
                 $setPropertyStrings[] = sprintf(
-                    "    node.%s: $%s",
+                    "    node.%s = $%s",
                     (string) $propertyName,
                     (string) $propertyName
                 );
@@ -63,7 +63,7 @@ class NodeMergeToStatementEventListener implements OnActionCypherElementToStatem
             $propertyValues[(string) $propertyName] = $node->getProperty($propertyName);
         }
         $identifyingString = implode(", ", $identifyingStrings);
-        $setPropertyString = implode("\n", $setPropertyStrings);
+        $setPropertyString = implode(",\n", $setPropertyStrings);
 
         return new Statement(
             sprintf(
