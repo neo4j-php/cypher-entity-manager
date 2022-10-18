@@ -9,8 +9,15 @@ jobs:
     tests:
         runs-on: ubuntu-latest
         name: "Running mutant tests for PHP 8.1"
-        strategy:
-            fail-fast: false
+        container: ubuntu
+        services:
+            neo4j:
+                image: neo4j
+                env:
+                    NEO4J_AUTH: neo4j/password
+                ports:
+                    - "7474:7474"
+                    - "7687:7687"
         steps:
             - uses: actions/checkout@v2
             - name: Cache Composer dependencies
