@@ -13,15 +13,8 @@ jobs:
             fail-fast: false
             matrix:
                 php-version: ['8.1']
-        container: ubuntu
-        services:
-            neo4j:
-                image: neo4j
-                env:
-                    NEO4J_AUTH: neo4j/password
-                ports:
-                    - "7474:7474"
-                    - "7687:7687"
+        env:
+            NO_FEATURE_TEST: true
         steps:
             - uses: actions/checkout@v2
             - name: Cache Composer dependencies

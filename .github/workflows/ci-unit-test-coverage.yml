@@ -9,17 +9,9 @@ jobs:
     coverage:
         runs-on: ubuntu-latest
         name: "Generate unit test coverage report for PHP ${{ matrix.php-version }}"
-        container: ubuntu
-        services:
-            neo4j:
-                image: neo4j
-                env:
-                    NEO4J_AUTH: neo4j/password
-                ports:
-                    - "7474:7474"
-                    - "7687:7687"
         env:
             XDEBUG_MODE: coverage
+            NO_FEATURE_TEST: true
         steps:
             - uses: actions/checkout@v2
             - name: Cache Composer dependencies
