@@ -6,9 +6,10 @@ namespace Syndesi\CypherEntityManager\Tests;
 
 use Laudis\Neo4j\ClientBuilder;
 use Laudis\Neo4j\Contracts\ClientInterface;
+use Laudis\Neo4j\Databags\Statement;
 use Selective\Container\Container;
 
-class FunctionalTestCase extends ContainerTestCase
+class FeatureTestCase extends ContainerTestCase
 {
     protected Container $container;
 
@@ -18,6 +19,7 @@ class FunctionalTestCase extends ContainerTestCase
         $client = ClientBuilder::create()
             ->withDriver('bolt', 'bolt://neo4j:password@neo4j')
             ->build();
+        $client->runStatement(Statement::create("MATCH (n) DETACH DELETE n"));
         $this->container->set(ClientInterface::class, $client);
     }
 

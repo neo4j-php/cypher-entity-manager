@@ -10,6 +10,7 @@ use Laudis\Neo4j\Contracts\TransactionInterface;
 use LogicException;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use ReflectionClass;
 use Syndesi\CypherDataStructures\Contract\ConstraintInterface;
 use Syndesi\CypherDataStructures\Contract\IndexInterface;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
@@ -19,6 +20,9 @@ use Syndesi\CypherEntityManager\Contract\EntityManagerInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarNodeQueueInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarRelationQueueInterface;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
+use Syndesi\CypherEntityManager\Event\PostFlushEvent;
+use Syndesi\CypherEntityManager\Event\PreFlushEvent;
+use Syndesi\CypherEntityManager\Helper\LifecycleEventHelper;
 
 class EntityManager implements EntityManagerInterface
 {
@@ -67,14 +71,23 @@ class EntityManager implements EntityManagerInterface
     public function flush(): self
     {
         $this->queue->preFlush();
+        $this->logger?->debug("Dispatching PreFlushEvent");
+        $this->dispatcher->dispatch(new PreFlushEvent());
         foreach ($this->queue as $actionCypherElement) {
-            // run pre lifecycle events
+            $events = LifecycleEventHelper::getLifecycleEventForCypherActionElement($actionCypherElement, true);
+            foreach ($events as $event) {
+                $this->logger?->debug(sprintf("Dispatching %s", (new ReflectionClass($event))->getShortName()));
+                $this->dispatcher->dispatch($event);
+            }
 
             $actionCypherElementToStatementEvent = new ActionCypherElementToStatementEvent($actionCypherElement);
+            $this->logger?->debug("Dispatching ActionCypherElementToStatementEvent", [
+                "event" => $actionCypherElementToStatementEvent,
+            ]);
             $actionCypherElementToStatementEvent = $this->dispatcher->dispatch($actionCypherElementToStatementEvent);
 
             if (!($actionCypherElementToStatementEvent instanceof ActionCypherElementToStatementEvent)) {
-                throw new LogicException('event is not of type ActionCypherElementToStatementEvent');
+                throw new LogicException('Event is not of type ActionCypherElementToStatementEvent');
             }
             $statement = $actionCypherElementToStatementEvent->getStatement();
             if (!$statement) {
@@ -85,11 +98,20 @@ class EntityManager implements EntityManagerInterface
                 $result = $tsx->runStatement($statement);
             });
 
-            // run post lifecycle events
+            $events = LifecycleEventHelper::getLifecycleEventForCypherActionElement($actionCypherElement, false);
+            foreach ($events as $event) {
+                $this->logger?->debug(sprintf("Dispatching %s", (new ReflectionClass($event))->getShortName()), [
+                    'element' => $event->getElement(),
+                ]);
+                $this->dispatcher->dispatch($event);
+            }
         }
         $this->queue->postFlush();
 
         $this->clear();
+
+        $this->logger?->debug("Dispatching PostFlushEvent");
+        $this->dispatcher->dispatch(new PostFlushEvent());
 
         return $this;
     }

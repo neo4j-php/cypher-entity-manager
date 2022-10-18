@@ -35,7 +35,7 @@ class NodeMergeToStatementEventListener implements OnActionCypherElementToStatem
         $event->setStatement($statement);
         $event->stopPropagation();
         $this->logger->debug("Acting on ActionCypherElementToStatementEvent: Created node-merge-statement and stopped propagation.", [
-            'elementClass' => get_class($element),
+            'element' => $element,
             'statement' => $statement,
         ]);
     }

@@ -9,7 +9,7 @@ use Syndesi\CypherDataStructures\Contract\IndexInterface;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
 use Syndesi\CypherDataStructures\Contract\RelationInterface;
 
-interface PostCreateEventInterface extends LifecycleEventInterface
+interface LifecycleEventInterface extends EventInterface
 {
-    public function getElement(): NodeInterface|RelationInterface|IndexInterface|ConstraintInterface;
+    public function getElement(): NodeInterface|RelationInterface|ConstraintInterface|IndexInterface;
 }

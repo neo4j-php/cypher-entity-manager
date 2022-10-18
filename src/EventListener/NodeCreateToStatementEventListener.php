@@ -35,7 +35,7 @@ class NodeCreateToStatementEventListener implements OnActionCypherElementToState
         $event->setStatement($statement);
         $event->stopPropagation();
         $this->logger->debug("Acting on ActionCypherElementToStatementEvent: Created node-create-statement and stopped propagation.", [
-            'elementClass' => get_class($element),
+            'element' => $element,
             'statement' => $statement,
         ]);
     }

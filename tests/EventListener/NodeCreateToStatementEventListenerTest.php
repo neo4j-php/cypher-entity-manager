@@ -42,7 +42,7 @@ class NodeCreateToStatementEventListenerTest extends ProphesizeTestCase
         $this->assertCount(1, $loggerHandler->getRecords());
         $logMessage = $loggerHandler->getRecords()[0];
         $this->assertSame('Acting on ActionCypherElementToStatementEvent: Created node-create-statement and stopped propagation.', $logMessage->message);
-        $this->assertArrayHasKey('elementClass', $logMessage->context);
+        $this->assertArrayHasKey('element', $logMessage->context);
         $this->assertArrayHasKey('statement', $logMessage->context);
     }
 
