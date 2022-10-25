@@ -14,4 +14,6 @@ interface SimilarRelationQueueInterface extends Iterator
     public function dequeue(): ?RelationInterface;
 
     public function supports(RelationInterface $relation): bool;
+
+    public function count(): int;
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Syndesi\CypherEntityManager\Tests\FeatureTest;
 
-use Laudis\Neo4j\Databags\Statement;
 use Syndesi\CypherDataStructures\Type\Node;
 use Syndesi\CypherDataStructures\Type\NodeLabel;
 use Syndesi\CypherDataStructures\Type\PropertyName;
@@ -24,31 +23,19 @@ class NodeFeatureTest extends FeatureTestCase
             ->addIdentifier(new PropertyName('identifier'));
 
         $em = $this->container->get(EntityManager::class);
-        $this->assertSame(
-            0,
-            $em->getClient()->runStatement(Statement::create("MATCH (n) RETURN count(n)"))->get(0)->get('count(n)')
-        );
+        $this->assertNodeCount(0);
         $em->create($nodeC);
         $em->flush();
-        $this->assertSame(
-            1,
-            $em->getClient()->runStatement(Statement::create("MATCH (n) RETURN count(n)"))->get(0)->get('count(n)')
-        );
+        $this->assertNodeCount(1);
 
         $nodeC->addProperty(new PropertyName('changed'), 'hello world update :D');
 
         $em->merge($nodeC);
         $em->flush();
-        $this->assertSame(
-            1,
-            $em->getClient()->runStatement(Statement::create("MATCH (n) RETURN count(n)"))->get(0)->get('count(n)')
-        );
+        $this->assertNodeCount(1);
 
         $em->delete($nodeC);
         $em->flush();
-        $this->assertSame(
-            0,
-            $em->getClient()->runStatement(Statement::create("MATCH (n) RETURN count(n)"))->get(0)->get('count(n)')
-        );
+        $this->assertNodeCount(0);
     }
 }

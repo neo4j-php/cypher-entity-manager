@@ -14,4 +14,6 @@ interface SimilarNodeQueueInterface extends Iterator
     public function dequeue(): ?NodeInterface;
 
     public function supports(NodeInterface $node): bool;
+
+    public function count(): int;
 }

@@ -17,6 +17,7 @@ use Selective\Container\Resolver\ConstructorResolver;
 use Syndesi\CypherEntityManager\EventListener\NodeCreateToStatementEventListener;
 use Syndesi\CypherEntityManager\EventListener\NodeDeleteToStatementEventListener;
 use Syndesi\CypherEntityManager\EventListener\NodeMergeToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\SimilarNodeQueueCreateToStatementEventListener;
 
 class ContainerTestCase extends ProphesizeTestCase
 {
@@ -42,6 +43,7 @@ class ContainerTestCase extends ProphesizeTestCase
         $listenerProvider->addSubscriber(NodeCreateToStatementEventListener::class, NodeCreateToStatementEventListener::class);
         $listenerProvider->addSubscriber(NodeMergeToStatementEventListener::class, NodeMergeToStatementEventListener::class);
         $listenerProvider->addSubscriber(NodeDeleteToStatementEventListener::class, NodeDeleteToStatementEventListener::class);
+        $listenerProvider->addSubscriber(SimilarNodeQueueCreateToStatementEventListener::class, SimilarNodeQueueCreateToStatementEventListener::class);
         $this->container->set(ListenerProviderInterface::class, $listenerProvider);
         $this->container->set(EventDispatcherInterface::class, new Dispatcher(
             $this->container->get(ListenerProviderInterface::class),

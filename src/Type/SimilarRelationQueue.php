@@ -69,4 +69,9 @@ class SimilarRelationQueue implements SimilarRelationQueueInterface
     {
         return $this->relationStructure === StructureHelper::getRelationStructure($relation);
     }
+
+    public function count(): int
+    {
+        return $this->queue->count();
+    }
 }

@@ -65,6 +65,11 @@ class SimilarNodeQueue implements SimilarNodeQueueInterface
         return $this->queue->dequeue();
     }
 
+    public function count(): int
+    {
+        return $this->queue->count();
+    }
+
     public function supports(NodeInterface $node): bool
     {
         return $this->nodeStructure === StructureHelper::getNodeStructure($node);
