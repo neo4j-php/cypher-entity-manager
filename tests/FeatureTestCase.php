@@ -16,17 +16,17 @@ class FeatureTestCase extends ContainerTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $client = ClientBuilder::create()
-            ->withDriver('bolt', 'bolt://neo4j:password@neo4j')
-            ->build();
-        $client->runStatement(Statement::create("MATCH (n) DETACH DELETE n"));
-        $this->container->set(ClientInterface::class, $client);
         if (!getenv('ENABLE_FEATURE_TEST')) {
             $this->markTestSkipped();
         }
         if (false !== getenv("LEAK")) {
             $this->markTestSkipped();
         }
+        $client = ClientBuilder::create()
+            ->withDriver('bolt', 'bolt://neo4j:password@neo4j')
+            ->build();
+        $client->runStatement(Statement::create("MATCH (n) DETACH DELETE n"));
+        $this->container->set(ClientInterface::class, $client);
     }
 
     protected function tearDown(): void
