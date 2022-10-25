@@ -14,11 +14,12 @@ jobs:
             fail-fast: false
             matrix:
                 php-version: ['8.1']
+                neo4j-version: ['4.2', '4.3', '4.4', '5.0', '5.1']
         env:
             ENABLE_FEATURE_TEST: true
         services:
             neo4j:
-                image: neo4j
+                image: neo4j:${{ matrix.neo4j-version }}
                 env:
                     NEO4J_AUTH: neo4j/password
                 ports:
