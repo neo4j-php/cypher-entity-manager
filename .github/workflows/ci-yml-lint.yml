@@ -9,8 +9,6 @@ jobs:
     yml-lint:
         runs-on: ubuntu-latest
         name: "YML lint"
-        strategy:
-            fail-fast: false
         steps:
             - uses: actions/checkout@v2
             - run: docker pull cytopia/yamllint

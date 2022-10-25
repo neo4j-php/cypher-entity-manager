@@ -21,7 +21,10 @@ class FeatureTestCase extends ContainerTestCase
             ->build();
         $client->runStatement(Statement::create("MATCH (n) DETACH DELETE n"));
         $this->container->set(ClientInterface::class, $client);
-        if (false !== getenv("LEAK") || false !== getenv("NO_FEATURE_TEST")) {
+        if (!getenv('ENABLE_FEATURE_TEST')) {
+            $this->markTestSkipped();
+        }
+        if (false !== getenv("LEAK")) {
             $this->markTestSkipped();
         }
     }

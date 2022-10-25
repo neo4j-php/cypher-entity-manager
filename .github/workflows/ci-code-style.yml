@@ -9,8 +9,6 @@ jobs:
     code-style:
         runs-on: ubuntu-latest
         name: "Check code style"
-        strategy:
-            fail-fast: false
         steps:
             - uses: actions/checkout@v2
             - name: Cache Composer dependencies

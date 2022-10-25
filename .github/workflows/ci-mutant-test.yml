@@ -9,8 +9,6 @@ jobs:
     tests:
         runs-on: ubuntu-latest
         name: "Running mutant tests for PHP 8.1"
-        env:
-            NO_FEATURE_TEST: true
         steps:
             - uses: actions/checkout@v2
             - name: Cache Composer dependencies

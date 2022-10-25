@@ -82,6 +82,9 @@ class SimilarNodeQueueTest extends TestCase
 
     public function testInvalidQueue(): void
     {
+        if (false !== getenv("LEAK")) {
+            $this->markTestSkipped();
+        }
         $nodeA = new Node();
         $nodeA
             ->addNodeLabel(new NodeLabel('NodeA'))
