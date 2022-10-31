@@ -8,7 +8,7 @@ on:
 jobs:
     tests:
         runs-on: ubuntu-latest
-        name: "Running unit tests for PHP ${{ matrix.php-version }}"
+        name: "Unit tests for PHP ${{ matrix.php-version }} & Neo4j ${{ matrix.neo4j-version }}"
         container: ubuntu
         strategy:
             fail-fast: false
