@@ -63,6 +63,14 @@ class FeatureTestCase extends ContainerTestCase
         $this->assertSame($expectedCount, $count, "Node count does not match.");
     }
 
+    public function assertRelationCount(int $expectedCount): void
+    {
+        $em = $this->container->get(EntityManager::class);
+        $client = $em->getClient();
+        $count = $client->runStatement(Statement::create("MATCH ()-[r]-() RETURN count(DISTINCT r)"))->get(0)->get('count(DISTINCT r)');
+        $this->assertSame($expectedCount, $count, "Relation count does not match.");
+    }
+
     public function assertIndexExist(string $name): void
     {
         $em = $this->container->get(EntityManager::class);

@@ -3,7 +3,6 @@
 ## Functions
 
 - Create listeners for `ActionCypherElementToStatementEvent`:
-  - Relation: Create, Merge, Delete
   - SimilarRelationQueue: Create, Merge, Delete
 - Create framework bridges:
   - Symfony
@@ -15,3 +14,7 @@
 
 - Add trigger/notification for newly released Neo4j versions?
 - Test with PHP 8.2 once it is released
+
+## Possible bugs
+
+- merge relations with no properties beside identifiers: does it work?

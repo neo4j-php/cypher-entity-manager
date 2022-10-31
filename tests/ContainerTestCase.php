@@ -21,6 +21,9 @@ use Syndesi\CypherEntityManager\EventListener\IndexDeleteToStatementEventListene
 use Syndesi\CypherEntityManager\EventListener\NodeCreateToStatementEventListener;
 use Syndesi\CypherEntityManager\EventListener\NodeDeleteToStatementEventListener;
 use Syndesi\CypherEntityManager\EventListener\NodeMergeToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\RelationCreateToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\RelationDeleteToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\RelationMergeToStatementEventListener;
 use Syndesi\CypherEntityManager\EventListener\SimilarNodeQueueCreateToStatementEventListener;
 use Syndesi\CypherEntityManager\EventListener\SimilarNodeQueueDeleteToStatementEventListener;
 use Syndesi\CypherEntityManager\EventListener\SimilarNodeQueueMergeToStatementEventListener;
@@ -52,6 +55,9 @@ class ContainerTestCase extends ProphesizeTestCase
         $listenerProvider->addSubscriber(SimilarNodeQueueCreateToStatementEventListener::class, SimilarNodeQueueCreateToStatementEventListener::class);
         $listenerProvider->addSubscriber(SimilarNodeQueueMergeToStatementEventListener::class, SimilarNodeQueueMergeToStatementEventListener::class);
         $listenerProvider->addSubscriber(SimilarNodeQueueDeleteToStatementEventListener::class, SimilarNodeQueueDeleteToStatementEventListener::class);
+        $listenerProvider->addSubscriber(RelationCreateToStatementEventListener::class, RelationCreateToStatementEventListener::class);
+        $listenerProvider->addSubscriber(RelationMergeToStatementEventListener::class, RelationMergeToStatementEventListener::class);
+        $listenerProvider->addSubscriber(RelationDeleteToStatementEventListener::class, RelationDeleteToStatementEventListener::class);
         $listenerProvider->addSubscriber(IndexCreateToStatementEventListener::class, IndexCreateToStatementEventListener::class);
         $listenerProvider->addSubscriber(IndexDeleteToStatementEventListener::class, IndexDeleteToStatementEventListener::class);
         $listenerProvider->addSubscriber(ConstraintCreateToStatementEventListener::class, ConstraintCreateToStatementEventListener::class);
