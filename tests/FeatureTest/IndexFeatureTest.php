@@ -17,20 +17,28 @@ class IndexFeatureTest extends FeatureTestCase
 {
     public function testIndex(): void
     {
+        // use BTREE for Neo4j 4.x and RANGE for Neo4j 5.x
+        $defaultIndex = IndexType::BTREE;
+        if (false !== getenv("NEO4J_VERSION")) {
+            if (str_starts_with('5.', getenv("NEO4J_VERSION"))) {
+                $defaultIndex = IndexType::RANGE;
+            }
+        }
+
         $nodeIndexA = (new Index())
             ->setFor(new NodeLabel('NodeA'))
-            ->setIndexType(IndexType::BTREE)
+            ->setIndexType($defaultIndex)
             ->setIndexName(new IndexName('index_node_a'))
             ->addProperty(new PropertyName('id'));
         $nodeIndexB = (new Index())
             ->setFor(new NodeLabel('NodeB'))
-            ->setIndexType(IndexType::BTREE)
+            ->setIndexType($defaultIndex)
             ->setIndexName(new IndexName('index_node_b'))
             ->addProperty(new PropertyName('id'))
             ->addProperty(new PropertyName('composite'));
         $relationIndex = (new Index())
             ->setFor(new RelationType('RELATION'))
-            ->setIndexType(IndexType::BTREE)
+            ->setIndexType($defaultIndex)
             ->setIndexName(new IndexName('index_relation'))
             ->addProperty(new PropertyName('id'));
 
