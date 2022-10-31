@@ -28,11 +28,24 @@ class FeatureTestCase extends ContainerTestCase
             ->build();
         $client->runStatement(Statement::create("MATCH (n) DETACH DELETE n"));
         $this->container->set(ClientInterface::class, $client);
+        $this->deleteAllIndexes();
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
+    }
+
+    protected function deleteAllIndexes(): void
+    {
+        $client = $this->container->get(ClientInterface::class);
+        $indexes = $client->runStatement(Statement::create("SHOW INDEXES"));
+        foreach ($indexes->toArray() as $index) {
+            $client->runStatement(Statement::create(sprintf(
+                "DROP INDEX %s IF EXISTS",
+                $index['name']
+            )));
+        }
     }
 
     public function assertNodeCount(int $expectedCount): void
@@ -41,5 +54,29 @@ class FeatureTestCase extends ContainerTestCase
         $client = $em->getClient();
         $count = $client->runStatement(Statement::create("MATCH (n) RETURN count(n)"))->get(0)->get('count(n)');
         $this->assertSame($expectedCount, $count, "Node count does not match.");
+    }
+
+    public function assertIndexExist(string $name): void
+    {
+        // SHOW INDEXES WHERE name = "parent_node_id"
+        $em = $this->container->get(EntityManager::class);
+        $client = $em->getClient();
+        $count = $client->runStatement(Statement::create(sprintf(
+            "SHOW INDEXES WHERE name = \"%s\"",
+            $name
+        )))->count();
+        $this->assertSame(1, $count, sprintf("Index with name %s does not exist", $name));
+    }
+
+    public function assertIndexDoesNotExist(string $name): void
+    {
+        // SHOW INDEXES WHERE name = "parent_node_id"
+        $em = $this->container->get(EntityManager::class);
+        $client = $em->getClient();
+        $count = $client->runStatement(Statement::create(sprintf(
+            "SHOW INDEXES WHERE name = \"%s\"",
+            $name
+        )))->count();
+        $this->assertSame(0, $count, sprintf("Index with name %s exists but is expected to be missing", $name));
     }
 }

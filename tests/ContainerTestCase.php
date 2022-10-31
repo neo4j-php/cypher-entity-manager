@@ -14,6 +14,8 @@ use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Log\LoggerInterface;
 use Selective\Container\Container;
 use Selective\Container\Resolver\ConstructorResolver;
+use Syndesi\CypherEntityManager\EventListener\IndexCreateToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\IndexDeleteToStatementEventListener;
 use Syndesi\CypherEntityManager\EventListener\NodeCreateToStatementEventListener;
 use Syndesi\CypherEntityManager\EventListener\NodeDeleteToStatementEventListener;
 use Syndesi\CypherEntityManager\EventListener\NodeMergeToStatementEventListener;
@@ -48,6 +50,8 @@ class ContainerTestCase extends ProphesizeTestCase
         $listenerProvider->addSubscriber(SimilarNodeQueueCreateToStatementEventListener::class, SimilarNodeQueueCreateToStatementEventListener::class);
         $listenerProvider->addSubscriber(SimilarNodeQueueMergeToStatementEventListener::class, SimilarNodeQueueMergeToStatementEventListener::class);
         $listenerProvider->addSubscriber(SimilarNodeQueueDeleteToStatementEventListener::class, SimilarNodeQueueDeleteToStatementEventListener::class);
+        $listenerProvider->addSubscriber(IndexCreateToStatementEventListener::class, IndexCreateToStatementEventListener::class);
+        $listenerProvider->addSubscriber(IndexDeleteToStatementEventListener::class, IndexDeleteToStatementEventListener::class);
         $this->container->set(ListenerProviderInterface::class, $listenerProvider);
         $this->container->set(EventDispatcherInterface::class, new Dispatcher(
             $this->container->get(ListenerProviderInterface::class),
