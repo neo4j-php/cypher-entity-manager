@@ -11,13 +11,13 @@ use Syndesi\CypherDataStructures\Type\Node;
 use Syndesi\CypherDataStructures\Type\NodeLabel;
 use Syndesi\CypherDataStructures\Type\PropertyName;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
-use Syndesi\CypherEntityManager\EventListener\SimilarNodeQueueCreateToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\SimilarNodeQueueMergeToStatementEventListener;
 use Syndesi\CypherEntityManager\Tests\ProphesizeTestCase;
 use Syndesi\CypherEntityManager\Type\ActionCypherElement;
 use Syndesi\CypherEntityManager\Type\ActionType;
 use Syndesi\CypherEntityManager\Type\SimilarNodeQueue;
 
-class SimilarNodeQueueCreateToStatementEventListenerTest extends ProphesizeTestCase
+class SimilarNodeQueueMergeToStatementEventListenerTest extends ProphesizeTestCase
 {
     public function testOnActionCypherElementToStatementEvent(): void
     {
@@ -47,20 +47,20 @@ class SimilarNodeQueueCreateToStatementEventListenerTest extends ProphesizeTestC
             ->enqueue($nodeB)
             ->enqueue($nodeC);
 
-        $actionCypherElement = new ActionCypherElement(ActionType::CREATE, $similarNodeQueue);
+        $actionCypherElement = new ActionCypherElement(ActionType::MERGE, $similarNodeQueue);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
         $loggerHandler = new TestHandler();
         $logger = (new Logger('logger'))
             ->pushHandler($loggerHandler);
 
-        $eventListener = new SimilarNodeQueueCreateToStatementEventListener($logger);
+        $eventListener = new SimilarNodeQueueMergeToStatementEventListener($logger);
         $eventListener->onActionCypherElementToStatementEvent($event);
 
         $this->assertTrue($event->isPropagationStopped());
         $this->assertInstanceOf(Statement::class, $event->getStatement());
         $this->assertCount(1, $loggerHandler->getRecords());
         $logMessage = $loggerHandler->getRecords()[0];
-        $this->assertSame('Acting on ActionCypherElementToStatementEvent: Created similar-node-queue-create-statement and stopped propagation.', $logMessage->message);
+        $this->assertSame('Acting on ActionCypherElementToStatementEvent: Created similar-node-queue-merge-statement and stopped propagation.', $logMessage->message);
         $this->assertArrayHasKey('element', $logMessage->context);
         $this->assertArrayHasKey('statement', $logMessage->context);
     }
@@ -93,12 +93,15 @@ class SimilarNodeQueueCreateToStatementEventListenerTest extends ProphesizeTestC
             ->enqueue($nodeB)
             ->enqueue($nodeC);
 
-        $statement = SimilarNodeQueueCreateToStatementEventListener::similarNodeQueueStatement($similarNodeQueue);
+        $statement = SimilarNodeQueueMergeToStatementEventListener::similarNodeQueueStatement($similarNodeQueue);
 
         $this->assertSame(
             "UNWIND \$batch as row\n".
-            "CREATE (n:Node {identifier: row.identifier.identifier})\n".
-            "SET n += row.property",
+            "MERGE (n:Node {identifier: row.identifier.identifier})\n".
+            "ON CREATE\n".
+            "  SET n += row.property\n".
+            "ON MATCH\n".
+            "  SET n += row.property",
             $statement->getText()
         );
         $this->assertCount(1, $statement->getParameters());

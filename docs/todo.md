@@ -16,6 +16,5 @@
 
 ## Other
 
-- Test with Neo4j `5.0` and `5.1`
 - Add trigger/notification for newly released Neo4j versions?
 - Test with PHP 8.2 once it is released

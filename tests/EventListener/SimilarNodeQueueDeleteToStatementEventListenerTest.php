@@ -11,13 +11,13 @@ use Syndesi\CypherDataStructures\Type\Node;
 use Syndesi\CypherDataStructures\Type\NodeLabel;
 use Syndesi\CypherDataStructures\Type\PropertyName;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
-use Syndesi\CypherEntityManager\EventListener\SimilarNodeQueueCreateToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\SimilarNodeQueueDeleteToStatementEventListener;
 use Syndesi\CypherEntityManager\Tests\ProphesizeTestCase;
 use Syndesi\CypherEntityManager\Type\ActionCypherElement;
 use Syndesi\CypherEntityManager\Type\ActionType;
 use Syndesi\CypherEntityManager\Type\SimilarNodeQueue;
 
-class SimilarNodeQueueCreateToStatementEventListenerTest extends ProphesizeTestCase
+class SimilarNodeQueueDeleteToStatementEventListenerTest extends ProphesizeTestCase
 {
     public function testOnActionCypherElementToStatementEvent(): void
     {
@@ -47,20 +47,20 @@ class SimilarNodeQueueCreateToStatementEventListenerTest extends ProphesizeTestC
             ->enqueue($nodeB)
             ->enqueue($nodeC);
 
-        $actionCypherElement = new ActionCypherElement(ActionType::CREATE, $similarNodeQueue);
+        $actionCypherElement = new ActionCypherElement(ActionType::DELETE, $similarNodeQueue);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
         $loggerHandler = new TestHandler();
         $logger = (new Logger('logger'))
             ->pushHandler($loggerHandler);
 
-        $eventListener = new SimilarNodeQueueCreateToStatementEventListener($logger);
+        $eventListener = new SimilarNodeQueueDeleteToStatementEventListener($logger);
         $eventListener->onActionCypherElementToStatementEvent($event);
 
         $this->assertTrue($event->isPropagationStopped());
         $this->assertInstanceOf(Statement::class, $event->getStatement());
         $this->assertCount(1, $loggerHandler->getRecords());
         $logMessage = $loggerHandler->getRecords()[0];
-        $this->assertSame('Acting on ActionCypherElementToStatementEvent: Created similar-node-queue-create-statement and stopped propagation.', $logMessage->message);
+        $this->assertSame('Acting on ActionCypherElementToStatementEvent: Created similar-node-queue-delete-statement and stopped propagation.', $logMessage->message);
         $this->assertArrayHasKey('element', $logMessage->context);
         $this->assertArrayHasKey('statement', $logMessage->context);
     }
@@ -93,15 +93,15 @@ class SimilarNodeQueueCreateToStatementEventListenerTest extends ProphesizeTestC
             ->enqueue($nodeB)
             ->enqueue($nodeC);
 
-        $statement = SimilarNodeQueueCreateToStatementEventListener::similarNodeQueueStatement($similarNodeQueue);
+        $statement = SimilarNodeQueueDeleteToStatementEventListener::similarNodeQueueStatement($similarNodeQueue);
 
         $this->assertSame(
             "UNWIND \$batch as row\n".
-            "CREATE (n:Node {identifier: row.identifier.identifier})\n".
-            "SET n += row.property",
+            "MATCH (n:Node {identifier: row.identifier})\n".
+            "DETACH DELETE n",
             $statement->getText()
         );
         $this->assertCount(1, $statement->getParameters());
-        $this->assertSame(1001, $statement->getParameters()['batch'][0]['identifier']['identifier']);
+        $this->assertSame(1001, $statement->getParameters()['batch'][0]['identifier']);
     }
 }

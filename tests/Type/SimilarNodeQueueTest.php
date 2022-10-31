@@ -45,6 +45,7 @@ class SimilarNodeQueueTest extends TestCase
         $this->assertCount(3, $queue);
         $queue->enqueue($nodeC);
         $this->assertCount(4, $queue);
+        $this->assertSame(4, $queue->count());
     }
 
     public function testIterator(): void
