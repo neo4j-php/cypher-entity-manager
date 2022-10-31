@@ -18,6 +18,8 @@ use Syndesi\CypherEntityManager\EventListener\NodeCreateToStatementEventListener
 use Syndesi\CypherEntityManager\EventListener\NodeDeleteToStatementEventListener;
 use Syndesi\CypherEntityManager\EventListener\NodeMergeToStatementEventListener;
 use Syndesi\CypherEntityManager\EventListener\SimilarNodeQueueCreateToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\SimilarNodeQueueDeleteToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\SimilarNodeQueueMergeToStatementEventListener;
 
 class ContainerTestCase extends ProphesizeTestCase
 {
@@ -44,6 +46,8 @@ class ContainerTestCase extends ProphesizeTestCase
         $listenerProvider->addSubscriber(NodeMergeToStatementEventListener::class, NodeMergeToStatementEventListener::class);
         $listenerProvider->addSubscriber(NodeDeleteToStatementEventListener::class, NodeDeleteToStatementEventListener::class);
         $listenerProvider->addSubscriber(SimilarNodeQueueCreateToStatementEventListener::class, SimilarNodeQueueCreateToStatementEventListener::class);
+        $listenerProvider->addSubscriber(SimilarNodeQueueMergeToStatementEventListener::class, SimilarNodeQueueMergeToStatementEventListener::class);
+        $listenerProvider->addSubscriber(SimilarNodeQueueDeleteToStatementEventListener::class, SimilarNodeQueueDeleteToStatementEventListener::class);
         $this->container->set(ListenerProviderInterface::class, $listenerProvider);
         $this->container->set(EventDispatcherInterface::class, new Dispatcher(
             $this->container->get(ListenerProviderInterface::class),

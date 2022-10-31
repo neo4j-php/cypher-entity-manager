@@ -13,13 +13,11 @@ use Syndesi\CypherEntityManager\Helper\StructureHelper;
 class SimilarNodeQueue implements SimilarNodeQueueInterface
 {
     private SplQueue $queue;
-    private string $nodeStructure;
+    private ?string $nodeStructure = null;
 
-    public function __construct(NodeInterface $element)
+    public function __construct()
     {
         $this->queue = new SplQueue();
-        $this->nodeStructure = StructureHelper::getNodeStructure($element);
-        $this->queue->enqueue($element);
     }
 
     public function current(): mixed
@@ -52,6 +50,9 @@ class SimilarNodeQueue implements SimilarNodeQueueInterface
      */
     public function enqueue(NodeInterface $node): SimilarNodeQueueInterface
     {
+        if (!$this->nodeStructure) {
+            $this->nodeStructure = StructureHelper::getNodeStructure($node);
+        }
         if (!$this->supports($node)) {
             throw InvalidArgumentException::createForNotSimilar(NodeInterface::class, $this->nodeStructure, StructureHelper::getNodeStructure($node));
         }
@@ -72,6 +73,10 @@ class SimilarNodeQueue implements SimilarNodeQueueInterface
 
     public function supports(NodeInterface $node): bool
     {
+        if (!$this->nodeStructure) {
+            return true;
+        }
+
         return $this->nodeStructure === StructureHelper::getNodeStructure($node);
     }
 }

@@ -34,7 +34,9 @@ class SimilarNodeQueueTest extends TestCase
             ->addProperty(new PropertyName('id'), 3)
             ->addIdentifier(new PropertyName('id'))
             ->addProperty(new PropertyName('name'), 'C');
-        $queue = new SimilarNodeQueue($nodeA);
+        $queue = new SimilarNodeQueue();
+        $this->assertCount(0, $queue);
+        $queue->enqueue($nodeA);
         $this->assertCount(1, $queue);
         $element = $queue->dequeue();
         $this->assertInstanceOf(NodeInterface::class, $element);
@@ -68,7 +70,8 @@ class SimilarNodeQueueTest extends TestCase
             ->addProperty(new PropertyName('id'), 3)
             ->addIdentifier(new PropertyName('id'))
             ->addProperty(new PropertyName('name'), 'C');
-        $queue = new SimilarNodeQueue($nodeA);
+        $queue = new SimilarNodeQueue();
+        $queue->enqueue($nodeA);
         $queue->enqueue($nodeB);
         $queue->enqueue($nodeC);
 
@@ -98,7 +101,12 @@ class SimilarNodeQueueTest extends TestCase
             ->addProperty(new PropertyName('id'), 2)
             ->addIdentifier(new PropertyName('id'))
             ->addProperty(new PropertyName('name'), 'B');
-        $queue = new SimilarNodeQueue($nodeA);
+        $queue = new SimilarNodeQueue();
+        $this->assertTrue($queue->supports($nodeA));
+        $this->assertTrue($queue->supports($nodeB));
+        $queue->enqueue($nodeA);
+        $this->assertTrue($queue->supports($nodeA));
+        $this->assertFalse($queue->supports($nodeB));
         $this->expectExceptionMessage("Expected type 'Syndesi\CypherDataStructures\Contract\NodeInterface' with similar structure of '(:NodeA id)', got '(:NodeB id)'");
         $this->expectException(InvalidArgumentException::class);
         $queue->enqueue($nodeB);

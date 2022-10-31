@@ -7,9 +7,11 @@ namespace Syndesi\CypherEntityManager\Tests\Helper\Statement;
 use Laudis\Neo4j\Databags\Statement;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Syndesi\CypherDataStructures\Type\Node;
 use Syndesi\CypherDataStructures\Type\NodeLabel;
 use Syndesi\CypherDataStructures\Type\PropertyName;
+use Syndesi\CypherDataStructures\Type\Relation;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
 use Syndesi\CypherEntityManager\EventListener\SimilarNodeQueueCreateToStatementEventListener;
 use Syndesi\CypherEntityManager\Tests\ProphesizeTestCase;
@@ -42,8 +44,8 @@ class SimilarNodeQueueCreateToStatementEventListenerTest extends ProphesizeTestC
             ->addProperty(new PropertyName('name'), 'c')
             ->addIdentifier(new PropertyName('identifier'));
 
-        $similarNodeQueue = new SimilarNodeQueue($nodeA);
-        $similarNodeQueue
+        $similarNodeQueue = (new SimilarNodeQueue())
+            ->enqueue($nodeA)
             ->enqueue($nodeB)
             ->enqueue($nodeC);
 
@@ -63,6 +65,53 @@ class SimilarNodeQueueCreateToStatementEventListenerTest extends ProphesizeTestC
         $this->assertSame('Acting on ActionCypherElementToStatementEvent: Created similar-node-queue-create-statement and stopped propagation.', $logMessage->message);
         $this->assertArrayHasKey('element', $logMessage->context);
         $this->assertArrayHasKey('statement', $logMessage->context);
+    }
+
+    public function testOnActionCypherElementToStatementEventWithWrongAction(): void
+    {
+        $node = new Node();
+        $node
+            ->addNodeLabel(new NodeLabel('Node'))
+            ->addProperty(new PropertyName('identifier'), 1001)
+            ->addIdentifier(new PropertyName('identifier'));
+
+        $similarNodeQueue = (new SimilarNodeQueue())
+            ->enqueue($node);
+
+        $actionCypherElement = new ActionCypherElement(ActionType::MERGE, $similarNodeQueue);
+        $event = new ActionCypherElementToStatementEvent($actionCypherElement);
+
+        $eventListener = new SimilarNodeQueueCreateToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
+        $eventListener->onActionCypherElementToStatementEvent($event);
+
+        $this->assertFalse($event->isPropagationStopped());
+        $this->assertNull($event->getStatement());
+    }
+
+    public function testOnActionCypherElementToStatementEventWithWrongType(): void
+    {
+        $relation = new Relation();
+        $actionCypherElement = new ActionCypherElement(ActionType::CREATE, $relation);
+        $event = new ActionCypherElementToStatementEvent($actionCypherElement);
+
+        $eventListener = new SimilarNodeQueueCreateToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
+        $eventListener->onActionCypherElementToStatementEvent($event);
+
+        $this->assertFalse($event->isPropagationStopped());
+        $this->assertNull($event->getStatement());
+    }
+
+    public function testOnActionCypherElementToStatementEventWithEmptyQueue(): void
+    {
+        $similarNodeQueue = new SimilarNodeQueue();
+        $actionCypherElement = new ActionCypherElement(ActionType::CREATE, $similarNodeQueue);
+        $event = new ActionCypherElementToStatementEvent($actionCypherElement);
+
+        $eventListener = new SimilarNodeQueueCreateToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
+        $eventListener->onActionCypherElementToStatementEvent($event);
+
+        $this->assertTrue($event->isPropagationStopped());
+        $this->assertSame('MATCH (n) LIMIT 0', $event->getStatement()->getText());
     }
 
     public function testNodeStatement(): void
@@ -88,8 +137,9 @@ class SimilarNodeQueueCreateToStatementEventListenerTest extends ProphesizeTestC
             ->addProperty(new PropertyName('name'), 'c')
             ->addIdentifier(new PropertyName('identifier'));
 
-        $similarNodeQueue = new SimilarNodeQueue($nodeA);
+        $similarNodeQueue = new SimilarNodeQueue();
         $similarNodeQueue
+            ->enqueue($nodeA)
             ->enqueue($nodeB)
             ->enqueue($nodeC);
 

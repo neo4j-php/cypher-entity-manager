@@ -13,13 +13,11 @@ use Syndesi\CypherEntityManager\Helper\StructureHelper;
 class SimilarRelationQueue implements SimilarRelationQueueInterface
 {
     private SplQueue $queue;
-    private string $relationStructure;
+    private ?string $relationStructure = null;
 
-    public function __construct(RelationInterface $element)
+    public function __construct()
     {
         $this->queue = new SplQueue();
-        $this->relationStructure = StructureHelper::getRelationStructure($element);
-        $this->queue->enqueue($element);
     }
 
     public function current(): mixed
@@ -52,6 +50,9 @@ class SimilarRelationQueue implements SimilarRelationQueueInterface
      */
     public function enqueue(RelationInterface $relation): SimilarRelationQueueInterface
     {
+        if (!$this->relationStructure) {
+            $this->relationStructure = StructureHelper::getRelationStructure($relation);
+        }
         if (!$this->supports($relation)) {
             throw InvalidArgumentException::createForNotSimilar(RelationInterface::class, $this->relationStructure, StructureHelper::getRelationStructure($relation));
         }
@@ -67,6 +68,10 @@ class SimilarRelationQueue implements SimilarRelationQueueInterface
 
     public function supports(RelationInterface $relation): bool
     {
+        if (!$this->relationStructure) {
+            return true;
+        }
+
         return $this->relationStructure === StructureHelper::getRelationStructure($relation);
     }
 

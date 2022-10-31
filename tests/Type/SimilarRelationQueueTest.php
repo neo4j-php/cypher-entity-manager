@@ -72,7 +72,9 @@ class SimilarRelationQueueTest extends TestCase
             ->addProperty(new PropertyName('id'), 9)
             ->addIdentifier(new PropertyName('id'));
 
-        $queue = new SimilarRelationQueue($relationA);
+        $queue = new SimilarRelationQueue();
+        $this->assertCount(0, $queue);
+        $queue->enqueue($relationA);
         $this->assertCount(1, $queue);
         $element = $queue->dequeue();
         $this->assertInstanceOf(RelationInterface::class, $element);
@@ -141,7 +143,8 @@ class SimilarRelationQueueTest extends TestCase
             ->setRelationType(new RelationType('RELATION'))
             ->addProperty(new PropertyName('id'), 9)
             ->addIdentifier(new PropertyName('id'));
-        $queue = new SimilarRelationQueue($relationA);
+        $queue = new SimilarRelationQueue();
+        $queue->enqueue($relationA);
         $queue->enqueue($relationB);
         $queue->enqueue($relationC);
 
@@ -195,7 +198,12 @@ class SimilarRelationQueueTest extends TestCase
             ->setRelationType(new RelationType('RELATION'))
             ->addProperty(new PropertyName('id'), 6)
             ->addIdentifier(new PropertyName('id'));
-        $queue = new SimilarRelationQueue($relationA);
+        $queue = new SimilarRelationQueue();
+        $this->assertTrue($queue->supports($relationA));
+        $this->assertTrue($queue->supports($relationB));
+        $queue->enqueue($relationA);
+        $this->assertTrue($queue->supports($relationA));
+        $this->assertFalse($queue->supports($relationB));
         $this->expectExceptionMessage("Expected type 'Syndesi\CypherDataStructures\Contract\RelationInterface' with similar structure of '(:StartNode id)-[RELATION id]->(:EndNode id)', got '(:OtherStartNode id)-[RELATION id]->(:EndNode id)'");
         $this->expectException(InvalidArgumentException::class);
         $queue->enqueue($relationB);

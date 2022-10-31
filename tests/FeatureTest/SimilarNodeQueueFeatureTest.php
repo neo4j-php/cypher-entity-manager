@@ -36,8 +36,8 @@ class SimilarNodeQueueFeatureTest extends FeatureTestCase
             ->addProperty(new PropertyName('name'), 'c')
             ->addIdentifier(new PropertyName('identifier'));
 
-        $similarNodeQueue = new SimilarNodeQueue($nodeA);
-        $similarNodeQueue
+        $similarNodeQueue = (new SimilarNodeQueue())
+            ->enqueue($nodeA)
             ->enqueue($nodeB)
             ->enqueue($nodeC);
 
@@ -46,5 +46,21 @@ class SimilarNodeQueueFeatureTest extends FeatureTestCase
         $em->create($similarNodeQueue);
         $em->flush();
         $this->assertNodeCount(3);
+
+        $nodeB = $nodeB
+            ->addProperty(new PropertyName('newProperty'), 'some value');
+
+        $newQueue = (new SimilarNodeQueue())
+            ->enqueue($nodeA)
+            ->enqueue($nodeB)
+            ->enqueue($nodeC);
+
+        $em->merge($newQueue);
+        $em->flush();
+        $this->assertNodeCount(3);
+
+        $em->delete($newQueue);
+        $em->flush();
+        $this->assertNodeCount(0);
     }
 }
