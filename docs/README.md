@@ -1,4 +1,5 @@
 [![GitHub](https://img.shields.io/github/license/Syndesi/cypher-entity-manager)](https://github.com/Syndesi/cypher-entity-manager/blob/main/LICENSE)
+![Neo4j Version Support](https://img.shields.io/badge/Neo4j-4.4%2B-blue)
 ![Packagist PHP Version Support (specify version)](https://img.shields.io/packagist/php-v/syndesi/cypher-entity-manager/dev-main)
 ![Packagist Version](https://img.shields.io/packagist/v/syndesi/cypher-entity-manager)
 ![Packagist Downloads](https://img.shields.io/packagist/dm/syndesi/cypher-entity-manager)
