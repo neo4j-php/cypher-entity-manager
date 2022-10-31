@@ -24,7 +24,7 @@ class IndexFeatureTest extends FeatureTestCase
                 $defaultIndex = IndexType::RANGE;
             }
         }
-        print_r($_ENV);
+        echo('"'.getenv('NEO4J_VERSION').'"');
 
         $nodeIndexA = (new Index())
             ->setFor(new NodeLabel('NodeA'))
