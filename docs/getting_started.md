@@ -3,7 +3,8 @@
 ## Requirements
 
 PHP: 8.1+ due to [enums](https://stitcher.io/blog/php-enums) and
-[readonly class properties](https://stitcher.io/blog/php-81-readonly-properties).
+[readonly class properties](https://stitcher.io/blog/php-81-readonly-properties).  
+Neo4j: 4.3 or newer, recommended versions are 4.4 and 5.x.
 
 ## Installation
 
