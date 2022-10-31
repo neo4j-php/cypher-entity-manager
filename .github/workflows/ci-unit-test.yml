@@ -41,3 +41,5 @@ jobs:
               shell: bash
             - run: composer test
               shell: bash
+            - run: cat ./tests/test.log
+              shell: bash
