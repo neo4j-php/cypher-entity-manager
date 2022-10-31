@@ -24,6 +24,7 @@ class IndexFeatureTest extends FeatureTestCase
                 $defaultIndex = IndexType::RANGE;
             }
         }
+        print_r($_ENV);
 
         $nodeIndexA = (new Index())
             ->setFor(new NodeLabel('NodeA'))
