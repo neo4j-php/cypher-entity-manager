@@ -6,16 +6,16 @@ namespace Syndesi\CypherEntityManager\EventListener;
 
 use Laudis\Neo4j\Databags\Statement;
 use Psr\Log\LoggerInterface;
-use Syndesi\CypherDataStructures\Contract\IndexInterface;
+use Syndesi\CypherDataStructures\Contract\ConstraintInterface;
 use Syndesi\CypherDataStructures\Contract\NodeLabelInterface;
 use Syndesi\CypherDataStructures\Contract\RelationTypeInterface;
-use Syndesi\CypherEntityManager\Contract\IndexStatementInterface;
+use Syndesi\CypherEntityManager\Contract\ConstraintStatementInterface;
 use Syndesi\CypherEntityManager\Contract\OnActionCypherElementToStatementEventListenerInterface;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
 use Syndesi\CypherEntityManager\Exception\InvalidArgumentException;
 use Syndesi\CypherEntityManager\Type\ActionType;
 
-class IndexCreateToStatementEventListener implements OnActionCypherElementToStatementEventListenerInterface, IndexStatementInterface
+class ConstraintCreateToStatementEventListener implements OnActionCypherElementToStatementEventListenerInterface, ConstraintStatementInterface
 {
     public function __construct(private LoggerInterface $logger)
     {
@@ -28,32 +28,29 @@ class IndexCreateToStatementEventListener implements OnActionCypherElementToStat
         if (ActionType::CREATE !== $action) {
             return;
         }
-        if (!($element instanceof IndexInterface)) {
+        if (!($element instanceof ConstraintInterface)) {
             return;
         }
 
-        $statement = self::indexStatement($element);
+        $statement = self::constraintStatement($element);
         $event->setStatement($statement);
         $event->stopPropagation();
-        $this->logger->debug("Acting on ActionCypherElementToStatementEvent: Created index-create-statement and stopped propagation.", [
+        $this->logger->debug("Acting on ActionCypherElementToStatementEvent: Created constraint-create-statement and stopped propagation.", [
             'element' => $element,
             'statement' => $statement,
         ]);
     }
 
-    public static function indexStatement(IndexInterface $index): Statement
+    public static function constraintStatement(ConstraintInterface $constraint): Statement
     {
-        $elementIdentifier = '';
-        $propertyIdentifier = '';
-
-        $indexType = $index->getIndexType();
-        if (null === $indexType) {
-            throw new InvalidArgumentException('index type can not be null when creating an index');
+        $constraintName = $constraint->getConstraintName();
+        if (null === $constraintName) {
+            throw new InvalidArgumentException("constraint name can not be null");
         }
-
-        $elementLabel = $index->getFor();
+        $elementIdentifier = '';
+        $elementLabel = $constraint->getFor();
         if (null === $elementLabel) {
-            throw new InvalidArgumentException("index for label/type can not be null");
+            throw new InvalidArgumentException("constraint for label/type can not be null");
         }
         if ($elementLabel instanceof NodeLabelInterface) {
             $elementIdentifier = '(e:'.((string) $elementLabel).')';
@@ -61,18 +58,23 @@ class IndexCreateToStatementEventListener implements OnActionCypherElementToStat
         if ($elementLabel instanceof RelationTypeInterface) {
             $elementIdentifier = '()-[e:'.((string) $elementLabel).']-()';
         }
+        $propertyIdentifier = '';
         $properties = [];
-        foreach ($index->getProperties() as $propertyName) {
+        foreach ($constraint->getProperties() as $propertyName) {
             $properties[] = 'e.'.((string) $propertyName);
             $propertyIdentifier = '('.join(', ', $properties).')';
         }
+        $constraintType = $constraint->getConstraintType();
+        if (null === $constraintType) {
+            throw new InvalidArgumentException("constraint type can not be null");
+        }
 
         return new Statement(sprintf(
-            "CREATE %s INDEX %s IF NOT EXISTS FOR %s ON %s",
-            $indexType->value,
-            (string) $index->getIndexName(),
+            "CREATE CONSTRAINT %s FOR %s REQUIRE %s IS %s",
+            (string) $constraintName,
             $elementIdentifier,
-            $propertyIdentifier
+            $propertyIdentifier,
+            $constraintType->value
         ), []);
     }
 }

@@ -28,7 +28,7 @@ class FeatureTestCase extends ContainerTestCase
             ->build();
         $client->runStatement(Statement::create("MATCH (n) DETACH DELETE n"));
         $this->container->set(ClientInterface::class, $client);
-        $this->deleteAllIndexes();
+        $this->deleteAllConstraintsAndIndexes();
     }
 
     protected function tearDown(): void
@@ -36,9 +36,16 @@ class FeatureTestCase extends ContainerTestCase
         parent::tearDown();
     }
 
-    protected function deleteAllIndexes(): void
+    protected function deleteAllConstraintsAndIndexes(): void
     {
         $client = $this->container->get(ClientInterface::class);
+        $indexes = $client->runStatement(Statement::create("SHOW CONSTRAINTS"));
+        foreach ($indexes->toArray() as $index) {
+            $client->runStatement(Statement::create(sprintf(
+                "DROP CONSTRAINT %s IF EXISTS",
+                $index['name']
+            )));
+        }
         $indexes = $client->runStatement(Statement::create("SHOW INDEXES"));
         foreach ($indexes->toArray() as $index) {
             $client->runStatement(Statement::create(sprintf(
@@ -58,7 +65,6 @@ class FeatureTestCase extends ContainerTestCase
 
     public function assertIndexExist(string $name): void
     {
-        // SHOW INDEXES WHERE name = "parent_node_id"
         $em = $this->container->get(EntityManager::class);
         $client = $em->getClient();
         $count = $client->runStatement(Statement::create(sprintf(
@@ -70,7 +76,6 @@ class FeatureTestCase extends ContainerTestCase
 
     public function assertIndexDoesNotExist(string $name): void
     {
-        // SHOW INDEXES WHERE name = "parent_node_id"
         $em = $this->container->get(EntityManager::class);
         $client = $em->getClient();
         $count = $client->runStatement(Statement::create(sprintf(
@@ -78,5 +83,27 @@ class FeatureTestCase extends ContainerTestCase
             $name
         )))->count();
         $this->assertSame(0, $count, sprintf("Index with name %s exists but is expected to be missing", $name));
+    }
+
+    public function assertConstraintExist(string $name): void
+    {
+        $em = $this->container->get(EntityManager::class);
+        $client = $em->getClient();
+        $count = $client->runStatement(Statement::create(sprintf(
+            "SHOW CONSTRAINT WHERE name = \"%s\"",
+            $name
+        )))->count();
+        $this->assertSame(1, $count, sprintf("Constraint with name %s does not exist", $name));
+    }
+
+    public function assertConstraintDoesNotExist(string $name): void
+    {
+        $em = $this->container->get(EntityManager::class);
+        $client = $em->getClient();
+        $count = $client->runStatement(Statement::create(sprintf(
+            "SHOW CONSTRAINT WHERE name = \"%s\"",
+            $name
+        )))->count();
+        $this->assertSame(0, $count, sprintf("Constraint with name %s exists but is expected to be missing", $name));
     }
 }

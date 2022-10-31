@@ -110,4 +110,19 @@ class IndexCreateToStatementEventListenerTest extends ProphesizeTestCase
         $this->expectExceptionMessage('index type can not be null when creating an index');
         IndexCreateToStatementEventListener::indexStatement($nodeIndex);
     }
+
+    public function testInvalidIndexStatementWithEmptyElementLabel(): void
+    {
+        if (false !== getenv("LEAK")) {
+            $this->markTestSkipped();
+        }
+        $nodeIndex = (new Index())
+            ->setIndexType(IndexType::BTREE)
+            ->setIndexName(new IndexName('index'))
+            ->addProperty(new PropertyName('id'));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('index for label/type can not be null');
+        IndexCreateToStatementEventListener::indexStatement($nodeIndex);
+    }
 }

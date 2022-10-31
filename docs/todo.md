@@ -5,7 +5,6 @@
 - Create listeners for `ActionCypherElementToStatementEvent`:
   - Relation: Create, Merge, Delete
   - SimilarRelationQueue: Create, Merge, Delete
-  - Constraint: Create, Delete
 - Create framework bridges:
   - Symfony
   - Laravel
