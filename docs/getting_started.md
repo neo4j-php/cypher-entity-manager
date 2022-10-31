@@ -4,7 +4,13 @@
 
 PHP: 8.1+ due to [enums](https://stitcher.io/blog/php-enums) and
 [readonly class properties](https://stitcher.io/blog/php-81-readonly-properties).  
-Neo4j: 4.3 or newer, recommended versions are 4.4 and 5.x.
+Neo4j: 4.4, 5.1 or newer.
+
+!> Note: While this library technically works with older Neo4j versions supported by
+[laudis/neo4j-php-client](https://github.com/neo4j-php/neo4j-php-client), we don't guarantee that every feature works as
+expected.  
+It is known that indices are problematic at Neo4j <= 4.2 and constraints at Neo4j <= 4.3 due to different syntax and
+capabilities.
 
 ## Installation
 
