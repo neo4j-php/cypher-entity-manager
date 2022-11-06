@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Syndesi\CypherEntityManager\Helper;
 
+use Laudis\Neo4j\Databags\Statement;
 use Syndesi\CypherDataStructures\Contract\HasIdentifiersInterface;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
 use Syndesi\CypherDataStructures\Contract\PropertyNameInterface;
@@ -14,6 +15,11 @@ use Syndesi\CypherEntityManager\Exception\InvalidArgumentException;
 
 class StructureHelper
 {
+    public static function getEmptyStatement(): Statement
+    {
+        return Statement::create('MATCH (n) LIMIT 0');
+    }
+
     public static function identifierStorageToString(PropertyStorageInterface $identifiers): string
     {
         $internalIdentifiers = [];

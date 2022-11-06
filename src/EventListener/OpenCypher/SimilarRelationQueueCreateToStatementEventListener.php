@@ -71,8 +71,7 @@ class SimilarRelationQueueCreateToStatementEventListener implements OnActionCyph
             ];
         }
         if (!$firstRelation) {
-            // aka empty queue
-            return new Statement("MATCH (n) LIMIT 0", []);
+            return StructureHelper::getEmptyStatement();
         }
         if (!$firstRelationStartNode) {
             throw new InvalidArgumentException('start node of relations can not be null');

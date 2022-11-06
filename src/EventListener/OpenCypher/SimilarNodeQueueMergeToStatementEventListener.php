@@ -7,12 +7,12 @@ namespace Syndesi\CypherEntityManager\EventListener\OpenCypher;
 use Laudis\Neo4j\Databags\Statement;
 use Psr\Log\LoggerInterface;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
-use Syndesi\CypherDataStructures\Contract\PropertyNameInterface;
 use Syndesi\CypherDataStructures\Helper\ToCypherHelper;
 use Syndesi\CypherEntityManager\Contract\OnActionCypherElementToStatementEventListenerInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarNodeQueueInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarNodeQueueStatementInterface;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
+use Syndesi\CypherEntityManager\Helper\StructureHelper;
 use Syndesi\CypherEntityManager\Type\ActionType;
 
 class SimilarNodeQueueMergeToStatementEventListener implements OnActionCypherElementToStatementEventListenerInterface, SimilarNodeQueueStatementInterface
@@ -50,33 +50,13 @@ class SimilarNodeQueueMergeToStatementEventListener implements OnActionCypherEle
             if (!$firstNode) {
                 $firstNode = $node;
             }
-            $properties = [];
-            $identifiers = [];
-            /** @var PropertyNameInterface $property */
-            foreach ($node->getProperties() as $property) {
-                if ($node->hasIdentifier($property)) {
-                    $identifiers[$property->getPropertyName()] = $node->getIdentifier($property);
-                    continue;
-                }
-                $properties[$property->getPropertyName()] = $node->getProperty($property);
-            }
             $batch[] = [
-                'identifier' => $identifiers,
-                'property' => $properties,
+                'identifier' => StructureHelper::getIdentifiersFromElementAsArray($node),
+                'property' => StructureHelper::getPropertiesFromElementAsArray($node),
             ];
         }
         if (!$firstNode) {
-            // aka empty queue
-            return new Statement("MATCH (n) LIMIT 0", []);
-        }
-        $identifiers = [];
-        /** @var PropertyNameInterface $identifier */
-        foreach ($firstNode->getIdentifiers() as $identifier) {
-            $identifiers[] = sprintf(
-                "%s: row.identifier.%s",
-                $identifier->getPropertyName(),
-                $identifier->getPropertyName(),
-            );
+            return StructureHelper::getEmptyStatement();
         }
 
         return new Statement(
@@ -88,7 +68,7 @@ class SimilarNodeQueueMergeToStatementEventListener implements OnActionCypherEle
                 "ON MATCH\n".
                 "  SET n += row.property",
                 ToCypherHelper::nodeLabelStorageToCypherLabelString($firstNode->getNodeLabels()),
-                join(', ', $identifiers)
+                StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstNode, 'row.identifier')
             ),
             [
                 'batch' => $batch,
