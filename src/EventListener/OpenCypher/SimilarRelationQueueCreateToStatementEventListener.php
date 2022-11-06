@@ -64,10 +64,10 @@ class SimilarRelationQueueCreateToStatementEventListener implements OnActionCyph
                 $firstRelationEndNode = $endNode;
             }
             $batch[] = [
-                'startNodeIdentifier' => StructureHelper::getIdentifiersFromElementAsArray($startNode),
-                'endNodeIdentifier' => StructureHelper::getIdentifiersFromElementAsArray($endNode),
-                'relationIdentifier' => StructureHelper::getIdentifiersFromElementAsArray($relation),
-                'relationProperty' => StructureHelper::getPropertiesFromElementAsArray($relation),
+                'startNode' => StructureHelper::getIdentifiersFromElementAsArray($startNode),
+                'endNode' => StructureHelper::getIdentifiersFromElementAsArray($endNode),
+                'identifier' => StructureHelper::getIdentifiersFromElementAsArray($relation),
+                'property' => StructureHelper::getPropertiesFromElementAsArray($relation),
             ];
         }
         if (!$firstRelation) {
@@ -91,13 +91,13 @@ class SimilarRelationQueueCreateToStatementEventListener implements OnActionCyph
                 "  (startNode%s {%s}),\n".
                 "  (endNode%s {%s})\n".
                 "CREATE (startNode)-[relation:%s {%s}]->(endNode)\n".
-                "SET relation += row.relationProperty",
+                "SET relation += row.property",
                 ToCypherHelper::nodeLabelStorageToCypherLabelString($firstRelationStartNode->getNodeLabels()),
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelationStartNode, 'row.startNodeIdentifier'),
+                StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelationStartNode, 'row.startNode'),
                 ToCypherHelper::nodeLabelStorageToCypherLabelString($firstRelationEndNode->getNodeLabels()),
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelationEndNode, 'row.endNodeIdentifier'),
+                StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelationEndNode, 'row.endNode'),
                 (string) $relationType,
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelation, 'row.relationIdentifier')
+                StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelation, 'row.identifier')
             ),
             [
                 'batch' => $batch,
