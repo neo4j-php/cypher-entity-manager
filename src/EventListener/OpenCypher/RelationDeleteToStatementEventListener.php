@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Syndesi\CypherEntityManager\EventListener;
+namespace Syndesi\CypherEntityManager\EventListener\OpenCypher;
 
 use Laudis\Neo4j\Databags\Statement;
 use Psr\Log\LoggerInterface;
@@ -15,7 +15,7 @@ use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
 use Syndesi\CypherEntityManager\Exception\InvalidArgumentException;
 use Syndesi\CypherEntityManager\Type\ActionType;
 
-class RelationCreateToStatementEventListener implements OnActionCypherElementToStatementEventListenerInterface, RelationStatementInterface
+class RelationDeleteToStatementEventListener implements OnActionCypherElementToStatementEventListenerInterface, RelationStatementInterface
 {
     public function __construct(private LoggerInterface $logger)
     {
@@ -25,7 +25,7 @@ class RelationCreateToStatementEventListener implements OnActionCypherElementToS
     {
         $action = $event->getActionCypherElement()->getAction();
         $element = $event->getActionCypherElement()->getElement();
-        if (ActionType::CREATE !== $action) {
+        if (ActionType::DELETE !== $action) {
             return;
         }
         if (!($element instanceof RelationInterface)) {
@@ -35,7 +35,7 @@ class RelationCreateToStatementEventListener implements OnActionCypherElementToS
         $statement = self::relationStatement($element);
         $event->setStatement($statement);
         $event->stopPropagation();
-        $this->logger->debug("Acting on ActionCypherElementToStatementEvent: Created relation-create-statement and stopped propagation.", [
+        $this->logger->debug("Acting on ActionCypherElementToStatementEvent: Created relation-delete-statement and stopped propagation.", [
             'element' => $element,
             'statement' => $statement,
         ]);
@@ -50,7 +50,7 @@ class RelationCreateToStatementEventListener implements OnActionCypherElementToS
         $endNodePropertyString = [];
         $endNodePropertyValues = [];
         /** @var PropertyNameInterface $propertyName */
-        foreach ($relation->getProperties() as $propertyName) {
+        foreach ($relation->getIdentifiers() as $propertyName) {
             $relationPropertyString[] = sprintf(
                 "%s: \$relation.%s",
                 (string) $propertyName,
@@ -87,16 +87,14 @@ class RelationCreateToStatementEventListener implements OnActionCypherElementToS
 
         return new Statement(
             sprintf(
-                "MATCH\n".
-                "  (startNode%s {%s}),\n".
-                "  (endNode%s {%s})\n".
-                "CREATE (startNode)-[:%s {%s}]->(endNode)",
+                "MATCH (%s {%s})-[relation:%s {%s}]->(%s {%s})\n".
+                "DELETE relation",
                 ToCypherHelper::nodeLabelStorageToCypherLabelString($startNode->getNodeLabels()),
                 implode(', ', $startNodePropertyString),
+                (string) $relation->getRelationType(),
+                implode(', ', $relationPropertyString),
                 ToCypherHelper::nodeLabelStorageToCypherLabelString($endNode->getNodeLabels()),
                 implode(', ', $endNodePropertyString),
-                (string) $relation->getRelationType(),
-                implode(', ', $relationPropertyString)
             ),
             [
                 'relation' => $relationPropertyValues,

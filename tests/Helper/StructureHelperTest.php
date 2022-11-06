@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Syndesi\CypherEntityManager\Tests\Trait;
+namespace Syndesi\CypherEntityManager\Tests\Helper;
 
 use PHPUnit\Framework\TestCase;
 use Syndesi\CypherDataStructures\Type\Node;

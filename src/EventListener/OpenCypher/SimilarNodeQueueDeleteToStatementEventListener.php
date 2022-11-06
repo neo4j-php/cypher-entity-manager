@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Syndesi\CypherEntityManager\EventListener;
+namespace Syndesi\CypherEntityManager\EventListener\OpenCypher;
 
 use Laudis\Neo4j\Databags\Statement;
 use Psr\Log\LoggerInterface;

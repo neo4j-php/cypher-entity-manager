@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Syndesi\CypherEntityManager\EventListener;
+namespace Syndesi\CypherEntityManager\EventListener\OpenCypher;
 
 use Laudis\Neo4j\Databags\Statement;
 use Psr\Log\LoggerInterface;
@@ -15,7 +15,7 @@ use Syndesi\CypherEntityManager\Contract\SimilarNodeQueueStatementInterface;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
 use Syndesi\CypherEntityManager\Type\ActionType;
 
-class SimilarNodeQueueCreateToStatementEventListener implements OnActionCypherElementToStatementEventListenerInterface, SimilarNodeQueueStatementInterface
+class SimilarNodeQueueMergeToStatementEventListener implements OnActionCypherElementToStatementEventListenerInterface, SimilarNodeQueueStatementInterface
 {
     public function __construct(private LoggerInterface $logger)
     {
@@ -25,7 +25,7 @@ class SimilarNodeQueueCreateToStatementEventListener implements OnActionCypherEl
     {
         $action = $event->getActionCypherElement()->getAction();
         $element = $event->getActionCypherElement()->getElement();
-        if (ActionType::CREATE !== $action) {
+        if (ActionType::MERGE !== $action) {
             return;
         }
         if (!($element instanceof SimilarNodeQueueInterface)) {
@@ -35,7 +35,7 @@ class SimilarNodeQueueCreateToStatementEventListener implements OnActionCypherEl
         $statement = self::similarNodeQueueStatement($element);
         $event->setStatement($statement);
         $event->stopPropagation();
-        $this->logger->debug("Acting on ActionCypherElementToStatementEvent: Created similar-node-queue-create-statement and stopped propagation.", [
+        $this->logger->debug("Acting on ActionCypherElementToStatementEvent: Created similar-node-queue-merge-statement and stopped propagation.", [
             'element' => $element,
             'statement' => $statement,
         ]);
@@ -82,8 +82,11 @@ class SimilarNodeQueueCreateToStatementEventListener implements OnActionCypherEl
         return new Statement(
             sprintf(
                 "UNWIND \$batch as row\n".
-                "CREATE (n%s {%s})\n".
-                "SET n += row.property",
+                "MERGE (n%s {%s})\n".
+                "ON CREATE\n".
+                "  SET n += row.property\n".
+                "ON MATCH\n".
+                "  SET n += row.property",
                 ToCypherHelper::nodeLabelStorageToCypherLabelString($firstNode->getNodeLabels()),
                 join(', ', $identifiers)
             ),

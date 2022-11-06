@@ -52,7 +52,7 @@
         "vlucas/phpdotenv": "^5.5"
     },
     "scripts": {
-        "test": "export ENABLE_FEATURE_TEST_OLD=true && echo -n \"\" > ./tests/test.log && php vendor/phpunit/phpunit/phpunit",
+        "test": "export ENABLE_FEATURE_TEST=true && echo -n \"\" > ./tests/test.log && php vendor/phpunit/phpunit/phpunit",
         "test:coverage:xml": "export XDEBUG_MODE=coverage && php ./vendor/phpunit/phpunit/phpunit --coverage-clover coverage.xml",
         "test:coverage:html": "export XDEBUG_MODE=coverage && php ./vendor/phpunit/phpunit/phpunit --coverage-html ./tmp",
         "test:mutant": "export XDEBUG_MODE=coverage && php vendor/infection/infection/bin/infection --threads=4",

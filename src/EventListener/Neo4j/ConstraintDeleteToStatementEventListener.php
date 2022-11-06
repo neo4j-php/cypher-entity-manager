@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Syndesi\CypherEntityManager\EventListener;
+namespace Syndesi\CypherEntityManager\EventListener\Neo4j;
 
 use Laudis\Neo4j\Databags\Statement;
 use Psr\Log\LoggerInterface;
-use Syndesi\CypherDataStructures\Contract\IndexInterface;
-use Syndesi\CypherEntityManager\Contract\IndexStatementInterface;
+use Syndesi\CypherDataStructures\Contract\ConstraintInterface;
+use Syndesi\CypherEntityManager\Contract\ConstraintStatementInterface;
 use Syndesi\CypherEntityManager\Contract\OnActionCypherElementToStatementEventListenerInterface;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
 use Syndesi\CypherEntityManager\Exception\InvalidArgumentException;
 use Syndesi\CypherEntityManager\Type\ActionType;
 
-class IndexDeleteToStatementEventListener implements OnActionCypherElementToStatementEventListenerInterface, IndexStatementInterface
+class ConstraintDeleteToStatementEventListener implements OnActionCypherElementToStatementEventListenerInterface, ConstraintStatementInterface
 {
     public function __construct(private LoggerInterface $logger)
     {
@@ -26,29 +26,29 @@ class IndexDeleteToStatementEventListener implements OnActionCypherElementToStat
         if (ActionType::DELETE !== $action) {
             return;
         }
-        if (!($element instanceof IndexInterface)) {
+        if (!($element instanceof ConstraintInterface)) {
             return;
         }
 
-        $statement = self::indexStatement($element);
+        $statement = self::constraintStatement($element);
         $event->setStatement($statement);
         $event->stopPropagation();
-        $this->logger->debug("Acting on ActionCypherElementToStatementEvent: Created index-delete-statement and stopped propagation.", [
+        $this->logger->debug("Acting on ActionCypherElementToStatementEvent: Created constraint-delete-statement and stopped propagation.", [
             'element' => $element,
             'statement' => $statement,
         ]);
     }
 
-    public static function indexStatement(IndexInterface $index): Statement
+    public static function constraintStatement(ConstraintInterface $constraint): Statement
     {
-        $indexName = $index->getIndexName();
-        if (null === $indexName) {
-            throw new InvalidArgumentException('index name can not be null when deleting an index');
+        $constraintName = $constraint->getConstraintName();
+        if (null === $constraintName) {
+            throw new InvalidArgumentException('constraint name can not be null when deleting a constraint');
         }
 
         return new Statement(sprintf(
-            "DROP INDEX %s IF EXISTS",
-            (string) $indexName
+            "DROP CONSTRAINT %s IF EXISTS",
+            (string) $constraintName
         ), []);
     }
 }

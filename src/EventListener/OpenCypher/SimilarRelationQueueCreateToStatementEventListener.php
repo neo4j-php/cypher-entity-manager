@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Syndesi\CypherEntityManager\EventListener;
+namespace Syndesi\CypherEntityManager\EventListener\OpenCypher;
 
 use Laudis\Neo4j\Databags\Statement;
 use Psr\Log\LoggerInterface;
@@ -16,7 +16,7 @@ use Syndesi\CypherEntityManager\Exception\InvalidArgumentException;
 use Syndesi\CypherEntityManager\Helper\StructureHelper;
 use Syndesi\CypherEntityManager\Type\ActionType;
 
-class SimilarRelationQueueDeleteToStatementEventListener implements OnActionCypherElementToStatementEventListenerInterface, SimilarRelationQueueStatementInterface
+class SimilarRelationQueueCreateToStatementEventListener implements OnActionCypherElementToStatementEventListenerInterface, SimilarRelationQueueStatementInterface
 {
     public function __construct(private LoggerInterface $logger)
     {
@@ -26,7 +26,7 @@ class SimilarRelationQueueDeleteToStatementEventListener implements OnActionCyph
     {
         $action = $event->getActionCypherElement()->getAction();
         $element = $event->getActionCypherElement()->getElement();
-        if (ActionType::DELETE !== $action) {
+        if (ActionType::CREATE !== $action) {
             return;
         }
         if (!($element instanceof SimilarRelationQueueInterface)) {
@@ -36,7 +36,7 @@ class SimilarRelationQueueDeleteToStatementEventListener implements OnActionCyph
         $statement = self::similarRelationQueueStatement($element);
         $event->setStatement($statement);
         $event->stopPropagation();
-        $this->logger->debug("Acting on ActionCypherElementToStatementEvent: Created similar-relation-queue-delete-statement and stopped propagation.", [
+        $this->logger->debug("Acting on ActionCypherElementToStatementEvent: Created similar-relation-queue-create-statement and stopped propagation.", [
             'element' => $element,
             'statement' => $statement,
         ]);
@@ -67,6 +67,7 @@ class SimilarRelationQueueDeleteToStatementEventListener implements OnActionCyph
                 'startNodeIdentifier' => StructureHelper::getIdentifiersFromElementAsArray($startNode),
                 'endNodeIdentifier' => StructureHelper::getIdentifiersFromElementAsArray($endNode),
                 'relationIdentifier' => StructureHelper::getIdentifiersFromElementAsArray($relation),
+                'relationProperty' => StructureHelper::getPropertiesFromElementAsArray($relation),
             ];
         }
         if (!$firstRelation) {
@@ -83,14 +84,17 @@ class SimilarRelationQueueDeleteToStatementEventListener implements OnActionCyph
         return new Statement(
             sprintf(
                 "UNWIND \$batch as row\n".
-                "MATCH (%s {%s})-[relation:%s {%s}]->(%s {%s})\n".
-                "DELETE relation",
+                "MATCH\n".
+                "  (startNode%s {%s}),\n".
+                "  (endNode%s {%s})\n".
+                "CREATE (startNode)-[relation:%s {%s}]->(endNode)\n".
+                "SET relation += row.relationProperty",
                 ToCypherHelper::nodeLabelStorageToCypherLabelString($firstRelationStartNode->getNodeLabels()),
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelationStartNode, 'row.startNodeIdentifier'),
-                (string) $firstRelation->getRelationType(),
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelation, 'row.relationIdentifier'),
                 ToCypherHelper::nodeLabelStorageToCypherLabelString($firstRelationEndNode->getNodeLabels()),
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelationEndNode, 'row.endNodeIdentifier'),
+                (string) $firstRelation->getRelationType(),
+                StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelation, 'row.relationIdentifier')
             ),
             [
                 'batch' => $batch,

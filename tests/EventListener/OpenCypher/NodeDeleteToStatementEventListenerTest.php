@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Syndesi\CypherEntityManager\Tests\Helper\Statement;
+namespace Syndesi\CypherEntityManager\Tests\EventListener\OpenCypher;
 
 use Laudis\Neo4j\Databags\Statement;
 use Monolog\Handler\TestHandler;
@@ -13,7 +13,7 @@ use Syndesi\CypherDataStructures\Type\NodeLabel;
 use Syndesi\CypherDataStructures\Type\PropertyName;
 use Syndesi\CypherDataStructures\Type\Relation;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
-use Syndesi\CypherEntityManager\EventListener\NodeDeleteToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\OpenCypher\NodeDeleteToStatementEventListener;
 use Syndesi\CypherEntityManager\Tests\ProphesizeTestCase;
 use Syndesi\CypherEntityManager\Type\ActionCypherElement;
 use Syndesi\CypherEntityManager\Type\ActionType;

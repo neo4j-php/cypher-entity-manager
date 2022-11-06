@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Syndesi\CypherEntityManager\EventListener;
+namespace Syndesi\CypherEntityManager\EventListener\OpenCypher;
 
 use Laudis\Neo4j\Databags\Statement;
 use Psr\Log\LoggerInterface;
@@ -14,7 +14,7 @@ use Syndesi\CypherEntityManager\Contract\OnActionCypherElementToStatementEventLi
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
 use Syndesi\CypherEntityManager\Type\ActionType;
 
-class NodeMergeToStatementEventListener implements OnActionCypherElementToStatementEventListenerInterface, NodeStatementInterface
+class NodeDeleteToStatementEventListener implements OnActionCypherElementToStatementEventListenerInterface, NodeStatementInterface
 {
     public function __construct(private LoggerInterface $logger)
     {
@@ -24,7 +24,7 @@ class NodeMergeToStatementEventListener implements OnActionCypherElementToStatem
     {
         $action = $event->getActionCypherElement()->getAction();
         $element = $event->getActionCypherElement()->getElement();
-        if (ActionType::MERGE !== $action) {
+        if (ActionType::DELETE !== $action) {
             return;
         }
         if (!($element instanceof NodeInterface)) {
@@ -34,7 +34,7 @@ class NodeMergeToStatementEventListener implements OnActionCypherElementToStatem
         $statement = self::nodeStatement($element);
         $event->setStatement($statement);
         $event->stopPropagation();
-        $this->logger->debug("Acting on ActionCypherElementToStatementEvent: Created node-merge-statement and stopped propagation.", [
+        $this->logger->debug("Acting on ActionCypherElementToStatementEvent: Created node-delete-statement and stopped propagation.", [
             'element' => $element,
             'statement' => $statement,
         ]);
@@ -43,41 +43,24 @@ class NodeMergeToStatementEventListener implements OnActionCypherElementToStatem
     public static function nodeStatement(NodeInterface $node): Statement
     {
         $identifyingStrings = [];
-        $setPropertyStrings = [];
         $propertyValues = [];
-        /** @var PropertyNameInterface $propertyName */
-        foreach ($node->getProperties() as $propertyName) {
-            if ($node->hasIdentifier($propertyName)) {
-                $identifyingStrings[] = sprintf(
-                    "%s: $%s",
-                    (string) $propertyName,
-                    (string) $propertyName
-                );
-            } else {
-                $setPropertyStrings[] = sprintf(
-                    "    node.%s = $%s",
-                    (string) $propertyName,
-                    (string) $propertyName
-                );
-            }
-            $propertyValues[(string) $propertyName] = $node->getProperty($propertyName);
+        /** @var PropertyNameInterface $identifierName */
+        foreach ($node->getIdentifiersWithPropertyValues() as $identifierName) {
+            $identifyingStrings[] = sprintf(
+                "%s: $%s",
+                (string) $identifierName,
+                (string) $identifierName
+            );
+            $propertyValues[(string) $identifierName] = $node->getProperty($identifierName);
         }
         $identifyingString = implode(", ", $identifyingStrings);
-        $setPropertyString = implode(",\n", $setPropertyStrings);
 
         return new Statement(
             sprintf(
-                "MERGE (node%s {%s})\n".
-                "ON CREATE\n".
-                "  SET\n".
-                "%s\n".
-                "ON MATCH\n".
-                "  SET\n".
-                "%s",
+                "MATCH (node%s {%s})\n".
+                "DETACH DELETE node",
                 ToCypherHelper::nodeLabelStorageToCypherLabelString($node->getNodeLabels()),
-                $identifyingString,
-                $setPropertyString,
-                $setPropertyString
+                $identifyingString
             ),
             $propertyValues
         );

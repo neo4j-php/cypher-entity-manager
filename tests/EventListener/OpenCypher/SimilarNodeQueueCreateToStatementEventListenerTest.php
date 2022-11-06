@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Syndesi\CypherEntityManager\Tests\Helper\Statement;
+namespace Syndesi\CypherEntityManager\Tests\EventListener\OpenCypher;
 
 use Laudis\Neo4j\Databags\Statement;
 use Monolog\Handler\TestHandler;
@@ -13,29 +13,32 @@ use Syndesi\CypherDataStructures\Type\NodeLabel;
 use Syndesi\CypherDataStructures\Type\PropertyName;
 use Syndesi\CypherDataStructures\Type\Relation;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
-use Syndesi\CypherEntityManager\EventListener\SimilarNodeQueueMergeToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\OpenCypher\SimilarNodeQueueCreateToStatementEventListener;
 use Syndesi\CypherEntityManager\Tests\ProphesizeTestCase;
 use Syndesi\CypherEntityManager\Type\ActionCypherElement;
 use Syndesi\CypherEntityManager\Type\ActionType;
 use Syndesi\CypherEntityManager\Type\SimilarNodeQueue;
 
-class SimilarNodeQueueMergeToStatementEventListenerTest extends ProphesizeTestCase
+class SimilarNodeQueueCreateToStatementEventListenerTest extends ProphesizeTestCase
 {
     public function testOnActionCypherElementToStatementEvent(): void
     {
-        $nodeA = (new Node())
+        $nodeA = new Node();
+        $nodeA
             ->addNodeLabel(new NodeLabel('Node'))
             ->addProperty(new PropertyName('identifier'), 1001)
             ->addProperty(new PropertyName('name'), 'a')
             ->addIdentifier(new PropertyName('identifier'));
 
-        $nodeB = (new Node())
+        $nodeB = new Node();
+        $nodeB
             ->addNodeLabel(new NodeLabel('Node'))
             ->addProperty(new PropertyName('identifier'), 1002)
             ->addProperty(new PropertyName('name'), 'b')
             ->addIdentifier(new PropertyName('identifier'));
 
-        $nodeC = (new Node())
+        $nodeC = new Node();
+        $nodeC
             ->addNodeLabel(new NodeLabel('Node'))
             ->addProperty(new PropertyName('identifier'), 1003)
             ->addProperty(new PropertyName('name'), 'c')
@@ -46,20 +49,20 @@ class SimilarNodeQueueMergeToStatementEventListenerTest extends ProphesizeTestCa
             ->enqueue($nodeB)
             ->enqueue($nodeC);
 
-        $actionCypherElement = new ActionCypherElement(ActionType::MERGE, $similarNodeQueue);
+        $actionCypherElement = new ActionCypherElement(ActionType::CREATE, $similarNodeQueue);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
         $loggerHandler = new TestHandler();
         $logger = (new Logger('logger'))
             ->pushHandler($loggerHandler);
 
-        $eventListener = new SimilarNodeQueueMergeToStatementEventListener($logger);
+        $eventListener = new SimilarNodeQueueCreateToStatementEventListener($logger);
         $eventListener->onActionCypherElementToStatementEvent($event);
 
         $this->assertTrue($event->isPropagationStopped());
         $this->assertInstanceOf(Statement::class, $event->getStatement());
         $this->assertCount(1, $loggerHandler->getRecords());
         $logMessage = $loggerHandler->getRecords()[0];
-        $this->assertSame('Acting on ActionCypherElementToStatementEvent: Created similar-node-queue-merge-statement and stopped propagation.', $logMessage->message);
+        $this->assertSame('Acting on ActionCypherElementToStatementEvent: Created similar-node-queue-create-statement and stopped propagation.', $logMessage->message);
         $this->assertArrayHasKey('element', $logMessage->context);
         $this->assertArrayHasKey('statement', $logMessage->context);
     }
@@ -75,10 +78,10 @@ class SimilarNodeQueueMergeToStatementEventListenerTest extends ProphesizeTestCa
         $similarNodeQueue = (new SimilarNodeQueue())
             ->enqueue($node);
 
-        $actionCypherElement = new ActionCypherElement(ActionType::CREATE, $similarNodeQueue);
+        $actionCypherElement = new ActionCypherElement(ActionType::MERGE, $similarNodeQueue);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
 
-        $eventListener = new SimilarNodeQueueMergeToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
+        $eventListener = new SimilarNodeQueueCreateToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
         $eventListener->onActionCypherElementToStatementEvent($event);
 
         $this->assertFalse($event->isPropagationStopped());
@@ -88,10 +91,10 @@ class SimilarNodeQueueMergeToStatementEventListenerTest extends ProphesizeTestCa
     public function testOnActionCypherElementToStatementEventWithWrongType(): void
     {
         $relation = new Relation();
-        $actionCypherElement = new ActionCypherElement(ActionType::MERGE, $relation);
+        $actionCypherElement = new ActionCypherElement(ActionType::CREATE, $relation);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
 
-        $eventListener = new SimilarNodeQueueMergeToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
+        $eventListener = new SimilarNodeQueueCreateToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
         $eventListener->onActionCypherElementToStatementEvent($event);
 
         $this->assertFalse($event->isPropagationStopped());
@@ -101,10 +104,10 @@ class SimilarNodeQueueMergeToStatementEventListenerTest extends ProphesizeTestCa
     public function testOnActionCypherElementToStatementEventWithEmptyQueue(): void
     {
         $similarNodeQueue = new SimilarNodeQueue();
-        $actionCypherElement = new ActionCypherElement(ActionType::MERGE, $similarNodeQueue);
+        $actionCypherElement = new ActionCypherElement(ActionType::CREATE, $similarNodeQueue);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
 
-        $eventListener = new SimilarNodeQueueMergeToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
+        $eventListener = new SimilarNodeQueueCreateToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
         $eventListener->onActionCypherElementToStatementEvent($event);
 
         $this->assertTrue($event->isPropagationStopped());
@@ -113,38 +116,39 @@ class SimilarNodeQueueMergeToStatementEventListenerTest extends ProphesizeTestCa
 
     public function testNodeStatement(): void
     {
-        $nodeA = (new Node())
+        $nodeA = new Node();
+        $nodeA
             ->addNodeLabel(new NodeLabel('Node'))
             ->addProperty(new PropertyName('identifier'), 1001)
             ->addProperty(new PropertyName('name'), 'a')
             ->addIdentifier(new PropertyName('identifier'));
 
-        $nodeB = (new Node())
+        $nodeB = new Node();
+        $nodeB
             ->addNodeLabel(new NodeLabel('Node'))
             ->addProperty(new PropertyName('identifier'), 1002)
             ->addProperty(new PropertyName('name'), 'b')
             ->addIdentifier(new PropertyName('identifier'));
 
-        $nodeC = (new Node())
+        $nodeC = new Node();
+        $nodeC
             ->addNodeLabel(new NodeLabel('Node'))
             ->addProperty(new PropertyName('identifier'), 1003)
             ->addProperty(new PropertyName('name'), 'c')
             ->addIdentifier(new PropertyName('identifier'));
 
-        $similarNodeQueue = (new SimilarNodeQueue())
+        $similarNodeQueue = new SimilarNodeQueue();
+        $similarNodeQueue
             ->enqueue($nodeA)
             ->enqueue($nodeB)
             ->enqueue($nodeC);
 
-        $statement = SimilarNodeQueueMergeToStatementEventListener::similarNodeQueueStatement($similarNodeQueue);
+        $statement = SimilarNodeQueueCreateToStatementEventListener::similarNodeQueueStatement($similarNodeQueue);
 
         $this->assertSame(
             "UNWIND \$batch as row\n".
-            "MERGE (n:Node {identifier: row.identifier.identifier})\n".
-            "ON CREATE\n".
-            "  SET n += row.property\n".
-            "ON MATCH\n".
-            "  SET n += row.property",
+            "CREATE (n:Node {identifier: row.identifier.identifier})\n".
+            "SET n += row.property",
             $statement->getText()
         );
         $this->assertCount(1, $statement->getParameters());

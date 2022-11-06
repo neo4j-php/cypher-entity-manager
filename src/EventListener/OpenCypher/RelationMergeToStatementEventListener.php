@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Syndesi\CypherEntityManager\EventListener;
+namespace Syndesi\CypherEntityManager\EventListener\OpenCypher;
 
 use Laudis\Neo4j\Databags\Statement;
 use Psr\Log\LoggerInterface;
@@ -15,7 +15,7 @@ use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
 use Syndesi\CypherEntityManager\Exception\InvalidArgumentException;
 use Syndesi\CypherEntityManager\Type\ActionType;
 
-class RelationDeleteToStatementEventListener implements OnActionCypherElementToStatementEventListenerInterface, RelationStatementInterface
+class RelationMergeToStatementEventListener implements OnActionCypherElementToStatementEventListenerInterface, RelationStatementInterface
 {
     public function __construct(private LoggerInterface $logger)
     {
@@ -25,7 +25,7 @@ class RelationDeleteToStatementEventListener implements OnActionCypherElementToS
     {
         $action = $event->getActionCypherElement()->getAction();
         $element = $event->getActionCypherElement()->getElement();
-        if (ActionType::DELETE !== $action) {
+        if (ActionType::MERGE !== $action) {
             return;
         }
         if (!($element instanceof RelationInterface)) {
@@ -35,7 +35,7 @@ class RelationDeleteToStatementEventListener implements OnActionCypherElementToS
         $statement = self::relationStatement($element);
         $event->setStatement($statement);
         $event->stopPropagation();
-        $this->logger->debug("Acting on ActionCypherElementToStatementEvent: Created relation-delete-statement and stopped propagation.", [
+        $this->logger->debug("Acting on ActionCypherElementToStatementEvent: Created relation-merge-statement and stopped propagation.", [
             'element' => $element,
             'statement' => $statement,
         ]);
@@ -43,20 +43,31 @@ class RelationDeleteToStatementEventListener implements OnActionCypherElementToS
 
     public static function relationStatement(RelationInterface $relation): Statement
     {
-        $relationPropertyString = [];
+        $relationIdentifierString = [];
+        $relationIdentifierValues = [];
+        $relationSetPropertyStrings = [];
         $relationPropertyValues = [];
         $startNodePropertyString = [];
         $startNodePropertyValues = [];
         $endNodePropertyString = [];
         $endNodePropertyValues = [];
         /** @var PropertyNameInterface $propertyName */
-        foreach ($relation->getIdentifiers() as $propertyName) {
-            $relationPropertyString[] = sprintf(
-                "%s: \$relation.%s",
-                (string) $propertyName,
-                (string) $propertyName
-            );
-            $relationPropertyValues[(string) $propertyName] = $relation->getProperty($propertyName);
+        foreach ($relation->getProperties() as $propertyName) {
+            if ($relation->hasIdentifier($propertyName)) {
+                $relationIdentifierString[] = sprintf(
+                    "%s: \$relationIdentifier.%s",
+                    (string) $propertyName,
+                    (string) $propertyName
+                );
+                $relationIdentifierValues[(string) $propertyName] = $relation->getProperty($propertyName);
+            } else {
+                $relationSetPropertyStrings[] = sprintf(
+                    "    relation.%s = \$relationProperty.%s",
+                    (string) $propertyName,
+                    (string) $propertyName
+                );
+                $relationPropertyValues[(string) $propertyName] = $relation->getProperty($propertyName);
+            }
         }
         $startNode = $relation->getStartNode();
         if (null === $startNode) {
@@ -87,17 +98,28 @@ class RelationDeleteToStatementEventListener implements OnActionCypherElementToS
 
         return new Statement(
             sprintf(
-                "MATCH (%s {%s})-[relation:%s {%s}]->(%s {%s})\n".
-                "DELETE relation",
+                "MATCH\n".
+                "  (startNode%s {%s}),\n".
+                "  (endNode%s {%s})\n".
+                "MERGE (startNode)-[relation:%s {%s}]->(endNode)\n".
+                "ON CREATE\n".
+                "  SET\n".
+                "%s\n".
+                "ON MATCH\n".
+                "  SET\n".
+                "%s",
                 ToCypherHelper::nodeLabelStorageToCypherLabelString($startNode->getNodeLabels()),
                 implode(', ', $startNodePropertyString),
-                (string) $relation->getRelationType(),
-                implode(', ', $relationPropertyString),
                 ToCypherHelper::nodeLabelStorageToCypherLabelString($endNode->getNodeLabels()),
                 implode(', ', $endNodePropertyString),
+                (string) $relation->getRelationType(),
+                implode(', ', $relationIdentifierString),
+                implode(",\n", $relationSetPropertyStrings),
+                implode(",\n", $relationSetPropertyStrings),
             ),
             [
-                'relation' => $relationPropertyValues,
+                'relationIdentifier' => $relationIdentifierValues,
+                'relationProperty' => $relationPropertyValues,
                 'startNode' => $startNodePropertyValues,
                 'endNode' => $endNodePropertyValues,
             ]

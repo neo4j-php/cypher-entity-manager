@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Syndesi\CypherEntityManager\Tests\Helper\Statement;
+namespace Syndesi\CypherEntityManager\Tests\EventListener\Neo4j;
 
 use Laudis\Neo4j\Databags\Statement;
 use Monolog\Handler\TestHandler;
@@ -16,7 +16,7 @@ use Syndesi\CypherDataStructures\Type\NodeLabel;
 use Syndesi\CypherDataStructures\Type\PropertyName;
 use Syndesi\CypherDataStructures\Type\RelationType;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
-use Syndesi\CypherEntityManager\EventListener\ConstraintCreateToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\Neo4j\ConstraintCreateToStatementEventListener;
 use Syndesi\CypherEntityManager\Exception\InvalidArgumentException;
 use Syndesi\CypherEntityManager\Tests\ProphesizeTestCase;
 use Syndesi\CypherEntityManager\Type\ActionCypherElement;
