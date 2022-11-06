@@ -48,10 +48,11 @@
         "crell/tukio": "^1.4",
         "monolog/monolog": "^3.2",
         "selective/container": "^1.2",
-        "phpspec/prophecy": "^1.15"
+        "phpspec/prophecy": "^1.15",
+        "vlucas/phpdotenv": "^5.5"
     },
     "scripts": {
-        "test": "export ENABLE_FEATURE_TEST=true && echo -n \"\" > ./tests/test.log && php vendor/phpunit/phpunit/phpunit",
+        "test": "export ENABLE_FEATURE_TEST_OLD=true && echo -n \"\" > ./tests/test.log && php vendor/phpunit/phpunit/phpunit",
         "test:coverage:xml": "export XDEBUG_MODE=coverage && php ./vendor/phpunit/phpunit/phpunit --coverage-clover coverage.xml",
         "test:coverage:html": "export XDEBUG_MODE=coverage && php ./vendor/phpunit/phpunit/phpunit --coverage-html ./tmp",
         "test:mutant": "export XDEBUG_MODE=coverage && php vendor/infection/infection/bin/infection --threads=4",
@@ -64,5 +65,10 @@
         "yml:lint": "docker run --rm -it -v $(pwd):/data cytopia/yamllint .",
         "markdown:lint": "docker run --rm -v $(pwd):/work tmknom/markdownlint '**/*.md' --ignore vendor",
         "docs:serve": "docker run --rm -d -p 3000:3000 -v $(pwd)/docs:/docs sujaykumarh/docsify serve"
+    },
+    "config": {
+        "allow-plugins": {
+            "infection/extension-installer": true
+        }
     }
 }

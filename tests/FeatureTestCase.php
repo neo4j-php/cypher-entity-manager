@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Syndesi\CypherEntityManager\Tests;
 
+use Dotenv\Dotenv;
 use Laudis\Neo4j\ClientBuilder;
 use Laudis\Neo4j\Contracts\ClientInterface;
 use Laudis\Neo4j\Databags\Statement;
@@ -17,14 +18,18 @@ class FeatureTestCase extends ContainerTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        if (!getenv('ENABLE_FEATURE_TEST')) {
+
+        $dotenv = Dotenv::createImmutable(__DIR__."/../");
+        $dotenv->safeLoad();
+
+        if (!array_key_exists('ENABLE_FEATURE_TEST', $_ENV)) {
             $this->markTestSkipped();
         }
-        if (false !== getenv("LEAK")) {
+        if (array_key_exists('LEAK', $_ENV)) {
             $this->markTestSkipped();
         }
         $client = ClientBuilder::create()
-            ->withDriver('bolt', 'bolt://neo4j:password@neo4j')
+            ->withDriver('bolt', $_ENV['NEO4J_AUTH'])
             ->build();
         $client->runStatement(Statement::create("MATCH (n) DETACH DELETE n"));
         $this->container->set(ClientInterface::class, $client);

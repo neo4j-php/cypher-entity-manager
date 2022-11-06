@@ -19,8 +19,8 @@ class IndexFeatureTest extends FeatureTestCase
     {
         // use BTREE for Neo4j 4.x and RANGE for Neo4j 5.x
         $defaultIndex = IndexType::BTREE;
-        if (false !== getenv("NEO4J_VERSION")) {
-            if (str_starts_with(getenv("NEO4J_VERSION"), '5.')) {
+        if (false !== $_ENV["NEO4J_VERSION"]) {
+            if (str_starts_with($_ENV["NEO4J_VERSION"], '5.')) {
                 $defaultIndex = IndexType::RANGE;
             }
         }
