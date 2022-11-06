@@ -7,11 +7,11 @@ namespace Syndesi\CypherEntityManager\EventListener\OpenCypher;
 use Laudis\Neo4j\Databags\Statement;
 use Psr\Log\LoggerInterface;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
-use Syndesi\CypherDataStructures\Contract\PropertyNameInterface;
 use Syndesi\CypherDataStructures\Helper\ToCypherHelper;
 use Syndesi\CypherEntityManager\Contract\NodeStatementInterface;
 use Syndesi\CypherEntityManager\Contract\OnActionCypherElementToStatementEventListenerInterface;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
+use Syndesi\CypherEntityManager\Helper\StructureHelper;
 use Syndesi\CypherEntityManager\Type\ActionType;
 
 class NodeMergeToStatementEventListener implements OnActionCypherElementToStatementEventListenerInterface, NodeStatementInterface
@@ -42,44 +42,20 @@ class NodeMergeToStatementEventListener implements OnActionCypherElementToStatem
 
     public static function nodeStatement(NodeInterface $node): Statement
     {
-        $identifyingStrings = [];
-        $setPropertyStrings = [];
-        $propertyValues = [];
-        /** @var PropertyNameInterface $propertyName */
-        foreach ($node->getProperties() as $propertyName) {
-            if ($node->hasIdentifier($propertyName)) {
-                $identifyingStrings[] = sprintf(
-                    "%s: $%s",
-                    (string) $propertyName,
-                    (string) $propertyName
-                );
-            } else {
-                $setPropertyStrings[] = sprintf(
-                    "    node.%s = $%s",
-                    (string) $propertyName,
-                    (string) $propertyName
-                );
-            }
-            $propertyValues[(string) $propertyName] = $node->getProperty($propertyName);
-        }
-        $identifyingString = implode(", ", $identifyingStrings);
-        $setPropertyString = implode(",\n", $setPropertyStrings);
-
         return new Statement(
             sprintf(
                 "MERGE (node%s {%s})\n".
                 "ON CREATE\n".
-                "  SET\n".
-                "%s\n".
+                "  SET node += \$properties\n".
                 "ON MATCH\n".
-                "  SET\n".
-                "%s",
+                "  SET node += \$properties",
                 ToCypherHelper::nodeLabelStorageToCypherLabelString($node->getNodeLabels()),
-                $identifyingString,
-                $setPropertyString,
-                $setPropertyString
+                StructureHelper::getIdentifiersFromElementAsCypherVariableString($node, '$identifier')
             ),
-            $propertyValues
+            [
+                'identifier' => StructureHelper::getIdentifiersFromElementAsArray($node),
+                'properties' => StructureHelper::getPropertiesFromElementAsArray($node),
+            ]
         );
     }
 }

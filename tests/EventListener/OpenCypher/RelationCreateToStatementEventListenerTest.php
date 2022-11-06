@@ -159,7 +159,7 @@ class RelationCreateToStatementEventListenerTest extends ProphesizeTestCase
         $this->assertSame(
             "MATCH\n".
             "  (startNode:NodeA {id: \$startNode.id}),\n".
-            "  (endNode:NodeB {id: \$endNode.id, name: \$endNode.name})\n".
+            "  (endNode:NodeB {id: \$endNode.id})\n".
             "CREATE (startNode)-[:RELATION {id: \$relation.id}]->(endNode)",
             $statement->getText()
         );

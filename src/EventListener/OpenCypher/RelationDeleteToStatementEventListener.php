@@ -6,13 +6,13 @@ namespace Syndesi\CypherEntityManager\EventListener\OpenCypher;
 
 use Laudis\Neo4j\Databags\Statement;
 use Psr\Log\LoggerInterface;
-use Syndesi\CypherDataStructures\Contract\PropertyNameInterface;
 use Syndesi\CypherDataStructures\Contract\RelationInterface;
 use Syndesi\CypherDataStructures\Helper\ToCypherHelper;
 use Syndesi\CypherEntityManager\Contract\OnActionCypherElementToStatementEventListenerInterface;
 use Syndesi\CypherEntityManager\Contract\RelationStatementInterface;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
 use Syndesi\CypherEntityManager\Exception\InvalidArgumentException;
+use Syndesi\CypherEntityManager\Helper\StructureHelper;
 use Syndesi\CypherEntityManager\Type\ActionType;
 
 class RelationDeleteToStatementEventListener implements OnActionCypherElementToStatementEventListenerInterface, RelationStatementInterface
@@ -43,46 +43,13 @@ class RelationDeleteToStatementEventListener implements OnActionCypherElementToS
 
     public static function relationStatement(RelationInterface $relation): Statement
     {
-        $relationPropertyString = [];
-        $relationPropertyValues = [];
-        $startNodePropertyString = [];
-        $startNodePropertyValues = [];
-        $endNodePropertyString = [];
-        $endNodePropertyValues = [];
-        /** @var PropertyNameInterface $propertyName */
-        foreach ($relation->getIdentifiers() as $propertyName) {
-            $relationPropertyString[] = sprintf(
-                "%s: \$relation.%s",
-                (string) $propertyName,
-                (string) $propertyName
-            );
-            $relationPropertyValues[(string) $propertyName] = $relation->getProperty($propertyName);
-        }
         $startNode = $relation->getStartNode();
         if (null === $startNode) {
             throw new InvalidArgumentException('the start node of relations can not be null');
         }
-        /** @var PropertyNameInterface $propertyName */
-        foreach ($startNode->getIdentifiers() as $propertyName) {
-            $startNodePropertyString[] = sprintf(
-                "%s: \$startNode.%s",
-                (string) $propertyName,
-                (string) $propertyName
-            );
-            $startNodePropertyValues[(string) $propertyName] = $startNode->getProperty($propertyName);
-        }
         $endNode = $relation->getEndNode();
         if (null === $endNode) {
             throw new InvalidArgumentException('the end node of relations can not be null');
-        }
-        /** @var PropertyNameInterface $propertyName */
-        foreach ($endNode->getProperties() as $propertyName) {
-            $endNodePropertyString[] = sprintf(
-                "%s: \$endNode.%s",
-                (string) $propertyName,
-                (string) $propertyName
-            );
-            $endNodePropertyValues[(string) $propertyName] = $endNode->getProperty($propertyName);
         }
 
         return new Statement(
@@ -90,16 +57,16 @@ class RelationDeleteToStatementEventListener implements OnActionCypherElementToS
                 "MATCH (%s {%s})-[relation:%s {%s}]->(%s {%s})\n".
                 "DELETE relation",
                 ToCypherHelper::nodeLabelStorageToCypherLabelString($startNode->getNodeLabels()),
-                implode(', ', $startNodePropertyString),
+                StructureHelper::getIdentifiersFromElementAsCypherVariableString($startNode, '$startNode'),
                 (string) $relation->getRelationType(),
-                implode(', ', $relationPropertyString),
+                StructureHelper::getIdentifiersFromElementAsCypherVariableString($relation, '$identifier'),
                 ToCypherHelper::nodeLabelStorageToCypherLabelString($endNode->getNodeLabels()),
-                implode(', ', $endNodePropertyString),
+                StructureHelper::getIdentifiersFromElementAsCypherVariableString($endNode, '$endNode')
             ),
             [
-                'relation' => $relationPropertyValues,
-                'startNode' => $startNodePropertyValues,
-                'endNode' => $endNodePropertyValues,
+                'identifier' => StructureHelper::getIdentifiersFromElementAsArray($relation),
+                'startNode' => StructureHelper::getIdentifiersFromElementAsArray($startNode),
+                'endNode' => StructureHelper::getIdentifiersFromElementAsArray($endNode),
             ]
         );
     }

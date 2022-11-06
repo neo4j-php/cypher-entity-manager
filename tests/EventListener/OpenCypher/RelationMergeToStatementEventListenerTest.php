@@ -160,19 +160,14 @@ class RelationMergeToStatementEventListenerTest extends ProphesizeTestCase
         $this->assertSame(
             "MATCH\n".
             "  (startNode:NodeA {id: \$startNode.id}),\n".
-            "  (endNode:NodeB {id: \$endNode.id, name: \$endNode.name})\n".
-            "MERGE (startNode)-[relation:RELATION {id: \$relationIdentifier.id}]->(endNode)\n".
-            "ON CREATE\n".
-            "  SET\n".
-            "    relation.someKey = \$relationProperty.someKey\n".
-            "ON MATCH\n".
-            "  SET\n".
-            "    relation.someKey = \$relationProperty.someKey",
+            "  (endNode:NodeB {id: \$endNode.id})\n".
+            "MERGE (startNode)-[relation:RELATION {id: \$identifier.id}]->(endNode)\n".
+            "SET relation += \$property",
             $statement->getText()
         );
         $this->assertCount(4, $statement->getParameters());
-        $this->assertArrayHasKey('relationIdentifier', $statement->getParameters());
-        $this->assertArrayHasKey('relationProperty', $statement->getParameters());
+        $this->assertArrayHasKey('identifier', $statement->getParameters());
+        $this->assertArrayHasKey('property', $statement->getParameters());
         $this->assertArrayHasKey('startNode', $statement->getParameters());
         $this->assertArrayHasKey('endNode', $statement->getParameters());
     }

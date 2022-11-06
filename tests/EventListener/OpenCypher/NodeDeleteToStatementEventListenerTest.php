@@ -83,11 +83,11 @@ class NodeDeleteToStatementEventListenerTest extends ProphesizeTestCase
         $statement = NodeDeleteToStatementEventListener::nodeStatement($node);
 
         $this->assertSame(
-            "MATCH (node:NodeLabel {id: \$id})\n".
+            "MATCH (node:NodeLabel {id: \$identifier.id})\n".
             "DETACH DELETE node",
             $statement->getText()
         );
         $this->assertCount(1, $statement->getParameters());
-        $this->assertSame(1234, $statement->getParameters()['id']);
+        $this->assertSame(1234, $statement->getParameters()['identifier']['id']);
     }
 }

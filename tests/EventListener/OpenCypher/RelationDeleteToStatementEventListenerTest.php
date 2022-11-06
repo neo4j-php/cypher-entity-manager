@@ -157,12 +157,12 @@ class RelationDeleteToStatementEventListenerTest extends ProphesizeTestCase
         $statement = RelationDeleteToStatementEventListener::relationStatement($relation);
 
         $this->assertSame(
-            "MATCH (:NodeA {id: \$startNode.id})-[relation:RELATION {id: \$relation.id}]->(:NodeB {id: \$endNode.id, name: \$endNode.name})\n".
+            "MATCH (:NodeA {id: \$startNode.id})-[relation:RELATION {id: \$identifier.id}]->(:NodeB {id: \$endNode.id})\n".
             "DELETE relation",
             $statement->getText()
         );
         $this->assertCount(3, $statement->getParameters());
-        $this->assertArrayHasKey('relation', $statement->getParameters());
+        $this->assertArrayHasKey('identifier', $statement->getParameters());
         $this->assertArrayHasKey('startNode', $statement->getParameters());
         $this->assertArrayHasKey('endNode', $statement->getParameters());
     }

@@ -83,17 +83,15 @@ class NodeMergeToStatementEventListenerTest extends ProphesizeTestCase
         $statement = NodeMergeToStatementEventListener::nodeStatement($node);
 
         $this->assertSame(
-            "MERGE (node:NodeLabel {id: \$id})\n".
+            "MERGE (node:NodeLabel {id: \$identifier.id})\n".
             "ON CREATE\n".
-            "  SET\n".
-            "    node.some = \$some\n".
+            "  SET node += \$properties\n".
             "ON MATCH\n".
-            "  SET\n".
-            "    node.some = \$some",
+            "  SET node += \$properties",
             $statement->getText()
         );
         $this->assertCount(2, $statement->getParameters());
-        $this->assertSame(1234, $statement->getParameters()['id']);
-        $this->assertSame('value', $statement->getParameters()['some']);
+        $this->assertSame(1234, $statement->getParameters()['identifier']['id']);
+        $this->assertSame('value', $statement->getParameters()['properties']['some']);
     }
 }

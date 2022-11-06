@@ -13,6 +13,7 @@ use Syndesi\CypherEntityManager\Contract\OnActionCypherElementToStatementEventLi
 use Syndesi\CypherEntityManager\Contract\RelationStatementInterface;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
 use Syndesi\CypherEntityManager\Exception\InvalidArgumentException;
+use Syndesi\CypherEntityManager\Helper\StructureHelper;
 use Syndesi\CypherEntityManager\Type\ActionType;
 
 class RelationCreateToStatementEventListener implements OnActionCypherElementToStatementEventListenerInterface, RelationStatementInterface
@@ -45,10 +46,6 @@ class RelationCreateToStatementEventListener implements OnActionCypherElementToS
     {
         $relationPropertyString = [];
         $relationPropertyValues = [];
-        $startNodePropertyString = [];
-        $startNodePropertyValues = [];
-        $endNodePropertyString = [];
-        $endNodePropertyValues = [];
         /** @var PropertyNameInterface $propertyName */
         foreach ($relation->getProperties() as $propertyName) {
             $relationPropertyString[] = sprintf(
@@ -62,27 +59,9 @@ class RelationCreateToStatementEventListener implements OnActionCypherElementToS
         if (null === $startNode) {
             throw new InvalidArgumentException('the start node of relations can not be null');
         }
-        /** @var PropertyNameInterface $propertyName */
-        foreach ($startNode->getIdentifiers() as $propertyName) {
-            $startNodePropertyString[] = sprintf(
-                "%s: \$startNode.%s",
-                (string) $propertyName,
-                (string) $propertyName
-            );
-            $startNodePropertyValues[(string) $propertyName] = $startNode->getProperty($propertyName);
-        }
         $endNode = $relation->getEndNode();
         if (null === $endNode) {
             throw new InvalidArgumentException('the end node of relations can not be null');
-        }
-        /** @var PropertyNameInterface $propertyName */
-        foreach ($endNode->getProperties() as $propertyName) {
-            $endNodePropertyString[] = sprintf(
-                "%s: \$endNode.%s",
-                (string) $propertyName,
-                (string) $propertyName
-            );
-            $endNodePropertyValues[(string) $propertyName] = $endNode->getProperty($propertyName);
         }
 
         return new Statement(
@@ -92,16 +71,16 @@ class RelationCreateToStatementEventListener implements OnActionCypherElementToS
                 "  (endNode%s {%s})\n".
                 "CREATE (startNode)-[:%s {%s}]->(endNode)",
                 ToCypherHelper::nodeLabelStorageToCypherLabelString($startNode->getNodeLabels()),
-                implode(', ', $startNodePropertyString),
+                StructureHelper::getIdentifiersFromElementAsCypherVariableString($startNode, '$startNode'),
                 ToCypherHelper::nodeLabelStorageToCypherLabelString($endNode->getNodeLabels()),
-                implode(', ', $endNodePropertyString),
+                StructureHelper::getIdentifiersFromElementAsCypherVariableString($endNode, '$endNode'),
                 (string) $relation->getRelationType(),
                 implode(', ', $relationPropertyString)
             ),
             [
                 'relation' => $relationPropertyValues,
-                'startNode' => $startNodePropertyValues,
-                'endNode' => $endNodePropertyValues,
+                'startNode' => StructureHelper::getIdentifiersFromElementAsArray($startNode),
+                'endNode' => StructureHelper::getIdentifiersFromElementAsArray($endNode),
             ]
         );
     }
