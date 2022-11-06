@@ -11,3 +11,8 @@ for helping to refine this library! :D
 - The favicon is a modified form of the icons `chart-bubble` and `cog` from
   [Material Design Icons](https://materialdesignicons.com/), published under the Apache 2.0 license.
 - This documentation uses the same blue as Neo4j's logo, which was not vetoed by Neo4j.
+
+## Dedication
+
+This project is dedicated to my family, as they sparked and fueled my interests in technology and data in the first
+place.
