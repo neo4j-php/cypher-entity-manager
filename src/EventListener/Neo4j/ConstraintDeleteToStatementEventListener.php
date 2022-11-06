@@ -43,7 +43,7 @@ class ConstraintDeleteToStatementEventListener implements OnActionCypherElementT
     {
         $constraintName = $constraint->getConstraintName();
         if (null === $constraintName) {
-            throw new InvalidArgumentException('constraint name can not be null when deleting a constraint');
+            throw InvalidArgumentException::createForConstraintNameIsNull();
         }
 
         return new Statement(sprintf(

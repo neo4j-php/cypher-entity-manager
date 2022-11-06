@@ -45,12 +45,12 @@ class ConstraintCreateToStatementEventListener implements OnActionCypherElementT
     {
         $constraintName = $constraint->getConstraintName();
         if (null === $constraintName) {
-            throw new InvalidArgumentException("constraint name can not be null");
+            throw InvalidArgumentException::createForConstraintNameIsNull();
         }
         $elementIdentifier = '';
         $elementLabel = $constraint->getFor();
         if (null === $elementLabel) {
-            throw new InvalidArgumentException("constraint for label/type can not be null");
+            throw InvalidArgumentException::createForConstraintForIsNull();
         }
         if ($elementLabel instanceof NodeLabelInterface) {
             $elementIdentifier = '(e:'.((string) $elementLabel).')';
@@ -66,7 +66,7 @@ class ConstraintCreateToStatementEventListener implements OnActionCypherElementT
         }
         $constraintType = $constraint->getConstraintType();
         if (null === $constraintType) {
-            throw new InvalidArgumentException("constraint type can not be null");
+            throw InvalidArgumentException::createForConstraintTypeIsNull();
         }
 
         return new Statement(sprintf(

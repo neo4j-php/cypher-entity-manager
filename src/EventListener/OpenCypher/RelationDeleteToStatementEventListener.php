@@ -45,11 +45,11 @@ class RelationDeleteToStatementEventListener implements OnActionCypherElementToS
     {
         $startNode = $relation->getStartNode();
         if (null === $startNode) {
-            throw new InvalidArgumentException('the start node of relations can not be null');
+            throw InvalidArgumentException::createForStartNodeIsNull();
         }
         $endNode = $relation->getEndNode();
         if (null === $endNode) {
-            throw new InvalidArgumentException('the end node of relations can not be null');
+            throw InvalidArgumentException::createForEndNodeIsNull();
         }
 
         return new Statement(

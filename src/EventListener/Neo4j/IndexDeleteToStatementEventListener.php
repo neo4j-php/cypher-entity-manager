@@ -43,7 +43,7 @@ class IndexDeleteToStatementEventListener implements OnActionCypherElementToStat
     {
         $indexName = $index->getIndexName();
         if (null === $indexName) {
-            throw new InvalidArgumentException('index name can not be null when deleting an index');
+            throw InvalidArgumentException::createForIndexNameIsNull();
         }
 
         return new Statement(sprintf(

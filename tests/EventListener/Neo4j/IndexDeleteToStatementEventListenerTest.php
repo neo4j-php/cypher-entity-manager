@@ -107,7 +107,7 @@ class IndexDeleteToStatementEventListenerTest extends ProphesizeTestCase
             ->addProperty(new PropertyName('id'));
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('index name can not be null when deleting an index');
+        $this->expectExceptionMessage('Index name can not be null');
         IndexDeleteToStatementEventListener::indexStatement($nodeIndex);
     }
 }

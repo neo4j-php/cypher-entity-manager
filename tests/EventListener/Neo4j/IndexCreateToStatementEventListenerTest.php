@@ -107,7 +107,7 @@ class IndexCreateToStatementEventListenerTest extends ProphesizeTestCase
             ->addProperty(new PropertyName('id'));
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('index type can not be null when creating an index');
+        $this->expectExceptionMessage('Index type can not be null');
         IndexCreateToStatementEventListener::indexStatement($nodeIndex);
     }
 
@@ -122,7 +122,7 @@ class IndexCreateToStatementEventListenerTest extends ProphesizeTestCase
             ->addProperty(new PropertyName('id'));
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('index for label/type can not be null');
+        $this->expectExceptionMessage('Index for (node label / relation type) can not be null');
         IndexCreateToStatementEventListener::indexStatement($nodeIndex);
     }
 }

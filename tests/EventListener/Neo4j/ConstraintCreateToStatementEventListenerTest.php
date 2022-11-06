@@ -107,7 +107,7 @@ class ConstraintCreateToStatementEventListenerTest extends ProphesizeTestCase
             ->addProperty(new PropertyName('id'));
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('constraint name can not be null');
+        $this->expectExceptionMessage('Constraint name can not be null');
         ConstraintCreateToStatementEventListener::constraintStatement($constraint);
     }
 
@@ -122,7 +122,7 @@ class ConstraintCreateToStatementEventListenerTest extends ProphesizeTestCase
             ->addProperty(new PropertyName('id'));
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('constraint for label/type can not be null');
+        $this->expectExceptionMessage('Constraint for (node label / relation type) can not be null');
         ConstraintCreateToStatementEventListener::constraintStatement($constraint);
     }
 
@@ -137,7 +137,7 @@ class ConstraintCreateToStatementEventListenerTest extends ProphesizeTestCase
             ->addProperty(new PropertyName('id'));
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('constraint type can not be null');
+        $this->expectExceptionMessage('Constraint type can not be null');
         ConstraintCreateToStatementEventListener::constraintStatement($constraint);
     }
 }

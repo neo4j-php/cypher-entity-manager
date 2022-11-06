@@ -106,7 +106,7 @@ class RelationCreateToStatementEventListenerTest extends ProphesizeTestCase
             ->addIdentifier(new PropertyName('id'));
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('the start node of relations can not be null');
+        $this->expectExceptionMessage('Start node of relation can not be null');
         RelationCreateToStatementEventListener::relationStatement($relation);
     }
 
@@ -129,7 +129,7 @@ class RelationCreateToStatementEventListenerTest extends ProphesizeTestCase
             ->addIdentifier(new PropertyName('id'));
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('the end node of relations can not be null');
+        $this->expectExceptionMessage('End node of relation can not be null');
         RelationCreateToStatementEventListener::relationStatement($relation);
     }
 

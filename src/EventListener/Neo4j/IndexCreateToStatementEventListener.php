@@ -47,13 +47,13 @@ class IndexCreateToStatementEventListener implements OnActionCypherElementToStat
         $propertyIdentifier = '';
 
         $indexType = $index->getIndexType();
-        if (null === $indexType) {
-            throw new InvalidArgumentException('index type can not be null when creating an index');
+        if (!$indexType) {
+            throw InvalidArgumentException::createForIndexTypeIsNull();
         }
 
         $elementLabel = $index->getFor();
-        if (null === $elementLabel) {
-            throw new InvalidArgumentException("index for label/type can not be null");
+        if (!$elementLabel) {
+            throw InvalidArgumentException::createForIndexForIsNull();
         }
         if ($elementLabel instanceof NodeLabelInterface) {
             $elementIdentifier = '(e:'.((string) $elementLabel).')';

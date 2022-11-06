@@ -53,10 +53,10 @@ class SimilarRelationQueueDeleteToStatementEventListener implements OnActionCyph
             $startNode = $relation->getStartNode();
             $endNode = $relation->getEndNode();
             if (!$startNode) {
-                throw new InvalidArgumentException('start node of relations can not be null');
+                throw InvalidArgumentException::createForStartNodeIsNull();
             }
             if (!$endNode) {
-                throw new InvalidArgumentException('start node of relations can not be null');
+                throw InvalidArgumentException::createForEndNodeIsNull();
             }
             if (!$firstRelation) {
                 $firstRelation = $relation;
@@ -73,10 +73,14 @@ class SimilarRelationQueueDeleteToStatementEventListener implements OnActionCyph
             return StructureHelper::getEmptyStatement();
         }
         if (!$firstRelationStartNode) {
-            throw new InvalidArgumentException('start node of relations can not be null');
+            throw InvalidArgumentException::createForStartNodeIsNull();
         }
         if (!$firstRelationEndNode) {
-            throw new InvalidArgumentException('end node of relations can not be null');
+            throw InvalidArgumentException::createForEndNodeIsNull();
+        }
+        $relationType = $firstRelation->getRelationType();
+        if (!$relationType) {
+            throw InvalidArgumentException::createForRelationTypeIsNull();
         }
 
         return new Statement(
@@ -86,7 +90,7 @@ class SimilarRelationQueueDeleteToStatementEventListener implements OnActionCyph
                 "DELETE relation",
                 ToCypherHelper::nodeLabelStorageToCypherLabelString($firstRelationStartNode->getNodeLabels()),
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelationStartNode, 'row.startNodeIdentifier'),
-                (string) $firstRelation->getRelationType(),
+                (string) $relationType,
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelation, 'row.relationIdentifier'),
                 ToCypherHelper::nodeLabelStorageToCypherLabelString($firstRelationEndNode->getNodeLabels()),
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelationEndNode, 'row.endNodeIdentifier'),

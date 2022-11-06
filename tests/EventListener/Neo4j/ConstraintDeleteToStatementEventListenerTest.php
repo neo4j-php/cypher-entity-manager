@@ -107,7 +107,7 @@ class ConstraintDeleteToStatementEventListenerTest extends ProphesizeTestCase
             ->addProperty(new PropertyName('id'));
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('constraint name can not be null');
+        $this->expectExceptionMessage('Constraint name can not be null');
         ConstraintDeleteToStatementEventListener::constraintStatement($constraint);
     }
 }
