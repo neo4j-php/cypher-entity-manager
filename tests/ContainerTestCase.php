@@ -27,6 +27,9 @@ use Syndesi\CypherEntityManager\EventListener\RelationMergeToStatementEventListe
 use Syndesi\CypherEntityManager\EventListener\SimilarNodeQueueCreateToStatementEventListener;
 use Syndesi\CypherEntityManager\EventListener\SimilarNodeQueueDeleteToStatementEventListener;
 use Syndesi\CypherEntityManager\EventListener\SimilarNodeQueueMergeToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\SimilarRelationQueueCreateToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\SimilarRelationQueueDeleteToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\SimilarRelationQueueMergeToStatementEventListener;
 
 class ContainerTestCase extends ProphesizeTestCase
 {
@@ -58,6 +61,9 @@ class ContainerTestCase extends ProphesizeTestCase
         $listenerProvider->addSubscriber(RelationCreateToStatementEventListener::class, RelationCreateToStatementEventListener::class);
         $listenerProvider->addSubscriber(RelationMergeToStatementEventListener::class, RelationMergeToStatementEventListener::class);
         $listenerProvider->addSubscriber(RelationDeleteToStatementEventListener::class, RelationDeleteToStatementEventListener::class);
+        $listenerProvider->addSubscriber(SimilarRelationQueueCreateToStatementEventListener::class, SimilarRelationQueueCreateToStatementEventListener::class);
+        $listenerProvider->addSubscriber(SimilarRelationQueueMergeToStatementEventListener::class, SimilarRelationQueueMergeToStatementEventListener::class);
+        $listenerProvider->addSubscriber(SimilarRelationQueueDeleteToStatementEventListener::class, SimilarRelationQueueDeleteToStatementEventListener::class);
         $listenerProvider->addSubscriber(IndexCreateToStatementEventListener::class, IndexCreateToStatementEventListener::class);
         $listenerProvider->addSubscriber(IndexDeleteToStatementEventListener::class, IndexDeleteToStatementEventListener::class);
         $listenerProvider->addSubscriber(ConstraintCreateToStatementEventListener::class, ConstraintCreateToStatementEventListener::class);

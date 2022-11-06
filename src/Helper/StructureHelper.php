@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Syndesi\CypherEntityManager\Helper;
 
+use Syndesi\CypherDataStructures\Contract\HasIdentifiersInterface;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
+use Syndesi\CypherDataStructures\Contract\PropertyNameInterface;
 use Syndesi\CypherDataStructures\Contract\PropertyStorageInterface;
 use Syndesi\CypherDataStructures\Contract\RelationInterface;
 use Syndesi\CypherDataStructures\Helper\ToCypherHelper;
@@ -73,5 +75,52 @@ class StructureHelper
         $parts[] = self::getNodeStructure($relation->getEndNode());
 
         return implode('', $parts);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function getIdentifiersFromElementAsArray(HasIdentifiersInterface $element): array
+    {
+        $identifiers = [];
+        /** @var PropertyNameInterface $identifier */
+        foreach ($element->getIdentifiers() as $identifier) {
+            $identifiers[$identifier->getPropertyName()] = $element->getIdentifier($identifier);
+        }
+
+        return $identifiers;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function getPropertiesFromElementAsArray(HasIdentifiersInterface $element): array
+    {
+        $properties = [];
+        /** @var PropertyNameInterface $property */
+        foreach ($element->getProperties() as $property) {
+            if ($element->hasIdentifier($property)) {
+                continue;
+            }
+            $properties[$property->getPropertyName()] = $element->getProperty($property);
+        }
+
+        return $properties;
+    }
+
+    public static function getIdentifiersFromElementAsCypherVariableString(HasIdentifiersInterface $element, string $variablePrefix): string
+    {
+        $identifiers = [];
+        /** @var PropertyNameInterface $identifier */
+        foreach ($element->getIdentifiers() as $identifier) {
+            $identifiers[] = sprintf(
+                "%s: %s.%s",
+                $identifier->getPropertyName(),
+                $variablePrefix,
+                $identifier->getPropertyName(),
+            );
+        }
+
+        return implode(', ', $identifiers);
     }
 }
