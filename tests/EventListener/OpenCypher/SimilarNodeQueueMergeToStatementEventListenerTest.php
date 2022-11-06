@@ -140,11 +140,8 @@ class SimilarNodeQueueMergeToStatementEventListenerTest extends ProphesizeTestCa
 
         $this->assertSame(
             "UNWIND \$batch as row\n".
-            "MERGE (n:Node {identifier: row.identifier.identifier})\n".
-            "ON CREATE\n".
-            "  SET n += row.property\n".
-            "ON MATCH\n".
-            "  SET n += row.property",
+            "MERGE (node:Node {identifier: row.identifier.identifier})\n".
+            "SET node += row.property",
             $statement->getText()
         );
         $this->assertCount(1, $statement->getParameters());

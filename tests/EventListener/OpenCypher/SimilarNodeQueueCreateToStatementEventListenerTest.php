@@ -147,8 +147,8 @@ class SimilarNodeQueueCreateToStatementEventListenerTest extends ProphesizeTestC
 
         $this->assertSame(
             "UNWIND \$batch as row\n".
-            "CREATE (n:Node {identifier: row.identifier.identifier})\n".
-            "SET n += row.property",
+            "CREATE (node:Node {identifier: row.identifier.identifier})\n".
+            "SET node += row.property",
             $statement->getText()
         );
         $this->assertCount(1, $statement->getParameters());

@@ -62,8 +62,8 @@ class SimilarNodeQueueCreateToStatementEventListener implements OnActionCypherEl
         return new Statement(
             sprintf(
                 "UNWIND \$batch as row\n".
-                "CREATE (n%s {%s})\n".
-                "SET n += row.property",
+                "CREATE (node%s {%s})\n".
+                "SET node += row.property",
                 ToCypherHelper::nodeLabelStorageToCypherLabelString($firstNode->getNodeLabels()),
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstNode, 'row.identifier')
             ),

@@ -62,11 +62,8 @@ class SimilarNodeQueueMergeToStatementEventListener implements OnActionCypherEle
         return new Statement(
             sprintf(
                 "UNWIND \$batch as row\n".
-                "MERGE (n%s {%s})\n".
-                "ON CREATE\n".
-                "  SET n += row.property\n".
-                "ON MATCH\n".
-                "  SET n += row.property",
+                "MERGE (node%s {%s})\n".
+                "SET node += row.property",
                 ToCypherHelper::nodeLabelStorageToCypherLabelString($firstNode->getNodeLabels()),
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstNode, 'row.identifier')
             ),

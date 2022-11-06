@@ -59,8 +59,8 @@ class SimilarNodeQueueDeleteToStatementEventListener implements OnActionCypherEl
         return new Statement(
             sprintf(
                 "UNWIND \$batch as row\n".
-                "MATCH (n%s {%s})\n".
-                "DETACH DELETE n",
+                "MATCH (node%s {%s})\n".
+                "DETACH DELETE node",
                 ToCypherHelper::nodeLabelStorageToCypherLabelString($firstNode->getNodeLabels()),
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstNode, 'row')
             ),

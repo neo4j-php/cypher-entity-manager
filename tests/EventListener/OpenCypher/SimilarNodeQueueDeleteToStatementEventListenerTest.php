@@ -140,8 +140,8 @@ class SimilarNodeQueueDeleteToStatementEventListenerTest extends ProphesizeTestC
 
         $this->assertSame(
             "UNWIND \$batch as row\n".
-            "MATCH (n:Node {identifier: row.identifier})\n".
-            "DETACH DELETE n",
+            "MATCH (node:Node {identifier: row.identifier})\n".
+            "DETACH DELETE node",
             $statement->getText()
         );
         $this->assertCount(1, $statement->getParameters());

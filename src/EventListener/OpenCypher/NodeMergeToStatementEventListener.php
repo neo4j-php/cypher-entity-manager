@@ -45,10 +45,7 @@ class NodeMergeToStatementEventListener implements OnActionCypherElementToStatem
         return new Statement(
             sprintf(
                 "MERGE (node%s {%s})\n".
-                "ON CREATE\n".
-                "  SET node += \$properties\n".
-                "ON MATCH\n".
-                "  SET node += \$properties",
+                "SET node += \$properties",
                 ToCypherHelper::nodeLabelStorageToCypherLabelString($node->getNodeLabels()),
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($node, '$identifier')
             ),
