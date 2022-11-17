@@ -2,7 +2,7 @@
     "name": "syndesi/cypher-entity-manager",
     "description": "Provides an entity manager for Cypher data types",
     "type": "library",
-    "homepage": "https://syndesi.github.io/cypher-entity-manager/#/",
+    "homepage": "https://neo4j-php.github.io/cypher-entity-manager/#/",
     "license": "MIT",
     "authors": [
         {
