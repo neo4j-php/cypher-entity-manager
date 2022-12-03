@@ -7,7 +7,7 @@ namespace Syndesi\CypherEntityManager\EventListener\OpenCypher;
 use Laudis\Neo4j\Databags\Statement;
 use Psr\Log\LoggerInterface;
 use Syndesi\CypherDataStructures\Contract\RelationInterface;
-use Syndesi\CypherDataStructures\Helper\ToCypherHelper;
+use Syndesi\CypherDataStructures\Helper\ToStringHelper;
 use Syndesi\CypherEntityManager\Contract\OnActionCypherElementToStatementEventListenerInterface;
 use Syndesi\CypherEntityManager\Contract\RelationStatementInterface;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
@@ -59,11 +59,11 @@ class RelationMergeToStatementEventListener implements OnActionCypherElementToSt
                 "  (endNode%s {%s})\n".
                 "MERGE (startNode)-[relation:%s {%s}]->(endNode)\n".
                 "SET relation += \$property",
-                ToCypherHelper::nodeLabelStorageToCypherLabelString($startNode->getNodeLabels()),
+                ToStringHelper::labelsToString($startNode->getLabels()),
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($startNode, '$startNode'),
-                ToCypherHelper::nodeLabelStorageToCypherLabelString($endNode->getNodeLabels()),
+                ToStringHelper::labelsToString($endNode->getLabels()),
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($endNode, '$endNode'),
-                (string) $relation->getRelationType(),
+                $relation->getType(),
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($relation, '$identifier')
             ),
             [

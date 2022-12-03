@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Syndesi\CypherEntityManager\Exception;
 
-use Exception;
-
-class InvalidArgumentException extends Exception
+class InvalidArgumentException extends \Exception
 {
     public static function createForNotSimilar(string $type, string $similarExpected, string $similarGot): self
     {

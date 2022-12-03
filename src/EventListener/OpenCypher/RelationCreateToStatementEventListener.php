@@ -6,9 +6,8 @@ namespace Syndesi\CypherEntityManager\EventListener\OpenCypher;
 
 use Laudis\Neo4j\Databags\Statement;
 use Psr\Log\LoggerInterface;
-use Syndesi\CypherDataStructures\Contract\PropertyNameInterface;
 use Syndesi\CypherDataStructures\Contract\RelationInterface;
-use Syndesi\CypherDataStructures\Helper\ToCypherHelper;
+use Syndesi\CypherDataStructures\Helper\ToStringHelper;
 use Syndesi\CypherEntityManager\Contract\OnActionCypherElementToStatementEventListenerInterface;
 use Syndesi\CypherEntityManager\Contract\RelationStatementInterface;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
@@ -45,15 +44,13 @@ class RelationCreateToStatementEventListener implements OnActionCypherElementToS
     public static function relationStatement(RelationInterface $relation): Statement
     {
         $relationPropertyString = [];
-        $relationPropertyValues = [];
-        /** @var PropertyNameInterface $propertyName */
-        foreach ($relation->getProperties() as $propertyName) {
+        $relationPropertyValues = $relation->getProperties();
+        foreach ($relation->getProperties() as $propertyName => $propertyValue) {
             $relationPropertyString[] = sprintf(
                 "%s: \$relation.%s",
-                (string) $propertyName,
-                (string) $propertyName
+                $propertyName,
+                $propertyName
             );
-            $relationPropertyValues[(string) $propertyName] = $relation->getProperty($propertyName);
         }
         $startNode = $relation->getStartNode();
         if (null === $startNode) {
@@ -70,11 +67,11 @@ class RelationCreateToStatementEventListener implements OnActionCypherElementToS
                 "  (startNode%s {%s}),\n".
                 "  (endNode%s {%s})\n".
                 "CREATE (startNode)-[:%s {%s}]->(endNode)",
-                ToCypherHelper::nodeLabelStorageToCypherLabelString($startNode->getNodeLabels()),
+                ToStringHelper::labelsToString($startNode->getLabels()),
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($startNode, '$startNode'),
-                ToCypherHelper::nodeLabelStorageToCypherLabelString($endNode->getNodeLabels()),
+                ToStringHelper::labelsToString($endNode->getLabels()),
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($endNode, '$endNode'),
-                (string) $relation->getRelationType(),
+                $relation->getType(),
                 implode(', ', $relationPropertyString)
             ),
             [

@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Syndesi\CypherEntityManager\Helper;
 
-use Syndesi\CypherDataStructures\Contract\ConstraintInterface;
-use Syndesi\CypherDataStructures\Contract\IndexInterface;
+use Syndesi\CypherDataStructures\Contract\NodeConstraintInterface;
+use Syndesi\CypherDataStructures\Contract\NodeIndexInterface;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
+use Syndesi\CypherDataStructures\Contract\RelationConstraintInterface;
+use Syndesi\CypherDataStructures\Contract\RelationIndexInterface;
 use Syndesi\CypherDataStructures\Contract\RelationInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarNodeQueueInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarRelationQueueInterface;
@@ -27,11 +29,17 @@ class ActionCypherElementHelper
         if ($element instanceof RelationInterface) {
             return ActionCypherElementType::RELATION;
         }
-        if ($element instanceof IndexInterface) {
-            return ActionCypherElementType::INDEX;
+        if ($element instanceof NodeIndexInterface) {
+            return ActionCypherElementType::NODE_INDEX;
         }
-        if ($element instanceof ConstraintInterface) {
-            return ActionCypherElementType::CONSTRAINT;
+        if ($element instanceof RelationIndexInterface) {
+            return ActionCypherElementType::RELATION_INDEX;
+        }
+        if ($element instanceof NodeConstraintInterface) {
+            return ActionCypherElementType::NODE_CONSTRAINT;
+        }
+        if ($element instanceof RelationConstraintInterface) {
+            return ActionCypherElementType::RELATION_CONSTRAINT;
         }
         if ($element instanceof SimilarNodeQueueInterface) {
             return ActionCypherElementType::SIMILAR_NODE_QUEUE;

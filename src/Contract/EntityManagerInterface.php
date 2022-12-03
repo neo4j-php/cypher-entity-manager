@@ -5,21 +5,47 @@ declare(strict_types=1);
 namespace Syndesi\CypherEntityManager\Contract;
 
 use Laudis\Neo4j\Contracts\ClientInterface;
-use Syndesi\CypherDataStructures\Contract\ConstraintInterface;
-use Syndesi\CypherDataStructures\Contract\IndexInterface;
+use Syndesi\CypherDataStructures\Contract\NodeConstraintInterface;
+use Syndesi\CypherDataStructures\Contract\NodeIndexInterface;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
+use Syndesi\CypherDataStructures\Contract\RelationConstraintInterface;
+use Syndesi\CypherDataStructures\Contract\RelationIndexInterface;
 use Syndesi\CypherDataStructures\Contract\RelationInterface;
 use Syndesi\CypherEntityManager\Type\ActionType;
 
 interface EntityManagerInterface
 {
-    public function add(ActionType $actionType, NodeInterface|RelationInterface|ConstraintInterface|IndexInterface|SimilarNodeQueueInterface|SimilarRelationQueueInterface $element): self;
+    public function add(ActionType $actionType, NodeInterface|
+    RelationInterface|
+    NodeIndexInterface|
+    RelationIndexInterface|
+    NodeConstraintInterface|
+    RelationConstraintInterface|
+    SimilarNodeQueueInterface|
+    SimilarRelationQueueInterface $element): self;
 
-    public function create(NodeInterface|RelationInterface|ConstraintInterface|IndexInterface|SimilarNodeQueueInterface|SimilarRelationQueueInterface $element): self;
+    public function create(NodeInterface|
+    RelationInterface|
+    NodeIndexInterface|
+    RelationIndexInterface|
+    NodeConstraintInterface|
+    RelationConstraintInterface|
+    SimilarNodeQueueInterface|
+    SimilarRelationQueueInterface $element): self;
 
-    public function merge(NodeInterface|RelationInterface|ConstraintInterface|IndexInterface|SimilarNodeQueueInterface|SimilarRelationQueueInterface $element): self;
+    public function merge(NodeInterface|
+    RelationInterface|
+    SimilarNodeQueueInterface|
+    SimilarRelationQueueInterface $element): self;
 
-    public function delete(NodeInterface|RelationInterface|ConstraintInterface|IndexInterface|SimilarNodeQueueInterface|SimilarRelationQueueInterface $element): self;
+    public function delete(NodeInterface|
+    RelationInterface|
+    NodeIndexInterface|
+    RelationIndexInterface|
+    NodeConstraintInterface|
+    RelationConstraintInterface|
+    SimilarNodeQueueInterface|
+    SimilarRelationQueueInterface $element): self;
 
     public function flush(): self;
 

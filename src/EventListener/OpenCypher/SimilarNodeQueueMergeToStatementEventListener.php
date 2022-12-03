@@ -7,7 +7,7 @@ namespace Syndesi\CypherEntityManager\EventListener\OpenCypher;
 use Laudis\Neo4j\Databags\Statement;
 use Psr\Log\LoggerInterface;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
-use Syndesi\CypherDataStructures\Helper\ToCypherHelper;
+use Syndesi\CypherDataStructures\Helper\ToStringHelper;
 use Syndesi\CypherEntityManager\Contract\OnActionCypherElementToStatementEventListenerInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarNodeQueueInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarNodeQueueStatementInterface;
@@ -64,7 +64,7 @@ class SimilarNodeQueueMergeToStatementEventListener implements OnActionCypherEle
                 "UNWIND \$batch as row\n".
                 "MERGE (node%s {%s})\n".
                 "SET node += row.property",
-                ToCypherHelper::nodeLabelStorageToCypherLabelString($firstNode->getNodeLabels()),
+                ToStringHelper::labelsToString($firstNode->getLabels()),
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstNode, 'row.identifier')
             ),
             [

@@ -7,7 +7,7 @@ namespace Syndesi\CypherEntityManager\EventListener\OpenCypher;
 use Laudis\Neo4j\Databags\Statement;
 use Psr\Log\LoggerInterface;
 use Syndesi\CypherDataStructures\Contract\RelationInterface;
-use Syndesi\CypherDataStructures\Helper\ToCypherHelper;
+use Syndesi\CypherDataStructures\Helper\ToStringHelper;
 use Syndesi\CypherEntityManager\Contract\OnActionCypherElementToStatementEventListenerInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarRelationQueueInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarRelationQueueStatementInterface;
@@ -78,7 +78,7 @@ class SimilarRelationQueueDeleteToStatementEventListener implements OnActionCyph
         if (!$firstRelationEndNode) {
             throw InvalidArgumentException::createForEndNodeIsNull();
         }
-        $relationType = $firstRelation->getRelationType();
+        $relationType = $firstRelation->getType();
         if (!$relationType) {
             throw InvalidArgumentException::createForRelationTypeIsNull();
         }
@@ -88,11 +88,11 @@ class SimilarRelationQueueDeleteToStatementEventListener implements OnActionCyph
                 "UNWIND \$batch as row\n".
                 "MATCH (%s {%s})-[relation:%s {%s}]->(%s {%s})\n".
                 "DELETE relation",
-                ToCypherHelper::nodeLabelStorageToCypherLabelString($firstRelationStartNode->getNodeLabels()),
+                ToStringHelper::labelsToString($firstRelationStartNode->getLabels()),
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelationStartNode, 'row.startNodeIdentifier'),
-                (string) $relationType,
+                $relationType,
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelation, 'row.relationIdentifier'),
-                ToCypherHelper::nodeLabelStorageToCypherLabelString($firstRelationEndNode->getNodeLabels()),
+                ToStringHelper::labelsToString($firstRelationEndNode->getLabels()),
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelationEndNode, 'row.endNodeIdentifier'),
             ),
             [

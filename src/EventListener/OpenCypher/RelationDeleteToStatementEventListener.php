@@ -7,7 +7,7 @@ namespace Syndesi\CypherEntityManager\EventListener\OpenCypher;
 use Laudis\Neo4j\Databags\Statement;
 use Psr\Log\LoggerInterface;
 use Syndesi\CypherDataStructures\Contract\RelationInterface;
-use Syndesi\CypherDataStructures\Helper\ToCypherHelper;
+use Syndesi\CypherDataStructures\Helper\ToStringHelper;
 use Syndesi\CypherEntityManager\Contract\OnActionCypherElementToStatementEventListenerInterface;
 use Syndesi\CypherEntityManager\Contract\RelationStatementInterface;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
@@ -56,11 +56,11 @@ class RelationDeleteToStatementEventListener implements OnActionCypherElementToS
             sprintf(
                 "MATCH (%s {%s})-[relation:%s {%s}]->(%s {%s})\n".
                 "DELETE relation",
-                ToCypherHelper::nodeLabelStorageToCypherLabelString($startNode->getNodeLabels()),
+                ToStringHelper::labelsToString($startNode->getLabels()),
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($startNode, '$startNode'),
-                (string) $relation->getRelationType(),
+                $relation->getType(),
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($relation, '$identifier'),
-                ToCypherHelper::nodeLabelStorageToCypherLabelString($endNode->getNodeLabels()),
+                ToStringHelper::labelsToString($endNode->getLabels()),
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($endNode, '$endNode')
             ),
             [

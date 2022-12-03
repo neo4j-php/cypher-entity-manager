@@ -7,8 +7,7 @@ namespace Syndesi\CypherEntityManager\EventListener\OpenCypher;
 use Laudis\Neo4j\Databags\Statement;
 use Psr\Log\LoggerInterface;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
-use Syndesi\CypherDataStructures\Contract\PropertyNameInterface;
-use Syndesi\CypherDataStructures\Helper\ToCypherHelper;
+use Syndesi\CypherDataStructures\Helper\ToStringHelper;
 use Syndesi\CypherEntityManager\Contract\NodeStatementInterface;
 use Syndesi\CypherEntityManager\Contract\OnActionCypherElementToStatementEventListenerInterface;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
@@ -43,21 +42,19 @@ class NodeCreateToStatementEventListener implements OnActionCypherElementToState
     public static function nodeStatement(NodeInterface $node): Statement
     {
         $propertyString = [];
-        $propertyValues = [];
-        /** @var PropertyNameInterface $propertyName */
-        foreach ($node->getProperties() as $propertyName) {
+        $propertyValues = $node->getProperties();
+        foreach ($node->getProperties() as $propertyName => $propertyValue) {
             $propertyString[] = sprintf(
                 "%s: $%s",
-                (string) $propertyName,
-                (string) $propertyName
+                $propertyName,
+                $propertyName
             );
-            $propertyValues[(string) $propertyName] = $node->getProperty($propertyName);
         }
 
         return new Statement(
             sprintf(
                 "CREATE (%s {%s})",
-                ToCypherHelper::nodeLabelStorageToCypherLabelString($node->getNodeLabels()),
+                ToStringHelper::labelsToString($node->getLabels()),
                 implode(', ', $propertyString)
             ),
             $propertyValues

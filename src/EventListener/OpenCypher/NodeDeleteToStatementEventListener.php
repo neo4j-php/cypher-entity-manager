@@ -7,7 +7,7 @@ namespace Syndesi\CypherEntityManager\EventListener\OpenCypher;
 use Laudis\Neo4j\Databags\Statement;
 use Psr\Log\LoggerInterface;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
-use Syndesi\CypherDataStructures\Helper\ToCypherHelper;
+use Syndesi\CypherDataStructures\Helper\ToStringHelper;
 use Syndesi\CypherEntityManager\Contract\NodeStatementInterface;
 use Syndesi\CypherEntityManager\Contract\OnActionCypherElementToStatementEventListenerInterface;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
@@ -46,7 +46,7 @@ class NodeDeleteToStatementEventListener implements OnActionCypherElementToState
             sprintf(
                 "MATCH (node%s {%s})\n".
                 "DETACH DELETE node",
-                ToCypherHelper::nodeLabelStorageToCypherLabelString($node->getNodeLabels()),
+                ToStringHelper::labelsToString($node->getLabels()),
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($node, '$identifier')
             ),
             [

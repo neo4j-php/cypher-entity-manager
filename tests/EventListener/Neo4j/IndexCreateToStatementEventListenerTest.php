@@ -16,7 +16,7 @@ use Syndesi\CypherDataStructures\Type\NodeLabel;
 use Syndesi\CypherDataStructures\Type\PropertyName;
 use Syndesi\CypherDataStructures\Type\RelationType;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
-use Syndesi\CypherEntityManager\EventListener\Neo4j\IndexCreateToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\Neo4j\NodeIndexCreateToStatementEventListener;
 use Syndesi\CypherEntityManager\Exception\InvalidArgumentException;
 use Syndesi\CypherEntityManager\Tests\ProphesizeTestCase;
 use Syndesi\CypherEntityManager\Type\ActionCypherElement;
@@ -37,7 +37,7 @@ class IndexCreateToStatementEventListenerTest extends ProphesizeTestCase
         $logger = (new Logger('logger'))
             ->pushHandler($loggerHandler);
 
-        $eventListener = new IndexCreateToStatementEventListener($logger);
+        $eventListener = new NodeIndexCreateToStatementEventListener($logger);
         $eventListener->onActionCypherElementToStatementEvent($event);
 
         $this->assertTrue($event->isPropagationStopped());
@@ -55,7 +55,7 @@ class IndexCreateToStatementEventListenerTest extends ProphesizeTestCase
         $actionCypherElement = new ActionCypherElement(ActionType::MERGE, $index);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
 
-        $eventListener = new IndexCreateToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
+        $eventListener = new NodeIndexCreateToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
         $eventListener->onActionCypherElementToStatementEvent($event);
 
         $this->assertFalse($event->isPropagationStopped());
@@ -68,7 +68,7 @@ class IndexCreateToStatementEventListenerTest extends ProphesizeTestCase
         $actionCypherElement = new ActionCypherElement(ActionType::CREATE, $node);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
 
-        $eventListener = new IndexCreateToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
+        $eventListener = new NodeIndexCreateToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
         $eventListener->onActionCypherElementToStatementEvent($event);
 
         $this->assertFalse($event->isPropagationStopped());
@@ -83,7 +83,7 @@ class IndexCreateToStatementEventListenerTest extends ProphesizeTestCase
             ->setIndexName(new IndexName('index_node'))
             ->addProperty(new PropertyName('id'));
 
-        $nodeStatement = IndexCreateToStatementEventListener::indexStatement($nodeIndex);
+        $nodeStatement = NodeIndexCreateToStatementEventListener::indexStatement($nodeIndex);
         $this->assertSame('CREATE BTREE INDEX index_node IF NOT EXISTS FOR (e:Node) ON (e.id)', $nodeStatement->getText());
 
         $relationIndex = (new Index())
@@ -92,7 +92,7 @@ class IndexCreateToStatementEventListenerTest extends ProphesizeTestCase
             ->setIndexName(new IndexName('index_relation'))
             ->addProperty(new PropertyName('id'));
 
-        $relationStatement = IndexCreateToStatementEventListener::indexStatement($relationIndex);
+        $relationStatement = NodeIndexCreateToStatementEventListener::indexStatement($relationIndex);
         $this->assertSame('CREATE BTREE INDEX index_relation IF NOT EXISTS FOR ()-[e:RELATION]-() ON (e.id)', $relationStatement->getText());
     }
 
@@ -108,7 +108,7 @@ class IndexCreateToStatementEventListenerTest extends ProphesizeTestCase
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Index type can not be null');
-        IndexCreateToStatementEventListener::indexStatement($nodeIndex);
+        NodeIndexCreateToStatementEventListener::indexStatement($nodeIndex);
     }
 
     public function testInvalidIndexStatementWithEmptyElementLabel(): void
@@ -123,6 +123,6 @@ class IndexCreateToStatementEventListenerTest extends ProphesizeTestCase
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Index for (node label / relation type) can not be null');
-        IndexCreateToStatementEventListener::indexStatement($nodeIndex);
+        NodeIndexCreateToStatementEventListener::indexStatement($nodeIndex);
     }
 }

@@ -16,7 +16,7 @@ use Syndesi\CypherDataStructures\Type\NodeLabel;
 use Syndesi\CypherDataStructures\Type\PropertyName;
 use Syndesi\CypherDataStructures\Type\RelationType;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
-use Syndesi\CypherEntityManager\EventListener\Neo4j\ConstraintDeleteToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\Neo4j\NodeConstraintDeleteToStatementEventListener;
 use Syndesi\CypherEntityManager\Exception\InvalidArgumentException;
 use Syndesi\CypherEntityManager\Tests\ProphesizeTestCase;
 use Syndesi\CypherEntityManager\Type\ActionCypherElement;
@@ -37,7 +37,7 @@ class ConstraintDeleteToStatementEventListenerTest extends ProphesizeTestCase
         $logger = (new Logger('logger'))
             ->pushHandler($loggerHandler);
 
-        $eventListener = new ConstraintDeleteToStatementEventListener($logger);
+        $eventListener = new NodeConstraintDeleteToStatementEventListener($logger);
         $eventListener->onActionCypherElementToStatementEvent($event);
 
         $this->assertTrue($event->isPropagationStopped());
@@ -55,7 +55,7 @@ class ConstraintDeleteToStatementEventListenerTest extends ProphesizeTestCase
         $actionCypherElement = new ActionCypherElement(ActionType::MERGE, $constraint);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
 
-        $eventListener = new ConstraintDeleteToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
+        $eventListener = new NodeConstraintDeleteToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
         $eventListener->onActionCypherElementToStatementEvent($event);
 
         $this->assertFalse($event->isPropagationStopped());
@@ -68,7 +68,7 @@ class ConstraintDeleteToStatementEventListenerTest extends ProphesizeTestCase
         $actionCypherElement = new ActionCypherElement(ActionType::DELETE, $node);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
 
-        $eventListener = new ConstraintDeleteToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
+        $eventListener = new NodeConstraintDeleteToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
         $eventListener->onActionCypherElementToStatementEvent($event);
 
         $this->assertFalse($event->isPropagationStopped());
@@ -83,7 +83,7 @@ class ConstraintDeleteToStatementEventListenerTest extends ProphesizeTestCase
             ->setConstraintName(new ConstraintName('constraint_node'))
             ->addProperty(new PropertyName('id'));
 
-        $nodeStatement = ConstraintDeleteToStatementEventListener::constraintStatement($nodeConstraint);
+        $nodeStatement = NodeConstraintDeleteToStatementEventListener::constraintStatement($nodeConstraint);
         $this->assertSame('DROP CONSTRAINT constraint_node IF EXISTS', $nodeStatement->getText());
 
         $relationConstraint = (new Constraint())
@@ -92,7 +92,7 @@ class ConstraintDeleteToStatementEventListenerTest extends ProphesizeTestCase
             ->setConstraintName(new ConstraintName('constraint_relation'))
             ->addProperty(new PropertyName('id'));
 
-        $relationStatement = ConstraintDeleteToStatementEventListener::constraintStatement($relationConstraint);
+        $relationStatement = NodeConstraintDeleteToStatementEventListener::constraintStatement($relationConstraint);
         $this->assertSame('DROP CONSTRAINT constraint_relation IF EXISTS', $relationStatement->getText());
     }
 
@@ -108,6 +108,6 @@ class ConstraintDeleteToStatementEventListenerTest extends ProphesizeTestCase
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Constraint name can not be null');
-        ConstraintDeleteToStatementEventListener::constraintStatement($constraint);
+        NodeConstraintDeleteToStatementEventListener::constraintStatement($constraint);
     }
 }

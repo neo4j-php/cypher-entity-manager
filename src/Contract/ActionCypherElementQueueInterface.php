@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Syndesi\CypherEntityManager\Contract;
 
-use Iterator;
-
-interface ActionCypherElementQueueInterface extends Iterator
+interface ActionCypherElementQueueInterface extends \Iterator
 {
     public function enqueue(ActionCypherElementInterface $element): self;
 

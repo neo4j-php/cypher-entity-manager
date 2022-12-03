@@ -14,10 +14,10 @@ use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Log\LoggerInterface;
 use Selective\Container\Container;
 use Selective\Container\Resolver\ConstructorResolver;
-use Syndesi\CypherEntityManager\EventListener\Neo4j\ConstraintCreateToStatementEventListener;
-use Syndesi\CypherEntityManager\EventListener\Neo4j\ConstraintDeleteToStatementEventListener;
-use Syndesi\CypherEntityManager\EventListener\Neo4j\IndexCreateToStatementEventListener;
-use Syndesi\CypherEntityManager\EventListener\Neo4j\IndexDeleteToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\Neo4j\NodeConstraintCreateToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\Neo4j\NodeConstraintDeleteToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\Neo4j\NodeIndexCreateToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\Neo4j\NodeIndexDeleteToStatementEventListener;
 use Syndesi\CypherEntityManager\EventListener\OpenCypher\NodeCreateToStatementEventListener;
 use Syndesi\CypherEntityManager\EventListener\OpenCypher\NodeDeleteToStatementEventListener;
 use Syndesi\CypherEntityManager\EventListener\OpenCypher\NodeMergeToStatementEventListener;
@@ -64,10 +64,10 @@ class ContainerTestCase extends ProphesizeTestCase
         $listenerProvider->addSubscriber(SimilarRelationQueueCreateToStatementEventListener::class, SimilarRelationQueueCreateToStatementEventListener::class);
         $listenerProvider->addSubscriber(SimilarRelationQueueMergeToStatementEventListener::class, SimilarRelationQueueMergeToStatementEventListener::class);
         $listenerProvider->addSubscriber(SimilarRelationQueueDeleteToStatementEventListener::class, SimilarRelationQueueDeleteToStatementEventListener::class);
-        $listenerProvider->addSubscriber(IndexCreateToStatementEventListener::class, IndexCreateToStatementEventListener::class);
-        $listenerProvider->addSubscriber(IndexDeleteToStatementEventListener::class, IndexDeleteToStatementEventListener::class);
-        $listenerProvider->addSubscriber(ConstraintCreateToStatementEventListener::class, ConstraintCreateToStatementEventListener::class);
-        $listenerProvider->addSubscriber(ConstraintDeleteToStatementEventListener::class, ConstraintDeleteToStatementEventListener::class);
+        $listenerProvider->addSubscriber(NodeIndexCreateToStatementEventListener::class, NodeIndexCreateToStatementEventListener::class);
+        $listenerProvider->addSubscriber(NodeIndexDeleteToStatementEventListener::class, NodeIndexDeleteToStatementEventListener::class);
+        $listenerProvider->addSubscriber(NodeConstraintCreateToStatementEventListener::class, NodeConstraintCreateToStatementEventListener::class);
+        $listenerProvider->addSubscriber(NodeConstraintDeleteToStatementEventListener::class, NodeConstraintDeleteToStatementEventListener::class);
         $this->container->set(ListenerProviderInterface::class, $listenerProvider);
         $this->container->set(EventDispatcherInterface::class, new Dispatcher(
             $this->container->get(ListenerProviderInterface::class),

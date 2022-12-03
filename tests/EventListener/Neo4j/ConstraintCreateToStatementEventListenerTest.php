@@ -16,7 +16,7 @@ use Syndesi\CypherDataStructures\Type\NodeLabel;
 use Syndesi\CypherDataStructures\Type\PropertyName;
 use Syndesi\CypherDataStructures\Type\RelationType;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
-use Syndesi\CypherEntityManager\EventListener\Neo4j\ConstraintCreateToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\Neo4j\NodeConstraintCreateToStatementEventListener;
 use Syndesi\CypherEntityManager\Exception\InvalidArgumentException;
 use Syndesi\CypherEntityManager\Tests\ProphesizeTestCase;
 use Syndesi\CypherEntityManager\Type\ActionCypherElement;
@@ -37,7 +37,7 @@ class ConstraintCreateToStatementEventListenerTest extends ProphesizeTestCase
         $logger = (new Logger('logger'))
             ->pushHandler($loggerHandler);
 
-        $eventListener = new ConstraintCreateToStatementEventListener($logger);
+        $eventListener = new NodeConstraintCreateToStatementEventListener($logger);
         $eventListener->onActionCypherElementToStatementEvent($event);
 
         $this->assertTrue($event->isPropagationStopped());
@@ -55,7 +55,7 @@ class ConstraintCreateToStatementEventListenerTest extends ProphesizeTestCase
         $actionCypherElement = new ActionCypherElement(ActionType::MERGE, $constraint);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
 
-        $eventListener = new ConstraintCreateToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
+        $eventListener = new NodeConstraintCreateToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
         $eventListener->onActionCypherElementToStatementEvent($event);
 
         $this->assertFalse($event->isPropagationStopped());
@@ -68,7 +68,7 @@ class ConstraintCreateToStatementEventListenerTest extends ProphesizeTestCase
         $actionCypherElement = new ActionCypherElement(ActionType::CREATE, $node);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
 
-        $eventListener = new ConstraintCreateToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
+        $eventListener = new NodeConstraintCreateToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
         $eventListener->onActionCypherElementToStatementEvent($event);
 
         $this->assertFalse($event->isPropagationStopped());
@@ -83,7 +83,7 @@ class ConstraintCreateToStatementEventListenerTest extends ProphesizeTestCase
             ->setConstraintName(new ConstraintName('constraint_node'))
             ->addProperty(new PropertyName('id'));
 
-        $nodeStatement = ConstraintCreateToStatementEventListener::constraintStatement($nodeConstraint);
+        $nodeStatement = NodeConstraintCreateToStatementEventListener::constraintStatement($nodeConstraint);
         $this->assertSame('CREATE CONSTRAINT constraint_node FOR (e:Node) REQUIRE (e.id) IS UNIQUE', $nodeStatement->getText());
 
         $relationConstraint = (new Constraint())
@@ -92,7 +92,7 @@ class ConstraintCreateToStatementEventListenerTest extends ProphesizeTestCase
             ->setConstraintName(new ConstraintName('constraint_relation'))
             ->addProperty(new PropertyName('id'));
 
-        $relationStatement = ConstraintCreateToStatementEventListener::constraintStatement($relationConstraint);
+        $relationStatement = NodeConstraintCreateToStatementEventListener::constraintStatement($relationConstraint);
         $this->assertSame('CREATE CONSTRAINT constraint_relation FOR ()-[e:RELATION]-() REQUIRE (e.id) IS NOT NULL', $relationStatement->getText());
     }
 
@@ -108,7 +108,7 @@ class ConstraintCreateToStatementEventListenerTest extends ProphesizeTestCase
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Constraint name can not be null');
-        ConstraintCreateToStatementEventListener::constraintStatement($constraint);
+        NodeConstraintCreateToStatementEventListener::constraintStatement($constraint);
     }
 
     public function testInvalidIndexStatementWithEmptyElementLabel(): void
@@ -123,7 +123,7 @@ class ConstraintCreateToStatementEventListenerTest extends ProphesizeTestCase
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Constraint for (node label / relation type) can not be null');
-        ConstraintCreateToStatementEventListener::constraintStatement($constraint);
+        NodeConstraintCreateToStatementEventListener::constraintStatement($constraint);
     }
 
     public function testInvalidIndexStatementWithEmptyConstraintType(): void
@@ -138,6 +138,6 @@ class ConstraintCreateToStatementEventListenerTest extends ProphesizeTestCase
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Constraint type can not be null');
-        ConstraintCreateToStatementEventListener::constraintStatement($constraint);
+        NodeConstraintCreateToStatementEventListener::constraintStatement($constraint);
     }
 }

@@ -16,7 +16,7 @@ use Syndesi\CypherDataStructures\Type\NodeLabel;
 use Syndesi\CypherDataStructures\Type\PropertyName;
 use Syndesi\CypherDataStructures\Type\RelationType;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
-use Syndesi\CypherEntityManager\EventListener\Neo4j\IndexDeleteToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\Neo4j\NodeIndexDeleteToStatementEventListener;
 use Syndesi\CypherEntityManager\Exception\InvalidArgumentException;
 use Syndesi\CypherEntityManager\Tests\ProphesizeTestCase;
 use Syndesi\CypherEntityManager\Type\ActionCypherElement;
@@ -37,7 +37,7 @@ class IndexDeleteToStatementEventListenerTest extends ProphesizeTestCase
         $logger = (new Logger('logger'))
             ->pushHandler($loggerHandler);
 
-        $eventListener = new IndexDeleteToStatementEventListener($logger);
+        $eventListener = new NodeIndexDeleteToStatementEventListener($logger);
         $eventListener->onActionCypherElementToStatementEvent($event);
 
         $this->assertTrue($event->isPropagationStopped());
@@ -55,7 +55,7 @@ class IndexDeleteToStatementEventListenerTest extends ProphesizeTestCase
         $actionCypherElement = new ActionCypherElement(ActionType::CREATE, $index);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
 
-        $eventListener = new IndexDeleteToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
+        $eventListener = new NodeIndexDeleteToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
         $eventListener->onActionCypherElementToStatementEvent($event);
 
         $this->assertFalse($event->isPropagationStopped());
@@ -68,7 +68,7 @@ class IndexDeleteToStatementEventListenerTest extends ProphesizeTestCase
         $actionCypherElement = new ActionCypherElement(ActionType::DELETE, $node);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
 
-        $eventListener = new IndexDeleteToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
+        $eventListener = new NodeIndexDeleteToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
         $eventListener->onActionCypherElementToStatementEvent($event);
 
         $this->assertFalse($event->isPropagationStopped());
@@ -83,7 +83,7 @@ class IndexDeleteToStatementEventListenerTest extends ProphesizeTestCase
             ->setIndexName(new IndexName('index_node'))
             ->addProperty(new PropertyName('id'));
 
-        $nodeStatement = IndexDeleteToStatementEventListener::indexStatement($nodeIndex);
+        $nodeStatement = NodeIndexDeleteToStatementEventListener::indexStatement($nodeIndex);
         $this->assertSame('DROP INDEX index_node IF EXISTS', $nodeStatement->getText());
 
         $relationIndex = (new Index())
@@ -92,7 +92,7 @@ class IndexDeleteToStatementEventListenerTest extends ProphesizeTestCase
             ->setIndexName(new IndexName('index_relation'))
             ->addProperty(new PropertyName('id'));
 
-        $relationStatement = IndexDeleteToStatementEventListener::indexStatement($relationIndex);
+        $relationStatement = NodeIndexDeleteToStatementEventListener::indexStatement($relationIndex);
         $this->assertSame('DROP INDEX index_relation IF EXISTS', $relationStatement->getText());
     }
 
@@ -108,6 +108,6 @@ class IndexDeleteToStatementEventListenerTest extends ProphesizeTestCase
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Index name can not be null');
-        IndexDeleteToStatementEventListener::indexStatement($nodeIndex);
+        NodeIndexDeleteToStatementEventListener::indexStatement($nodeIndex);
     }
 }

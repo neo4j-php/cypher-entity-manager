@@ -13,6 +13,9 @@ use Syndesi\CypherDataStructures\Contract\RelationInterface;
 use Syndesi\CypherDataStructures\Helper\ToCypherHelper;
 use Syndesi\CypherEntityManager\Exception\InvalidArgumentException;
 
+/**
+ * todo fix.
+ */
 class StructureHelper
 {
     public static function getEmptyStatement(): Statement

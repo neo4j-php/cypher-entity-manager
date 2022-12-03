@@ -7,14 +7,14 @@ namespace Syndesi\CypherEntityManager\Tests\Trait;
 use PHPUnit\Framework\TestCase;
 use Syndesi\CypherDataStructures\Type\Constraint;
 use Syndesi\CypherDataStructures\Type\ConstraintType;
-use Syndesi\CypherEntityManager\Event\ConstraintPostCreateEvent;
+use Syndesi\CypherEntityManager\Event\NodeConstraintPostCreateEvent;
 
 class ConstraintPostCreateEventTest extends TestCase
 {
     public function testConstraintPostCreateEvent(): void
     {
         $element = new Constraint();
-        $event = new ConstraintPostCreateEvent($element);
+        $event = new NodeConstraintPostCreateEvent($element);
         $this->assertSame($element, $event->getElement());
     }
 
@@ -22,7 +22,7 @@ class ConstraintPostCreateEventTest extends TestCase
     {
         $element = new Constraint();
         $element->setConstraintType(ConstraintType::UNIQUE);
-        $event = new ConstraintPostCreateEvent($element);
+        $event = new NodeConstraintPostCreateEvent($element);
         $this->assertSame(ConstraintType::UNIQUE, $event->getElement()->getConstraintType());
         $event->getElement()->setConstraintType(ConstraintType::NOT_NULL);
         $this->assertSame(ConstraintType::NOT_NULL, $event->getElement()->getConstraintType());

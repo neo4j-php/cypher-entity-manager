@@ -9,14 +9,14 @@ use Syndesi\CypherDataStructures\Type\Constraint;
 use Syndesi\CypherDataStructures\Type\Index;
 use Syndesi\CypherDataStructures\Type\Node;
 use Syndesi\CypherDataStructures\Type\Relation;
-use Syndesi\CypherEntityManager\Event\ConstraintPostCreateEvent;
-use Syndesi\CypherEntityManager\Event\ConstraintPostDeleteEvent;
-use Syndesi\CypherEntityManager\Event\ConstraintPreCreateEvent;
-use Syndesi\CypherEntityManager\Event\ConstraintPreDeleteEvent;
-use Syndesi\CypherEntityManager\Event\IndexPostCreateEvent;
-use Syndesi\CypherEntityManager\Event\IndexPostDeleteEvent;
-use Syndesi\CypherEntityManager\Event\IndexPreCreateEvent;
-use Syndesi\CypherEntityManager\Event\IndexPreDeleteEvent;
+use Syndesi\CypherEntityManager\Event\NodeConstraintPostCreateEvent;
+use Syndesi\CypherEntityManager\Event\NodeConstraintPostDeleteEvent;
+use Syndesi\CypherEntityManager\Event\NodeConstraintPreCreateEvent;
+use Syndesi\CypherEntityManager\Event\NodeConstraintPreDeleteEvent;
+use Syndesi\CypherEntityManager\Event\NodeIndexPostCreateEvent;
+use Syndesi\CypherEntityManager\Event\NodeIndexPostDeleteEvent;
+use Syndesi\CypherEntityManager\Event\NodeIndexPreCreateEvent;
+use Syndesi\CypherEntityManager\Event\NodeIndexPreDeleteEvent;
 use Syndesi\CypherEntityManager\Event\NodePostCreateEvent;
 use Syndesi\CypherEntityManager\Event\NodePostDeleteEvent;
 use Syndesi\CypherEntityManager\Event\NodePostMergeEvent;
@@ -126,56 +126,56 @@ class LifecycleEventHandlerTest extends TestCase
                 new ActionCypherElement(ActionType::CREATE, new Index()),
                 true,
                 [
-                    IndexPreCreateEvent::class,
+                    NodeIndexPreCreateEvent::class,
                 ],
             ],
             [
                 new ActionCypherElement(ActionType::CREATE, new Index()),
                 false,
                 [
-                    IndexPostCreateEvent::class,
+                    NodeIndexPostCreateEvent::class,
                 ],
             ],
             [
                 new ActionCypherElement(ActionType::DELETE, new Index()),
                 true,
                 [
-                    IndexPreDeleteEvent::class,
+                    NodeIndexPreDeleteEvent::class,
                 ],
             ],
             [
                 new ActionCypherElement(ActionType::DELETE, new Index()),
                 false,
                 [
-                    IndexPostDeleteEvent::class,
+                    NodeIndexPostDeleteEvent::class,
                 ],
             ],
             [
                 new ActionCypherElement(ActionType::CREATE, new Constraint()),
                 true,
                 [
-                    ConstraintPreCreateEvent::class,
+                    NodeConstraintPreCreateEvent::class,
                 ],
             ],
             [
                 new ActionCypherElement(ActionType::CREATE, new Constraint()),
                 false,
                 [
-                    ConstraintPostCreateEvent::class,
+                    NodeConstraintPostCreateEvent::class,
                 ],
             ],
             [
                 new ActionCypherElement(ActionType::DELETE, new Constraint()),
                 true,
                 [
-                    ConstraintPreDeleteEvent::class,
+                    NodeConstraintPreDeleteEvent::class,
                 ],
             ],
             [
                 new ActionCypherElement(ActionType::DELETE, new Constraint()),
                 false,
                 [
-                    ConstraintPostDeleteEvent::class,
+                    NodeConstraintPostDeleteEvent::class,
                 ],
             ],
         ];

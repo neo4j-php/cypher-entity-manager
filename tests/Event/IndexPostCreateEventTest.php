@@ -7,14 +7,14 @@ namespace Syndesi\CypherEntityManager\Tests\Trait;
 use PHPUnit\Framework\TestCase;
 use Syndesi\CypherDataStructures\Type\Index;
 use Syndesi\CypherDataStructures\Type\IndexType;
-use Syndesi\CypherEntityManager\Event\IndexPostCreateEvent;
+use Syndesi\CypherEntityManager\Event\NodeIndexPostCreateEvent;
 
 class IndexPostCreateEventTest extends TestCase
 {
     public function testIndexPostCreateEvent(): void
     {
         $element = new Index();
-        $event = new IndexPostCreateEvent($element);
+        $event = new NodeIndexPostCreateEvent($element);
         $this->assertSame($element, $event->getElement());
     }
 
@@ -22,7 +22,7 @@ class IndexPostCreateEventTest extends TestCase
     {
         $element = new Index();
         $element->setIndexType(IndexType::BTREE);
-        $event = new IndexPostCreateEvent($element);
+        $event = new NodeIndexPostCreateEvent($element);
         $this->assertSame(IndexType::BTREE, $event->getElement()->getIndexType());
         $event->getElement()->setIndexType(IndexType::FULLTEXT);
         $this->assertSame(IndexType::FULLTEXT, $event->getElement()->getIndexType());

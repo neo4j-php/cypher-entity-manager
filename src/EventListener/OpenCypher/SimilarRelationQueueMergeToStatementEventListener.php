@@ -7,7 +7,7 @@ namespace Syndesi\CypherEntityManager\EventListener\OpenCypher;
 use Laudis\Neo4j\Databags\Statement;
 use Psr\Log\LoggerInterface;
 use Syndesi\CypherDataStructures\Contract\RelationInterface;
-use Syndesi\CypherDataStructures\Helper\ToCypherHelper;
+use Syndesi\CypherDataStructures\Helper\ToStringHelper;
 use Syndesi\CypherEntityManager\Contract\OnActionCypherElementToStatementEventListenerInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarRelationQueueInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarRelationQueueStatementInterface;
@@ -79,7 +79,7 @@ class SimilarRelationQueueMergeToStatementEventListener implements OnActionCyphe
         if (!$firstRelationEndNode) {
             throw InvalidArgumentException::createForEndNodeIsNull();
         }
-        $relationType = $firstRelation->getRelationType();
+        $relationType = $firstRelation->getType();
         if (!$relationType) {
             throw InvalidArgumentException::createForRelationTypeIsNull();
         }
@@ -92,11 +92,11 @@ class SimilarRelationQueueMergeToStatementEventListener implements OnActionCyphe
                 "  (endNode%s {%s})\n".
                 "MERGE (startNode)-[relation:%s {%s}]->(endNode)\n".
                 "SET relation += row.relationProperty",
-                ToCypherHelper::nodeLabelStorageToCypherLabelString($firstRelationStartNode->getNodeLabels()),
+                ToStringHelper::labelsToString($firstRelationStartNode->getLabels()),
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelationStartNode, 'row.startNodeIdentifier'),
-                ToCypherHelper::nodeLabelStorageToCypherLabelString($firstRelationEndNode->getNodeLabels()),
+                ToStringHelper::labelsToString($firstRelationEndNode->getLabels()),
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelationEndNode, 'row.endNodeIdentifier'),
-                (string) $relationType,
+                $relationType,
                 StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelation, 'row.relationIdentifier')
             ),
             [
