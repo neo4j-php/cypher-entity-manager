@@ -41,14 +41,14 @@ class RelationIndexDeleteToStatementEventListener implements OnActionCypherEleme
 
     public static function relationIndexStatement(RelationIndexInterface $relationIndex): Statement
     {
-        $indexName = $relationIndex->getName();
-        if (null === $indexName) {
+        $name = $relationIndex->getName();
+        if (!$name) {
             throw InvalidArgumentException::createForIndexNameIsNull();
         }
 
-        return new Statement(sprintf(
+        return Statement::create(sprintf(
             "DROP INDEX %s IF EXISTS",
-            $indexName
-        ), []);
+            $name
+        ));
     }
 }

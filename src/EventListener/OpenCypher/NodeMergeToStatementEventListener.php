@@ -47,11 +47,11 @@ class NodeMergeToStatementEventListener implements OnActionCypherElementToStatem
                 "MERGE (node%s {%s})\n".
                 "SET node += \$properties",
                 ToStringHelper::labelsToString($node->getLabels()),
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($node, '$identifier')
+                StructureHelper::getPropertiesAsCypherVariableString($node->getIdentifiers(), '$identifier')
             ),
             [
-                'identifier' => StructureHelper::getIdentifiersFromElementAsArray($node),
-                'properties' => StructureHelper::getPropertiesFromElementAsArray($node),
+                'identifier' => $node->getIdentifiers(),
+                'properties' => $node->getProperties(),
             ]
         );
     }

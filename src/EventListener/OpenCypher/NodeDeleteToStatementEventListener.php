@@ -47,10 +47,10 @@ class NodeDeleteToStatementEventListener implements OnActionCypherElementToState
                 "MATCH (node%s {%s})\n".
                 "DETACH DELETE node",
                 ToStringHelper::labelsToString($node->getLabels()),
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($node, '$identifier')
+                StructureHelper::getPropertiesAsCypherVariableString($node->getIdentifiers(), '$identifier')
             ),
             [
-                'identifier' => StructureHelper::getIdentifiersFromElementAsArray($node),
+                'identifier' => $node->getIdentifiers(),
             ]
         );
     }

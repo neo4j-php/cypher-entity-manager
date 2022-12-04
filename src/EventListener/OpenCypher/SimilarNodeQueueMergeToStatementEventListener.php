@@ -51,8 +51,8 @@ class SimilarNodeQueueMergeToStatementEventListener implements OnActionCypherEle
                 $firstNode = $node;
             }
             $batch[] = [
-                'identifier' => StructureHelper::getIdentifiersFromElementAsArray($node),
-                'property' => StructureHelper::getPropertiesFromElementAsArray($node),
+                'identifier' => $node->getIdentifiers(),
+                'property' => StructureHelper::getPropertiesWhichAreNotIdentifiers($node),
             ];
         }
         if (!$firstNode) {
@@ -65,7 +65,7 @@ class SimilarNodeQueueMergeToStatementEventListener implements OnActionCypherEle
                 "MERGE (node%s {%s})\n".
                 "SET node += row.property",
                 ToStringHelper::labelsToString($firstNode->getLabels()),
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstNode, 'row.identifier')
+                StructureHelper::getPropertiesAsCypherVariableString($firstNode->getIdentifiers(), 'row.identifier')
             ),
             [
                 'batch' => $batch,

@@ -41,32 +41,29 @@ class NodeConstraintCreateToStatementEventListener implements OnActionCypherElem
 
     public static function nodeConstraintStatement(NodeConstraintInterface $nodeConstraint): Statement
     {
-        $constraintName = $nodeConstraint->getName();
-        if (null === $constraintName) {
+        $name = $nodeConstraint->getName();
+        if (!$name) {
             throw InvalidArgumentException::createForConstraintNameIsNull();
         }
-        $elementLabel = $nodeConstraint->getFor();
-        if (null === $elementLabel) {
+        $label = $nodeConstraint->getFor();
+        if (!$label) {
             throw InvalidArgumentException::createForConstraintForIsNull();
         }
-        $elementIdentifier = '(e:'.$elementLabel.')';
-        $propertyIdentifier = '';
         $properties = [];
         foreach ($nodeConstraint->getProperties() as $propertyName) {
-            $properties[] = 'e.'.((string) $propertyName);
-            $propertyIdentifier = '('.join(', ', $properties).')';
+            $properties[] = sprintf("e.%s", $propertyName);
         }
-        $constraintType = $nodeConstraint->getType();
-        if (null === $constraintType) {
+        $type = $nodeConstraint->getType();
+        if (!$type) {
             throw InvalidArgumentException::createForConstraintTypeIsNull();
         }
 
         return new Statement(sprintf(
-            "CREATE CONSTRAINT %s FOR %s REQUIRE %s IS %s",
-            $constraintName,
-            $elementIdentifier,
-            $propertyIdentifier,
-            $constraintType
+            "CREATE CONSTRAINT %s FOR (e:%s) REQUIRE (%s) IS %s",
+            $name,
+            $label,
+            join(', ', $properties),
+            $type
         ), []);
     }
 }

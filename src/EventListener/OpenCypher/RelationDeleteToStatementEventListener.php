@@ -43,12 +43,18 @@ class RelationDeleteToStatementEventListener implements OnActionCypherElementToS
 
     public static function relationStatement(RelationInterface $relation): Statement
     {
+        $type = $relation->getType();
+        if (!$type) {
+            throw InvalidArgumentException::createForRelationTypeIsNull();
+        }
+
         $startNode = $relation->getStartNode();
-        if (null === $startNode) {
+        if (!$startNode) {
             throw InvalidArgumentException::createForStartNodeIsNull();
         }
+
         $endNode = $relation->getEndNode();
-        if (null === $endNode) {
+        if (!$endNode) {
             throw InvalidArgumentException::createForEndNodeIsNull();
         }
 
@@ -57,16 +63,16 @@ class RelationDeleteToStatementEventListener implements OnActionCypherElementToS
                 "MATCH (%s {%s})-[relation:%s {%s}]->(%s {%s})\n".
                 "DELETE relation",
                 ToStringHelper::labelsToString($startNode->getLabels()),
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($startNode, '$startNode'),
-                $relation->getType(),
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($relation, '$identifier'),
+                StructureHelper::getPropertiesAsCypherVariableString($startNode->getIdentifiers(), '$startNode'),
+                $type,
+                StructureHelper::getPropertiesAsCypherVariableString($relation->getIdentifiers(), '$identifier'),
                 ToStringHelper::labelsToString($endNode->getLabels()),
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($endNode, '$endNode')
+                StructureHelper::getPropertiesAsCypherVariableString($endNode->getIdentifiers(), '$endNode')
             ),
             [
-                'identifier' => StructureHelper::getIdentifiersFromElementAsArray($relation),
-                'startNode' => StructureHelper::getIdentifiersFromElementAsArray($startNode),
-                'endNode' => StructureHelper::getIdentifiersFromElementAsArray($endNode),
+                'identifier' => $relation->getIdentifiers(),
+                'startNode' => $startNode->getIdentifiers(),
+                'endNode' => $endNode->getIdentifiers(),
             ]
         );
     }

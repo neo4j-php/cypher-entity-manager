@@ -43,12 +43,18 @@ class RelationMergeToStatementEventListener implements OnActionCypherElementToSt
 
     public static function relationStatement(RelationInterface $relation): Statement
     {
+        $type = $relation->getType();
+        if (!$type) {
+            throw InvalidArgumentException::createForRelationTypeIsNull();
+        }
+
         $startNode = $relation->getStartNode();
-        if (null === $startNode) {
+        if (!$startNode) {
             throw InvalidArgumentException::createForStartNodeIsNull();
         }
+
         $endNode = $relation->getEndNode();
-        if (null === $endNode) {
+        if (!$endNode) {
             throw InvalidArgumentException::createForEndNodeIsNull();
         }
 
@@ -60,17 +66,17 @@ class RelationMergeToStatementEventListener implements OnActionCypherElementToSt
                 "MERGE (startNode)-[relation:%s {%s}]->(endNode)\n".
                 "SET relation += \$property",
                 ToStringHelper::labelsToString($startNode->getLabels()),
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($startNode, '$startNode'),
+                StructureHelper::getPropertiesAsCypherVariableString($startNode->getIdentifiers(), '$startNode'),
                 ToStringHelper::labelsToString($endNode->getLabels()),
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($endNode, '$endNode'),
-                $relation->getType(),
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($relation, '$identifier')
+                StructureHelper::getPropertiesAsCypherVariableString($endNode->getIdentifiers(), '$endNode'),
+                $type,
+                StructureHelper::getPropertiesAsCypherVariableString($relation->getIdentifiers(), '$identifier')
             ),
             [
-                'identifier' => StructureHelper::getIdentifiersFromElementAsArray($relation),
-                'property' => StructureHelper::getPropertiesFromElementAsArray($relation),
-                'startNode' => StructureHelper::getIdentifiersFromElementAsArray($startNode),
-                'endNode' => StructureHelper::getIdentifiersFromElementAsArray($endNode),
+                'identifier' => $relation->getIdentifiers(),
+                'property' => StructureHelper::getPropertiesWhichAreNotIdentifiers($relation),
+                'startNode' => $startNode->getIdentifiers(),
+                'endNode' => $endNode->getIdentifiers(),
             ]
         );
     }

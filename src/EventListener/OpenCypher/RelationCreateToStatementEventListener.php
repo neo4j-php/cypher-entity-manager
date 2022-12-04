@@ -43,21 +43,18 @@ class RelationCreateToStatementEventListener implements OnActionCypherElementToS
 
     public static function relationStatement(RelationInterface $relation): Statement
     {
-        $relationPropertyString = [];
-        $relationPropertyValues = $relation->getProperties();
-        foreach ($relation->getProperties() as $propertyName => $propertyValue) {
-            $relationPropertyString[] = sprintf(
-                "%s: \$relation.%s",
-                $propertyName,
-                $propertyName
-            );
+        $type = $relation->getType();
+        if (!$type) {
+            throw InvalidArgumentException::createForRelationTypeIsNull();
         }
+
         $startNode = $relation->getStartNode();
-        if (null === $startNode) {
+        if (!$startNode) {
             throw InvalidArgumentException::createForStartNodeIsNull();
         }
+
         $endNode = $relation->getEndNode();
-        if (null === $endNode) {
+        if (!$endNode) {
             throw InvalidArgumentException::createForEndNodeIsNull();
         }
 
@@ -68,16 +65,16 @@ class RelationCreateToStatementEventListener implements OnActionCypherElementToS
                 "  (endNode%s {%s})\n".
                 "CREATE (startNode)-[:%s {%s}]->(endNode)",
                 ToStringHelper::labelsToString($startNode->getLabels()),
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($startNode, '$startNode'),
+                StructureHelper::getPropertiesAsCypherVariableString($startNode->getIdentifiers(), '$startNode'),
                 ToStringHelper::labelsToString($endNode->getLabels()),
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($endNode, '$endNode'),
-                $relation->getType(),
-                implode(', ', $relationPropertyString)
+                StructureHelper::getPropertiesAsCypherVariableString($endNode->getIdentifiers(), '$endNode'),
+                $type,
+                StructureHelper::getPropertiesAsCypherVariableString($relation->getProperties(), '$relation')
             ),
             [
-                'relation' => $relationPropertyValues,
-                'startNode' => StructureHelper::getIdentifiersFromElementAsArray($startNode),
-                'endNode' => StructureHelper::getIdentifiersFromElementAsArray($endNode),
+                'relation' => $relation->getProperties(),
+                'startNode' => $startNode->getIdentifiers(),
+                'endNode' => $endNode->getIdentifiers(),
             ]
         );
     }

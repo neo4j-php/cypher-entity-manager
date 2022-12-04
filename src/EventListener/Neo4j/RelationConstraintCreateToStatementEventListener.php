@@ -41,31 +41,28 @@ class RelationConstraintCreateToStatementEventListener implements OnActionCypher
 
     public static function relationConstraintStatement(RelationConstraintInterface $relationConstraint): Statement
     {
-        $constraintName = $relationConstraint->getName();
-        if (null === $constraintName) {
+        $name = $relationConstraint->getName();
+        if (!$name) {
             throw InvalidArgumentException::createForConstraintNameIsNull();
         }
-        $elementLabel = $relationConstraint->getFor();
-        if (null === $elementLabel) {
+        $relationType = $relationConstraint->getFor();
+        if (!$relationType) {
             throw InvalidArgumentException::createForConstraintForIsNull();
         }
-        $elementIdentifier = '()-[e:'.$elementLabel.']-()';
-        $propertyIdentifier = '';
         $properties = [];
         foreach ($relationConstraint->getProperties() as $propertyName) {
-            $properties[] = 'e.'.((string) $propertyName);
-            $propertyIdentifier = '('.join(', ', $properties).')';
+            $properties[] = sprintf("e.%s", $propertyName);
         }
         $constraintType = $relationConstraint->getType();
-        if (null === $constraintType) {
+        if (!$constraintType) {
             throw InvalidArgumentException::createForConstraintTypeIsNull();
         }
 
         return new Statement(sprintf(
-            "CREATE CONSTRAINT %s FOR %s REQUIRE %s IS %s",
-            $constraintName,
-            $elementIdentifier,
-            $propertyIdentifier,
+            "CREATE CONSTRAINT %s FOR ()-[e:%s]-() REQUIRE (%s) IS %s",
+            $name,
+            $relationType,
+            join(', ', $properties),
             $constraintType
         ), []);
     }

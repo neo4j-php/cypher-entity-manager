@@ -64,24 +64,28 @@ class SimilarRelationQueueMergeToStatementEventListener implements OnActionCyphe
                 $firstRelationEndNode = $endNode;
             }
             $batch[] = [
-                'startNodeIdentifier' => StructureHelper::getIdentifiersFromElementAsArray($startNode),
-                'endNodeIdentifier' => StructureHelper::getIdentifiersFromElementAsArray($endNode),
-                'relationIdentifier' => StructureHelper::getIdentifiersFromElementAsArray($relation),
-                'relationProperty' => StructureHelper::getPropertiesFromElementAsArray($relation),
+                'startNodeIdentifier' => $startNode->getIdentifiers(),
+                'endNodeIdentifier' => $endNode->getIdentifiers(),
+                'relationIdentifier' => $relation->getIdentifiers(),
+                'relationProperty' => StructureHelper::getPropertiesWhichAreNotIdentifiers($relation),
             ];
         }
+
         if (!$firstRelation) {
             return StructureHelper::getEmptyStatement();
         }
+
+        $type = $firstRelation->getType();
+        if (!$type) {
+            throw InvalidArgumentException::createForRelationTypeIsNull();
+        }
+
         if (!$firstRelationStartNode) {
             throw InvalidArgumentException::createForStartNodeIsNull();
         }
+
         if (!$firstRelationEndNode) {
             throw InvalidArgumentException::createForEndNodeIsNull();
-        }
-        $relationType = $firstRelation->getType();
-        if (!$relationType) {
-            throw InvalidArgumentException::createForRelationTypeIsNull();
         }
 
         return new Statement(
@@ -93,11 +97,11 @@ class SimilarRelationQueueMergeToStatementEventListener implements OnActionCyphe
                 "MERGE (startNode)-[relation:%s {%s}]->(endNode)\n".
                 "SET relation += row.relationProperty",
                 ToStringHelper::labelsToString($firstRelationStartNode->getLabels()),
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelationStartNode, 'row.startNodeIdentifier'),
+                StructureHelper::getPropertiesAsCypherVariableString($firstRelationStartNode->getIdentifiers(), 'row.startNodeIdentifier'),
                 ToStringHelper::labelsToString($firstRelationEndNode->getLabels()),
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelationEndNode, 'row.endNodeIdentifier'),
-                $relationType,
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelation, 'row.relationIdentifier')
+                StructureHelper::getPropertiesAsCypherVariableString($firstRelationEndNode->getIdentifiers(), 'row.endNodeIdentifier'),
+                $type,
+                StructureHelper::getPropertiesAsCypherVariableString($firstRelation->getIdentifiers(), 'row.relationIdentifier')
             ),
             [
                 'batch' => $batch,

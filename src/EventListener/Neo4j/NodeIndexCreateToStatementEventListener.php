@@ -41,30 +41,32 @@ class NodeIndexCreateToStatementEventListener implements OnActionCypherElementTo
 
     public static function nodeIndexStatement(NodeIndexInterface $nodeIndex): Statement
     {
-        $propertyIdentifier = '';
-
-        $indexType = $nodeIndex->getType();
-        if (!$indexType) {
+        $type = $nodeIndex->getType();
+        if (!$type) {
             throw InvalidArgumentException::createForIndexTypeIsNull();
         }
 
-        $elementLabel = $nodeIndex->getFor();
-        if (!$elementLabel) {
-            throw InvalidArgumentException::createForIndexForIsNull();
-        }
-        $elementIdentifier = '(e:'.$elementLabel.')';
-        $properties = [];
-        foreach ($nodeIndex->getProperties() as $propertyName) {
-            $properties[] = 'e.'.$propertyName;
-            $propertyIdentifier = '('.join(', ', $properties).')';
+        $name = $nodeIndex->getName();
+        if (!$name) {
+            throw InvalidArgumentException::createForIndexNameIsNull();
         }
 
-        return new Statement(sprintf(
-            "CREATE %s INDEX %s IF NOT EXISTS FOR %s ON %s",
-            $indexType,
-            $nodeIndex->getName(),
-            $elementIdentifier,
-            $propertyIdentifier
-        ), []);
+        $label = $nodeIndex->getFor();
+        if (!$label) {
+            throw InvalidArgumentException::createForIndexForIsNull();
+        }
+
+        $properties = [];
+        foreach ($nodeIndex->getProperties() as $propertyName => $propertyValue) {
+            $properties[] = sprintf("e.%s", $propertyName);
+        }
+
+        return Statement::create(sprintf(
+            "CREATE %s INDEX %s IF NOT EXISTS FOR (e:%s) ON (%s)",
+            $type,
+            $name,
+            $label,
+            join(', ', $properties)
+        ));
     }
 }

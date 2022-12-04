@@ -50,7 +50,7 @@ class SimilarNodeQueueDeleteToStatementEventListener implements OnActionCypherEl
             if (!$firstNode) {
                 $firstNode = $node;
             }
-            $batch[] = StructureHelper::getIdentifiersFromElementAsArray($node);
+            $batch[] = $node->getIdentifiers();
         }
         if (!$firstNode) {
             return StructureHelper::getEmptyStatement();
@@ -62,7 +62,7 @@ class SimilarNodeQueueDeleteToStatementEventListener implements OnActionCypherEl
                 "MATCH (node%s {%s})\n".
                 "DETACH DELETE node",
                 ToStringHelper::labelsToString($firstNode->getLabels()),
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstNode, 'row')
+                StructureHelper::getPropertiesAsCypherVariableString($firstNode->getIdentifiers(), 'row')
             ),
             [
                 'batch' => $batch,

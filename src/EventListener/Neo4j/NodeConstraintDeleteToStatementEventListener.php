@@ -41,14 +41,14 @@ class NodeConstraintDeleteToStatementEventListener implements OnActionCypherElem
 
     public static function nodeConstraintStatement(NodeConstraintInterface $nodeConstraint): Statement
     {
-        $constraintName = $nodeConstraint->getName();
-        if (null === $constraintName) {
+        $name = $nodeConstraint->getName();
+        if (!$name) {
             throw InvalidArgumentException::createForConstraintNameIsNull();
         }
 
         return new Statement(sprintf(
             "DROP CONSTRAINT %s IF EXISTS",
-            $constraintName
+            $name
         ), []);
     }
 }

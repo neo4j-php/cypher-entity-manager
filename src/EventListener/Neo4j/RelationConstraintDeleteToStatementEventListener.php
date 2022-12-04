@@ -41,14 +41,14 @@ class RelationConstraintDeleteToStatementEventListener implements OnActionCypher
 
     public static function relationConstraintStatement(RelationConstraintInterface $relationConstraint): Statement
     {
-        $constraintName = $relationConstraint->getName();
-        if (null === $constraintName) {
+        $name = $relationConstraint->getName();
+        if (!$name) {
             throw InvalidArgumentException::createForConstraintNameIsNull();
         }
 
         return new Statement(sprintf(
             "DROP CONSTRAINT %s IF EXISTS",
-            $constraintName
+            $name
         ), []);
     }
 }

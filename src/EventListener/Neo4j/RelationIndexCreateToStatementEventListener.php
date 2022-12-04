@@ -41,30 +41,32 @@ class RelationIndexCreateToStatementEventListener implements OnActionCypherEleme
 
     public static function relationIndexStatement(RelationIndexInterface $relationIndex): Statement
     {
-        $propertyIdentifier = '';
-
-        $indexType = $relationIndex->getType();
-        if (!$indexType) {
+        $relationType = $relationIndex->getType();
+        if (!$relationType) {
             throw InvalidArgumentException::createForIndexTypeIsNull();
         }
 
-        $elementLabel = $relationIndex->getFor();
-        if (!$elementLabel) {
-            throw InvalidArgumentException::createForIndexForIsNull();
-        }
-        $elementIdentifier = '()-[e:'.$elementLabel.']-()';
-        $properties = [];
-        foreach ($relationIndex->getProperties() as $propertyName) {
-            $properties[] = 'e.'.$propertyName;
-            $propertyIdentifier = '('.join(', ', $properties).')';
+        $name = $relationIndex->getName();
+        if (!$name) {
+            throw InvalidArgumentException::createForIndexNameIsNull();
         }
 
-        return new Statement(sprintf(
-            "CREATE %s INDEX %s IF NOT EXISTS FOR %s ON %s",
+        $indexType = $relationIndex->getFor();
+        if (!$indexType) {
+            throw InvalidArgumentException::createForIndexForIsNull();
+        }
+
+        $properties = [];
+        foreach ($relationIndex->getProperties() as $propertyName => $propertyValue) {
+            $properties[] = sprintf("e.%s", $propertyName);
+        }
+
+        return Statement::create(sprintf(
+            "CREATE %s INDEX %s IF NOT EXISTS FOR ()-[e:%s]-() ON (%s)",
+            $relationType,
+            $name,
             $indexType,
-            $relationIndex->getName(),
-            $elementIdentifier,
-            $propertyIdentifier
-        ), []);
+            join(', ', $properties)
+        ));
     }
 }
