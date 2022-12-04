@@ -17,10 +17,53 @@
 
 # Syndesi's Cypher Entity Manager
 
-This library provides an entity manager for Cypher data types.
-
-Links:
+This library provides an entity manager for Cypher data types.  
+This basically means, that you do not have to write create/merge/delete statements for your nodes, relations etc. per
+hand. Instead, you just call `$em->create($node)`, `$em->merge($node)`, `$em->delete($node)` and at the end
+`$em->flush()`.
 
 - [Documentation](https://neo4j-php.github.io/cypher-entity-manager)
 - [Packagist](https://packagist.org/packages/syndesi/cypher-entity-manager)
-- [Neo4j PHP Community](https://github.com/neo4j-php)
+
+## Installation
+
+To install this library, run the following code:
+
+```bash
+composer require syndesi/cypher-entity-manager
+```
+
+This is all, now you can use the library :D
+
+## Using the library
+
+```php
+use Syndesi\CypherDataStructures\Type\Node;
+use Syndesi\CypherEntityManager\Type\EntityManager;
+
+/**
+ * note: the container should be provided by your framework. manual configuration is possible, see documentation
+ * @var EntityManagerInterface $em 
+ */
+$em = $container->get(EntityManager::class);
+
+$node = new Node();
+$node
+    ->addLabel('NodeLabel')
+    ->addIdentifier('id', 123)
+    ->addProperty('someProperty', 'someValue')
+    ->addIdentifier('id');
+
+// create a node:
+$em->create($node);
+$em->flush();
+
+// update a node:
+$node->addProperty('newProperty', 'Hello world :D');
+$em->merge($node);
+$em->flush();
+
+// delete a node:
+$em->delete($node);
+$em->flush();
+```

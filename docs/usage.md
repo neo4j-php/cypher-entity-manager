@@ -50,8 +50,8 @@ $em = $container->get(EntityManagerInterface::class);
 
 $node = new Node();
 $node
-    ->addProperty(new PropertyName('id'), 1234)
-    ->addIdentifier(new PropertyName('id'));
+    ->addProperty('id', 1234)
+    ->addIdentifier('id');
 
 $em->create($node);
 $em->flush();
@@ -69,9 +69,9 @@ $em = $container->get(EntityManagerInterface::class);
 
 $node = new Node();
 $node
-    ->addProperty(new PropertyName('id'), 1234)
-    ->addProperty(new PropertyName('newProperty'), ':D')
-    ->addIdentifier(new PropertyName('id'));
+    ->addProperty('id', 1234)
+    ->addProperty('newProperty', ':D')
+    ->addIdentifier('id');
 
 $em->merge($node);
 $em->flush();
@@ -89,8 +89,8 @@ $em = $container->get(EntityManagerInterface::class);
 
 $node = new Node();
 $node
-    ->addProperty(new PropertyName('id'), 1234)
-    ->addIdentifier(new PropertyName('id'));
+    ->addProperty('id', 1234)
+    ->addIdentifier('id');
 
 $em->delete($node);
 $em->flush();

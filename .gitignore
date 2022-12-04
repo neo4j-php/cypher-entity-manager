@@ -8,3 +8,5 @@
 composer.lock
 coverage.xml
 infection.html
+/docs/.npm
+/docs/.config
