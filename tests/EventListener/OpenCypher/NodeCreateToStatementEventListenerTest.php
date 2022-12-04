@@ -9,8 +9,6 @@ use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Syndesi\CypherDataStructures\Type\Node;
-use Syndesi\CypherDataStructures\Type\NodeLabel;
-use Syndesi\CypherDataStructures\Type\PropertyName;
 use Syndesi\CypherDataStructures\Type\Relation;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
 use Syndesi\CypherEntityManager\EventListener\OpenCypher\NodeCreateToStatementEventListener;
@@ -24,10 +22,10 @@ class NodeCreateToStatementEventListenerTest extends ProphesizeTestCase
     {
         $node = new Node();
         $node
-            ->addNodeLabel(new NodeLabel("NodeLabel"))
-            ->addProperty(new PropertyName('id'), 1234)
-            ->addProperty(new PropertyName('some'), 'value')
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel("NodeLabel")
+            ->addProperty('id', 1234)
+            ->addProperty('some', 'value')
+            ->addIdentifier('id');
         $actionCypherElement = new ActionCypherElement(ActionType::CREATE, $node);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
         $loggerHandler = new TestHandler();
@@ -76,10 +74,10 @@ class NodeCreateToStatementEventListenerTest extends ProphesizeTestCase
     {
         $node = new Node();
         $node
-            ->addNodeLabel(new NodeLabel("NodeLabel"))
-            ->addProperty(new PropertyName('id'), 1234)
-            ->addProperty(new PropertyName('some'), 'value')
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel("NodeLabel")
+            ->addProperty('id', 1234)
+            ->addProperty('some', 'value')
+            ->addIdentifier('id');
 
         $statement = NodeCreateToStatementEventListener::nodeStatement($node);
 

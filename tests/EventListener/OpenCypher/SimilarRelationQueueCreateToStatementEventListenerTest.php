@@ -10,10 +10,7 @@ use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
 use Syndesi\CypherDataStructures\Type\Node;
-use Syndesi\CypherDataStructures\Type\NodeLabel;
-use Syndesi\CypherDataStructures\Type\PropertyName;
 use Syndesi\CypherDataStructures\Type\Relation;
-use Syndesi\CypherDataStructures\Type\RelationType;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
 use Syndesi\CypherEntityManager\EventListener\OpenCypher\SimilarRelationQueueCreateToStatementEventListener;
 use Syndesi\CypherEntityManager\Exception\InvalidArgumentException;
@@ -27,9 +24,9 @@ class SimilarRelationQueueCreateToStatementEventListenerTest extends ProphesizeT
     public function createNode(int $id): Node
     {
         return (new Node())
-            ->addNodeLabel(new NodeLabel('Node'))
-            ->addProperty(new PropertyName('id'), $id)
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('Node')
+            ->addProperty('id', $id)
+            ->addIdentifier('id');
     }
 
     public function createRelation(int $id, ?NodeInterface $startNode, ?NodeInterface $endNode): Relation
@@ -37,9 +34,9 @@ class SimilarRelationQueueCreateToStatementEventListenerTest extends ProphesizeT
         return (new Relation())
             ->setStartNode($startNode)
             ->setEndNode($endNode)
-            ->setRelationType(new RelationType('RELATION'))
-            ->addProperty(new PropertyName('id'), $id)
-            ->addIdentifier(new PropertyName('id'));
+            ->setType('RELATION')
+            ->addProperty('id', $id)
+            ->addIdentifier('id');
     }
 
     public function testOnActionCypherElementToStatementEvent(): void

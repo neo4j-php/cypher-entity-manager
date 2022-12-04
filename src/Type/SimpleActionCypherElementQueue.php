@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace Syndesi\CypherEntityManager\Type;
 
-use SplQueue;
 use Syndesi\CypherEntityManager\Contract\ActionCypherElementInterface;
 use Syndesi\CypherEntityManager\Contract\ActionCypherElementQueueInterface;
 
 class SimpleActionCypherElementQueue implements ActionCypherElementQueueInterface
 {
-    private SplQueue $queue;
+    private \SplQueue $queue;
 
     public function __construct()
     {
-        $this->queue = new SplQueue();
+        $this->queue = new \SplQueue();
     }
 
     public function enqueue(ActionCypherElementInterface $element): self
@@ -41,7 +40,7 @@ class SimpleActionCypherElementQueue implements ActionCypherElementQueueInterfac
 
     public function clear(): self
     {
-        $this->queue = new SplQueue();
+        $this->queue = new \SplQueue();
 
         return $this;
     }

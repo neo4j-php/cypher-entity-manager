@@ -7,10 +7,8 @@ namespace Syndesi\CypherEntityManager\Helper;
 use Laudis\Neo4j\Databags\Statement;
 use Syndesi\CypherDataStructures\Contract\HasIdentifiersInterface;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
-use Syndesi\CypherDataStructures\Contract\PropertyNameInterface;
-use Syndesi\CypherDataStructures\Contract\PropertyStorageInterface;
 use Syndesi\CypherDataStructures\Contract\RelationInterface;
-use Syndesi\CypherDataStructures\Helper\ToCypherHelper;
+use Syndesi\CypherDataStructures\Helper\ToStringHelper;
 use Syndesi\CypherEntityManager\Exception\InvalidArgumentException;
 
 class StructureHelper
@@ -20,12 +18,14 @@ class StructureHelper
         return Statement::create('MATCH (n) LIMIT 0');
     }
 
-    public static function identifierStorageToString(PropertyStorageInterface $identifiers): string
+    /**
+     * @param array<string, mixed> $identifiers
+     */
+    public static function identifiersToStructure(array $identifiers): string
     {
         $internalIdentifiers = [];
         $publicIdentifiers = [];
-        foreach ($identifiers as $key) {
-            $key = (string) $key;
+        foreach ($identifiers as $key => $value) {
             if (str_starts_with($key, '_')) {
                 $internalIdentifiers[] = $key;
             } else {
@@ -41,15 +41,15 @@ class StructureHelper
 
     public static function getNodeStructure(NodeInterface $node): string
     {
-        if (0 === $node->getIdentifiers()->count()) {
+        if (0 === count($node->getIdentifiers())) {
             throw new InvalidArgumentException('at least one identifier is required');
         }
         $parts = [];
-        $cypherLabelString = ToCypherHelper::nodeLabelStorageToCypherLabelString($node->getNodeLabels());
+        $cypherLabelString = ToStringHelper::labelsToString($node->getLabels());
         if ('' !== $cypherLabelString) {
             $parts[] = $cypherLabelString;
         }
-        $parts[] = self::identifierStorageToString($node->getIdentifiers());
+        $parts[] = self::identifiersToStructure($node->getIdentifiers());
 
         return '('.implode(' ', $parts).')';
     }
@@ -59,26 +59,29 @@ class StructureHelper
      */
     public static function getRelationStructure(RelationInterface $relation): string
     {
-        if (null === $relation->getStartNode()) {
-            throw new InvalidArgumentException('start node can not be null');
+        $startNode = $relation->getStartNode();
+        if (!$startNode) {
+            throw InvalidArgumentException::createForStartNodeIsNull();
         }
-        if (null === $relation->getEndNode()) {
-            throw new InvalidArgumentException('end node can not be null');
+        $endNode = $relation->getEndNode();
+        if (!$endNode) {
+            throw InvalidArgumentException::createForEndNodeIsNull();
         }
-        if (0 === $relation->getIdentifiers()->count()) {
+        $type = $relation->getType();
+        if (!$type) {
+            throw InvalidArgumentException::createForRelationTypeIsNull();
+        }
+        if (0 === count($relation->getIdentifiers())) {
             throw new InvalidArgumentException('at least one relation identifier is required');
         }
         $parts = [];
-        /** @psalm-suppress PossiblyNullArgument */
-        $parts[] = self::getNodeStructure($relation->getStartNode());
-        /** @psalm-suppress PossiblyNullArgument */
+        $parts[] = self::getNodeStructure($startNode);
         $parts[] = sprintf(
             "-[%s %s]->",
-            (string) $relation->getRelationType(),
-            self::identifierStorageToString($relation->getIdentifiers())
+            $type,
+            self::identifiersToStructure($relation->getIdentifiers())
         );
-        /** @psalm-suppress PossiblyNullArgument */
-        $parts[] = self::getNodeStructure($relation->getEndNode());
+        $parts[] = self::getNodeStructure($endNode);
 
         return implode('', $parts);
     }
@@ -86,47 +89,34 @@ class StructureHelper
     /**
      * @return array<string, mixed>
      */
-    public static function getIdentifiersFromElementAsArray(HasIdentifiersInterface $element): array
-    {
-        $identifiers = [];
-        /** @var PropertyNameInterface $identifier */
-        foreach ($element->getIdentifiers() as $identifier) {
-            $identifiers[$identifier->getPropertyName()] = $element->getIdentifier($identifier);
-        }
-
-        return $identifiers;
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public static function getPropertiesFromElementAsArray(HasIdentifiersInterface $element): array
+    public static function getPropertiesWhichAreNotIdentifiers(HasIdentifiersInterface $element): array
     {
         $properties = [];
-        /** @var PropertyNameInterface $property */
-        foreach ($element->getProperties() as $property) {
-            if ($element->hasIdentifier($property)) {
+        foreach ($element->getProperties() as $name => $value) {
+            if ($element->hasIdentifier($name)) {
                 continue;
             }
-            $properties[$property->getPropertyName()] = $element->getProperty($property);
+            $properties[$name] = $value;
         }
 
         return $properties;
     }
 
-    public static function getIdentifiersFromElementAsCypherVariableString(HasIdentifiersInterface $element, string $variablePrefix): string
+    /**
+     * @param array<string, mixed> $properties
+     */
+    public static function getPropertiesAsCypherVariableString(array $properties, string $variablePrefix): string
     {
-        $identifiers = [];
-        /** @var PropertyNameInterface $identifier */
-        foreach ($element->getIdentifiers() as $identifier) {
-            $identifiers[] = sprintf(
+        $parts = [];
+        foreach ($properties as $name => $value) {
+            $parts[] = sprintf(
                 "%s: %s.%s",
-                $identifier->getPropertyName(),
+                $name,
                 $variablePrefix,
-                $identifier->getPropertyName(),
+                $name,
             );
         }
 
-        return implode(', ', $identifiers);
+        return implode(', ', $parts);
     }
 }

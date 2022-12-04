@@ -4,24 +4,31 @@ declare(strict_types=1);
 
 namespace Syndesi\CypherEntityManager\Helper;
 
-use LogicException;
 use Syndesi\CypherEntityManager\Contract\Event\LifecycleEventInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarNodeQueueInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarRelationQueueInterface;
-use Syndesi\CypherEntityManager\Event\ConstraintPostCreateEvent;
-use Syndesi\CypherEntityManager\Event\ConstraintPostDeleteEvent;
-use Syndesi\CypherEntityManager\Event\ConstraintPreCreateEvent;
-use Syndesi\CypherEntityManager\Event\ConstraintPreDeleteEvent;
-use Syndesi\CypherEntityManager\Event\IndexPostCreateEvent;
-use Syndesi\CypherEntityManager\Event\IndexPostDeleteEvent;
-use Syndesi\CypherEntityManager\Event\IndexPreCreateEvent;
-use Syndesi\CypherEntityManager\Event\IndexPreDeleteEvent;
+use Syndesi\CypherEntityManager\Event\NodeConstraintPostCreateEvent;
+use Syndesi\CypherEntityManager\Event\NodeConstraintPostDeleteEvent;
+use Syndesi\CypherEntityManager\Event\NodeConstraintPreCreateEvent;
+use Syndesi\CypherEntityManager\Event\NodeConstraintPreDeleteEvent;
+use Syndesi\CypherEntityManager\Event\NodeIndexPostCreateEvent;
+use Syndesi\CypherEntityManager\Event\NodeIndexPostDeleteEvent;
+use Syndesi\CypherEntityManager\Event\NodeIndexPreCreateEvent;
+use Syndesi\CypherEntityManager\Event\NodeIndexPreDeleteEvent;
 use Syndesi\CypherEntityManager\Event\NodePostCreateEvent;
 use Syndesi\CypherEntityManager\Event\NodePostDeleteEvent;
 use Syndesi\CypherEntityManager\Event\NodePostMergeEvent;
 use Syndesi\CypherEntityManager\Event\NodePreCreateEvent;
 use Syndesi\CypherEntityManager\Event\NodePreDeleteEvent;
 use Syndesi\CypherEntityManager\Event\NodePreMergeEvent;
+use Syndesi\CypherEntityManager\Event\RelationConstraintPostCreateEvent;
+use Syndesi\CypherEntityManager\Event\RelationConstraintPostDeleteEvent;
+use Syndesi\CypherEntityManager\Event\RelationConstraintPreCreateEvent;
+use Syndesi\CypherEntityManager\Event\RelationConstraintPreDeleteEvent;
+use Syndesi\CypherEntityManager\Event\RelationIndexPostCreateEvent;
+use Syndesi\CypherEntityManager\Event\RelationIndexPostDeleteEvent;
+use Syndesi\CypherEntityManager\Event\RelationIndexPreCreateEvent;
+use Syndesi\CypherEntityManager\Event\RelationIndexPreDeleteEvent;
 use Syndesi\CypherEntityManager\Event\RelationPostCreateEvent;
 use Syndesi\CypherEntityManager\Event\RelationPostDeleteEvent;
 use Syndesi\CypherEntityManager\Event\RelationPostMergeEvent;
@@ -64,24 +71,44 @@ class LifecycleEventHelper
                     ActionType::DELETE->name => RelationPostDeleteEvent::class,
                 ],
             ],
-            ActionCypherElementType::INDEX->name => [
+            ActionCypherElementType::NODE_INDEX->name => [
                 'Pre' => [
-                    ActionType::CREATE->name => IndexPreCreateEvent::class,
-                    ActionType::DELETE->name => IndexPreDeleteEvent::class,
+                    ActionType::CREATE->name => NodeIndexPreCreateEvent::class,
+                    ActionType::DELETE->name => NodeIndexPreDeleteEvent::class,
                 ],
                 'Post' => [
-                    ActionType::CREATE->name => IndexPostCreateEvent::class,
-                    ActionType::DELETE->name => IndexPostDeleteEvent::class,
+                    ActionType::CREATE->name => NodeIndexPostCreateEvent::class,
+                    ActionType::DELETE->name => NodeIndexPostDeleteEvent::class,
                 ],
             ],
-            ActionCypherElementType::CONSTRAINT->name => [
+            ActionCypherElementType::RELATION_INDEX->name => [
                 'Pre' => [
-                    ActionType::CREATE->name => ConstraintPreCreateEvent::class,
-                    ActionType::DELETE->name => ConstraintPreDeleteEvent::class,
+                    ActionType::CREATE->name => RelationIndexPreCreateEvent::class,
+                    ActionType::DELETE->name => RelationIndexPreDeleteEvent::class,
                 ],
                 'Post' => [
-                    ActionType::CREATE->name => ConstraintPostCreateEvent::class,
-                    ActionType::DELETE->name => ConstraintPostDeleteEvent::class,
+                    ActionType::CREATE->name => RelationIndexPostCreateEvent::class,
+                    ActionType::DELETE->name => RelationIndexPostDeleteEvent::class,
+                ],
+            ],
+            ActionCypherElementType::NODE_CONSTRAINT->name => [
+                'Pre' => [
+                    ActionType::CREATE->name => NodeConstraintPreCreateEvent::class,
+                    ActionType::DELETE->name => NodeConstraintPreDeleteEvent::class,
+                ],
+                'Post' => [
+                    ActionType::CREATE->name => NodeConstraintPostCreateEvent::class,
+                    ActionType::DELETE->name => NodeConstraintPostDeleteEvent::class,
+                ],
+            ],
+            ActionCypherElementType::RELATION_CONSTRAINT->name => [
+                'Pre' => [
+                    ActionType::CREATE->name => RelationConstraintPreCreateEvent::class,
+                    ActionType::DELETE->name => RelationConstraintPreDeleteEvent::class,
+                ],
+                'Post' => [
+                    ActionType::CREATE->name => RelationConstraintPostCreateEvent::class,
+                    ActionType::DELETE->name => RelationConstraintPostDeleteEvent::class,
                 ],
             ],
         ];
@@ -113,6 +140,6 @@ class LifecycleEventHelper
             // todo build events
             return $events;
         }
-        throw new LogicException("this line can not be reached");
+        throw new \LogicException("this line can not be reached");
     }
 }

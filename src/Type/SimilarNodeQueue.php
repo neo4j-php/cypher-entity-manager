@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Syndesi\CypherEntityManager\Type;
 
-use SplQueue;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarNodeQueueInterface;
 use Syndesi\CypherEntityManager\Exception\InvalidArgumentException;
@@ -12,12 +11,12 @@ use Syndesi\CypherEntityManager\Helper\StructureHelper;
 
 class SimilarNodeQueue implements SimilarNodeQueueInterface
 {
-    private SplQueue $queue;
+    private \SplQueue $queue;
     private ?string $nodeStructure = null;
 
     public function __construct()
     {
-        $this->queue = new SplQueue();
+        $this->queue = new \SplQueue();
     }
 
     public function current(): mixed

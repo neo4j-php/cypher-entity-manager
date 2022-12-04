@@ -7,7 +7,7 @@ namespace Syndesi\CypherEntityManager\EventListener\OpenCypher;
 use Laudis\Neo4j\Databags\Statement;
 use Psr\Log\LoggerInterface;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
-use Syndesi\CypherDataStructures\Helper\ToCypherHelper;
+use Syndesi\CypherDataStructures\Helper\ToStringHelper;
 use Syndesi\CypherEntityManager\Contract\NodeStatementInterface;
 use Syndesi\CypherEntityManager\Contract\OnActionCypherElementToStatementEventListenerInterface;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
@@ -46,12 +46,12 @@ class NodeMergeToStatementEventListener implements OnActionCypherElementToStatem
             sprintf(
                 "MERGE (node%s {%s})\n".
                 "SET node += \$properties",
-                ToCypherHelper::nodeLabelStorageToCypherLabelString($node->getNodeLabels()),
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($node, '$identifier')
+                ToStringHelper::labelsToString($node->getLabels()),
+                StructureHelper::getPropertiesAsCypherVariableString($node->getIdentifiers(), '$identifier')
             ),
             [
-                'identifier' => StructureHelper::getIdentifiersFromElementAsArray($node),
-                'properties' => StructureHelper::getPropertiesFromElementAsArray($node),
+                'identifier' => $node->getIdentifiers(),
+                'properties' => $node->getProperties(),
             ]
         );
     }

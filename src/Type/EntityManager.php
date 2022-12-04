@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace Syndesi\CypherEntityManager\Type;
 
-use Exception;
 use Laudis\Neo4j\Contracts\ClientInterface;
 use Laudis\Neo4j\Contracts\TransactionInterface;
-use LogicException;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
-use ReflectionClass;
-use Syndesi\CypherDataStructures\Contract\ConstraintInterface;
-use Syndesi\CypherDataStructures\Contract\IndexInterface;
+use Syndesi\CypherDataStructures\Contract\NodeConstraintInterface;
+use Syndesi\CypherDataStructures\Contract\NodeIndexInterface;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
+use Syndesi\CypherDataStructures\Contract\RelationConstraintInterface;
+use Syndesi\CypherDataStructures\Contract\RelationIndexInterface;
 use Syndesi\CypherDataStructures\Contract\RelationInterface;
 use Syndesi\CypherEntityManager\Contract\ActionCypherElementQueueInterface;
 use Syndesi\CypherEntityManager\Contract\EntityManagerInterface;
@@ -39,7 +38,14 @@ class EntityManager implements EntityManagerInterface
         $this->queue = new SimpleActionCypherElementQueue();
     }
 
-    public function add(ActionType $actionType, RelationInterface|SimilarRelationQueueInterface|NodeInterface|IndexInterface|ConstraintInterface|SimilarNodeQueueInterface $element): self
+    public function add(ActionType $actionType, NodeInterface|
+    RelationInterface|
+    NodeIndexInterface|
+    RelationIndexInterface|
+    NodeConstraintInterface|
+    RelationConstraintInterface|
+    SimilarNodeQueueInterface|
+    SimilarRelationQueueInterface $element): self
     {
         $actionCypherElement = new ActionCypherElement($actionType, $element);
         $this->queue->enqueue($actionCypherElement);
@@ -47,21 +53,38 @@ class EntityManager implements EntityManagerInterface
         return $this;
     }
 
-    public function create(RelationInterface|SimilarRelationQueueInterface|NodeInterface|IndexInterface|ConstraintInterface|SimilarNodeQueueInterface $element): self
+    public function create(NodeInterface|
+    RelationInterface|
+    NodeIndexInterface|
+    RelationIndexInterface|
+    NodeConstraintInterface|
+    RelationConstraintInterface|
+    SimilarNodeQueueInterface|
+    SimilarRelationQueueInterface $element): self
     {
         $this->add(ActionType::CREATE, $element);
 
         return $this;
     }
 
-    public function merge(RelationInterface|SimilarRelationQueueInterface|NodeInterface|IndexInterface|ConstraintInterface|SimilarNodeQueueInterface $element): self
+    public function merge(NodeInterface|
+    RelationInterface|
+    SimilarNodeQueueInterface|
+    SimilarRelationQueueInterface $element): self
     {
         $this->add(ActionType::MERGE, $element);
 
         return $this;
     }
 
-    public function delete(RelationInterface|SimilarRelationQueueInterface|NodeInterface|IndexInterface|ConstraintInterface|SimilarNodeQueueInterface $element): self
+    public function delete(NodeInterface|
+    RelationInterface|
+    NodeIndexInterface|
+    RelationIndexInterface|
+    NodeConstraintInterface|
+    RelationConstraintInterface|
+    SimilarNodeQueueInterface|
+    SimilarRelationQueueInterface $element): self
     {
         $this->add(ActionType::DELETE, $element);
 
@@ -76,7 +99,7 @@ class EntityManager implements EntityManagerInterface
         foreach ($this->queue as $actionCypherElement) {
             $events = LifecycleEventHelper::getLifecycleEventForCypherActionElement($actionCypherElement, true);
             foreach ($events as $event) {
-                $this->logger?->debug(sprintf("Dispatching %s", (new ReflectionClass($event))->getShortName()));
+                $this->logger?->debug(sprintf("Dispatching %s", (new \ReflectionClass($event))->getShortName()));
                 $this->dispatcher->dispatch($event);
             }
 
@@ -87,11 +110,11 @@ class EntityManager implements EntityManagerInterface
             $actionCypherElementToStatementEvent = $this->dispatcher->dispatch($actionCypherElementToStatementEvent);
 
             if (!($actionCypherElementToStatementEvent instanceof ActionCypherElementToStatementEvent)) {
-                throw new LogicException('Event is not of type ActionCypherElementToStatementEvent');
+                throw new \LogicException('Event is not of type ActionCypherElementToStatementEvent');
             }
             $statement = $actionCypherElementToStatementEvent->getStatement();
             if (!$statement) {
-                throw new Exception('No event handler found which can transform action cypher element to statement');
+                throw new \Exception('No event handler found which can transform action cypher element to statement');
             }
 
             $this->client->writeTransaction(static function (TransactionInterface $tsx) use ($statement) {
@@ -100,7 +123,7 @@ class EntityManager implements EntityManagerInterface
 
             $events = LifecycleEventHelper::getLifecycleEventForCypherActionElement($actionCypherElement, false);
             foreach ($events as $event) {
-                $this->logger?->debug(sprintf("Dispatching %s", (new ReflectionClass($event))->getShortName()), [
+                $this->logger?->debug(sprintf("Dispatching %s", (new \ReflectionClass($event))->getShortName()), [
                     'element' => $event->getElement(),
                 ]);
                 $this->dispatcher->dispatch($event);

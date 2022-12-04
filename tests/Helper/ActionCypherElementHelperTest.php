@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Syndesi\CypherEntityManager\Tests\Helper;
 
 use PHPUnit\Framework\TestCase;
-use Syndesi\CypherDataStructures\Type\Constraint;
-use Syndesi\CypherDataStructures\Type\Index;
 use Syndesi\CypherDataStructures\Type\Node;
+use Syndesi\CypherDataStructures\Type\NodeConstraint;
+use Syndesi\CypherDataStructures\Type\NodeIndex;
 use Syndesi\CypherDataStructures\Type\Relation;
+use Syndesi\CypherDataStructures\Type\RelationConstraint;
+use Syndesi\CypherDataStructures\Type\RelationIndex;
 use Syndesi\CypherEntityManager\Helper\ActionCypherElementHelper;
 use Syndesi\CypherEntityManager\Type\ActionCypherElement;
 use Syndesi\CypherEntityManager\Type\ActionCypherElementType;
@@ -30,12 +32,20 @@ class ActionCypherElementHelperTest extends TestCase
                 ActionCypherElementType::RELATION,
             ],
             [
-                new ActionCypherElement(ActionType::CREATE, new Index()),
-                ActionCypherElementType::INDEX,
+                new ActionCypherElement(ActionType::CREATE, new NodeIndex()),
+                ActionCypherElementType::NODE_INDEX,
             ],
             [
-                new ActionCypherElement(ActionType::CREATE, new Constraint()),
-                ActionCypherElementType::CONSTRAINT,
+                new ActionCypherElement(ActionType::CREATE, new RelationIndex()),
+                ActionCypherElementType::RELATION_INDEX,
+            ],
+            [
+                new ActionCypherElement(ActionType::CREATE, new NodeConstraint()),
+                ActionCypherElementType::NODE_CONSTRAINT,
+            ],
+            [
+                new ActionCypherElement(ActionType::CREATE, new RelationConstraint()),
+                ActionCypherElementType::RELATION_CONSTRAINT,
             ],
             [
                 new ActionCypherElement(ActionType::CREATE, new SimilarNodeQueue()),

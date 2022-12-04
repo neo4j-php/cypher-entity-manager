@@ -9,8 +9,6 @@ use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Syndesi\CypherDataStructures\Type\Node;
-use Syndesi\CypherDataStructures\Type\NodeLabel;
-use Syndesi\CypherDataStructures\Type\PropertyName;
 use Syndesi\CypherDataStructures\Type\Relation;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
 use Syndesi\CypherEntityManager\EventListener\OpenCypher\SimilarNodeQueueCreateToStatementEventListener;
@@ -25,24 +23,24 @@ class SimilarNodeQueueCreateToStatementEventListenerTest extends ProphesizeTestC
     {
         $nodeA = new Node();
         $nodeA
-            ->addNodeLabel(new NodeLabel('Node'))
-            ->addProperty(new PropertyName('identifier'), 1001)
-            ->addProperty(new PropertyName('name'), 'a')
-            ->addIdentifier(new PropertyName('identifier'));
+            ->addLabel('Node')
+            ->addProperty('identifier', 1001)
+            ->addProperty('name', 'a')
+            ->addIdentifier('identifier');
 
         $nodeB = new Node();
         $nodeB
-            ->addNodeLabel(new NodeLabel('Node'))
-            ->addProperty(new PropertyName('identifier'), 1002)
-            ->addProperty(new PropertyName('name'), 'b')
-            ->addIdentifier(new PropertyName('identifier'));
+            ->addLabel('Node')
+            ->addProperty('identifier', 1002)
+            ->addProperty('name', 'b')
+            ->addIdentifier('identifier');
 
         $nodeC = new Node();
         $nodeC
-            ->addNodeLabel(new NodeLabel('Node'))
-            ->addProperty(new PropertyName('identifier'), 1003)
-            ->addProperty(new PropertyName('name'), 'c')
-            ->addIdentifier(new PropertyName('identifier'));
+            ->addLabel('Node')
+            ->addProperty('identifier', 1003)
+            ->addProperty('name', 'c')
+            ->addIdentifier('identifier');
 
         $similarNodeQueue = (new SimilarNodeQueue())
             ->enqueue($nodeA)
@@ -71,9 +69,9 @@ class SimilarNodeQueueCreateToStatementEventListenerTest extends ProphesizeTestC
     {
         $node = new Node();
         $node
-            ->addNodeLabel(new NodeLabel('Node'))
-            ->addProperty(new PropertyName('identifier'), 1001)
-            ->addIdentifier(new PropertyName('identifier'));
+            ->addLabel('Node')
+            ->addProperty('identifier', 1001)
+            ->addIdentifier('identifier');
 
         $similarNodeQueue = (new SimilarNodeQueue())
             ->enqueue($node);
@@ -118,24 +116,24 @@ class SimilarNodeQueueCreateToStatementEventListenerTest extends ProphesizeTestC
     {
         $nodeA = new Node();
         $nodeA
-            ->addNodeLabel(new NodeLabel('Node'))
-            ->addProperty(new PropertyName('identifier'), 1001)
-            ->addProperty(new PropertyName('name'), 'a')
-            ->addIdentifier(new PropertyName('identifier'));
+            ->addLabel('Node')
+            ->addProperty('identifier', 1001)
+            ->addProperty('name', 'a')
+            ->addIdentifier('identifier');
 
         $nodeB = new Node();
         $nodeB
-            ->addNodeLabel(new NodeLabel('Node'))
-            ->addProperty(new PropertyName('identifier'), 1002)
-            ->addProperty(new PropertyName('name'), 'b')
-            ->addIdentifier(new PropertyName('identifier'));
+            ->addLabel('Node')
+            ->addProperty('identifier', 1002)
+            ->addProperty('name', 'b')
+            ->addIdentifier('identifier');
 
         $nodeC = new Node();
         $nodeC
-            ->addNodeLabel(new NodeLabel('Node'))
-            ->addProperty(new PropertyName('identifier'), 1003)
-            ->addProperty(new PropertyName('name'), 'c')
-            ->addIdentifier(new PropertyName('identifier'));
+            ->addLabel('Node')
+            ->addProperty('identifier', 1003)
+            ->addProperty('name', 'c')
+            ->addIdentifier('identifier');
 
         $similarNodeQueue = new SimilarNodeQueue();
         $similarNodeQueue

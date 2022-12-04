@@ -7,7 +7,7 @@ namespace Syndesi\CypherEntityManager\EventListener\OpenCypher;
 use Laudis\Neo4j\Databags\Statement;
 use Psr\Log\LoggerInterface;
 use Syndesi\CypherDataStructures\Contract\RelationInterface;
-use Syndesi\CypherDataStructures\Helper\ToCypherHelper;
+use Syndesi\CypherDataStructures\Helper\ToStringHelper;
 use Syndesi\CypherEntityManager\Contract\OnActionCypherElementToStatementEventListenerInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarRelationQueueInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarRelationQueueStatementInterface;
@@ -64,24 +64,28 @@ class SimilarRelationQueueCreateToStatementEventListener implements OnActionCyph
                 $firstRelationEndNode = $endNode;
             }
             $batch[] = [
-                'startNode' => StructureHelper::getIdentifiersFromElementAsArray($startNode),
-                'endNode' => StructureHelper::getIdentifiersFromElementAsArray($endNode),
-                'identifier' => StructureHelper::getIdentifiersFromElementAsArray($relation),
-                'property' => StructureHelper::getPropertiesFromElementAsArray($relation),
+                'startNode' => $startNode->getIdentifiers(),
+                'endNode' => $endNode->getIdentifiers(),
+                'identifier' => $relation->getIdentifiers(),
+                'property' => StructureHelper::getPropertiesWhichAreNotIdentifiers($relation),
             ];
         }
+
         if (!$firstRelation) {
             return StructureHelper::getEmptyStatement();
         }
+
+        $type = $firstRelation->getType();
+        if (!$type) {
+            throw InvalidArgumentException::createForRelationTypeIsNull();
+        }
+
         if (!$firstRelationStartNode) {
             throw InvalidArgumentException::createForStartNodeIsNull();
         }
+
         if (!$firstRelationEndNode) {
             throw InvalidArgumentException::createForEndNodeIsNull();
-        }
-        $relationType = $firstRelation->getRelationType();
-        if (!$relationType) {
-            throw InvalidArgumentException::createForRelationTypeIsNull();
         }
 
         return new Statement(
@@ -92,12 +96,12 @@ class SimilarRelationQueueCreateToStatementEventListener implements OnActionCyph
                 "  (endNode%s {%s})\n".
                 "CREATE (startNode)-[relation:%s {%s}]->(endNode)\n".
                 "SET relation += row.property",
-                ToCypherHelper::nodeLabelStorageToCypherLabelString($firstRelationStartNode->getNodeLabels()),
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelationStartNode, 'row.startNode'),
-                ToCypherHelper::nodeLabelStorageToCypherLabelString($firstRelationEndNode->getNodeLabels()),
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelationEndNode, 'row.endNode'),
-                (string) $relationType,
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelation, 'row.identifier')
+                ToStringHelper::labelsToString($firstRelationStartNode->getLabels()),
+                StructureHelper::getPropertiesAsCypherVariableString($firstRelationStartNode->getIdentifiers(), 'row.startNode'),
+                ToStringHelper::labelsToString($firstRelationEndNode->getLabels()),
+                StructureHelper::getPropertiesAsCypherVariableString($firstRelationEndNode->getIdentifiers(), 'row.endNode'),
+                $type,
+                StructureHelper::getPropertiesAsCypherVariableString($firstRelation->getIdentifiers(), 'row.identifier')
             ),
             [
                 'batch' => $batch,

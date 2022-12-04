@@ -7,7 +7,7 @@ namespace Syndesi\CypherEntityManager\EventListener\OpenCypher;
 use Laudis\Neo4j\Databags\Statement;
 use Psr\Log\LoggerInterface;
 use Syndesi\CypherDataStructures\Contract\RelationInterface;
-use Syndesi\CypherDataStructures\Helper\ToCypherHelper;
+use Syndesi\CypherDataStructures\Helper\ToStringHelper;
 use Syndesi\CypherEntityManager\Contract\OnActionCypherElementToStatementEventListenerInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarRelationQueueInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarRelationQueueStatementInterface;
@@ -64,23 +64,27 @@ class SimilarRelationQueueDeleteToStatementEventListener implements OnActionCyph
                 $firstRelationEndNode = $endNode;
             }
             $batch[] = [
-                'startNodeIdentifier' => StructureHelper::getIdentifiersFromElementAsArray($startNode),
-                'endNodeIdentifier' => StructureHelper::getIdentifiersFromElementAsArray($endNode),
-                'relationIdentifier' => StructureHelper::getIdentifiersFromElementAsArray($relation),
+                'startNodeIdentifier' => $startNode->getIdentifiers(),
+                'endNodeIdentifier' => $endNode->getIdentifiers(),
+                'relationIdentifier' => $relation->getIdentifiers(),
             ];
         }
+
         if (!$firstRelation) {
             return StructureHelper::getEmptyStatement();
         }
+
+        $type = $firstRelation->getType();
+        if (!$type) {
+            throw InvalidArgumentException::createForRelationTypeIsNull();
+        }
+
         if (!$firstRelationStartNode) {
             throw InvalidArgumentException::createForStartNodeIsNull();
         }
+
         if (!$firstRelationEndNode) {
             throw InvalidArgumentException::createForEndNodeIsNull();
-        }
-        $relationType = $firstRelation->getRelationType();
-        if (!$relationType) {
-            throw InvalidArgumentException::createForRelationTypeIsNull();
         }
 
         return new Statement(
@@ -88,12 +92,12 @@ class SimilarRelationQueueDeleteToStatementEventListener implements OnActionCyph
                 "UNWIND \$batch as row\n".
                 "MATCH (%s {%s})-[relation:%s {%s}]->(%s {%s})\n".
                 "DELETE relation",
-                ToCypherHelper::nodeLabelStorageToCypherLabelString($firstRelationStartNode->getNodeLabels()),
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelationStartNode, 'row.startNodeIdentifier'),
-                (string) $relationType,
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelation, 'row.relationIdentifier'),
-                ToCypherHelper::nodeLabelStorageToCypherLabelString($firstRelationEndNode->getNodeLabels()),
-                StructureHelper::getIdentifiersFromElementAsCypherVariableString($firstRelationEndNode, 'row.endNodeIdentifier'),
+                ToStringHelper::labelsToString($firstRelationStartNode->getLabels()),
+                StructureHelper::getPropertiesAsCypherVariableString($firstRelationStartNode->getIdentifiers(), 'row.startNodeIdentifier'),
+                $type,
+                StructureHelper::getPropertiesAsCypherVariableString($firstRelation->getIdentifiers(), 'row.relationIdentifier'),
+                ToStringHelper::labelsToString($firstRelationEndNode->getLabels()),
+                StructureHelper::getPropertiesAsCypherVariableString($firstRelationEndNode->getIdentifiers(), 'row.endNodeIdentifier'),
             ),
             [
                 'batch' => $batch,

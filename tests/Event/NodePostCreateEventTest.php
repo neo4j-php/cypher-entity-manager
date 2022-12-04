@@ -6,7 +6,6 @@ namespace Syndesi\CypherEntityManager\Tests\Trait;
 
 use PHPUnit\Framework\TestCase;
 use Syndesi\CypherDataStructures\Type\Node;
-use Syndesi\CypherDataStructures\Type\NodeLabel;
 use Syndesi\CypherEntityManager\Event\NodePostCreateEvent;
 
 class NodePostCreateEventTest extends TestCase
@@ -21,10 +20,10 @@ class NodePostCreateEventTest extends TestCase
     public function testElementManipulation(): void
     {
         $element = new Node();
-        $element->addNodeLabel(new NodeLabel('Label'));
+        $element->addLabel('Label');
         $event = new NodePostCreateEvent($element);
-        $this->assertTrue($event->getElement()->hasNodeLabel(new NodeLabel('Label')));
-        $event->getElement()->removeNodeLabel(new NodeLabel('Label'));
-        $this->assertFalse($event->getElement()->hasNodeLabel(new NodeLabel('Label')));
+        $this->assertTrue($event->getElement()->hasLabel('Label'));
+        $event->getElement()->removeLabel('Label');
+        $this->assertFalse($event->getElement()->hasLabel('Label'));
     }
 }
