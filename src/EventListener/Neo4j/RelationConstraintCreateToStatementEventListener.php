@@ -50,7 +50,7 @@ class RelationConstraintCreateToStatementEventListener implements OnActionCypher
             throw InvalidArgumentException::createForConstraintForIsNull();
         }
         $properties = [];
-        foreach ($relationConstraint->getProperties() as $propertyName) {
+        foreach ($relationConstraint->getProperties() as $propertyName => $propertyValue) {
             $properties[] = sprintf("e.%s", $propertyName);
         }
         $constraintType = $relationConstraint->getType();

@@ -5,10 +5,7 @@ declare(strict_types=1);
 namespace Syndesi\CypherEntityManager\Tests\FeatureTest;
 
 use Syndesi\CypherDataStructures\Type\Node;
-use Syndesi\CypherDataStructures\Type\NodeLabel;
-use Syndesi\CypherDataStructures\Type\PropertyName;
 use Syndesi\CypherDataStructures\Type\Relation;
-use Syndesi\CypherDataStructures\Type\RelationType;
 use Syndesi\CypherEntityManager\Tests\FeatureTestCase;
 use Syndesi\CypherEntityManager\Type\EntityManager;
 use Syndesi\CypherEntityManager\Type\SimilarNodeQueue;
@@ -20,31 +17,31 @@ class SimilarRelationQueueFeatureTest extends FeatureTestCase
     {
         $nodeA = new Node();
         $nodeA
-            ->addNodeLabel(new NodeLabel('Node'))
-            ->addProperty(new PropertyName('id'), 1000)
-            ->addProperty(new PropertyName('name'), 'a')
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('Node')
+            ->addProperty('id', 1000)
+            ->addProperty('name', 'a')
+            ->addIdentifier('id');
 
         $nodeB = new Node();
         $nodeB
-            ->addNodeLabel(new NodeLabel('Node'))
-            ->addProperty(new PropertyName('id'), 1001)
-            ->addProperty(new PropertyName('name'), 'b')
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('Node')
+            ->addProperty('id', 1001)
+            ->addProperty('name', 'b')
+            ->addIdentifier('id');
 
         $nodeC = new Node();
         $nodeC
-            ->addNodeLabel(new NodeLabel('Node'))
-            ->addProperty(new PropertyName('id'), 1002)
-            ->addProperty(new PropertyName('name'), 'c')
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('Node')
+            ->addProperty('id', 1002)
+            ->addProperty('name', 'c')
+            ->addIdentifier('id');
 
         $nodeD = new Node();
         $nodeD
-            ->addNodeLabel(new NodeLabel('Node'))
-            ->addProperty(new PropertyName('id'), 1003)
-            ->addProperty(new PropertyName('name'), 'd')
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('Node')
+            ->addProperty('id', 1003)
+            ->addProperty('name', 'd')
+            ->addIdentifier('id');
 
         $similarNodeQueue = (new SimilarNodeQueue())
             ->enqueue($nodeA)
@@ -55,42 +52,42 @@ class SimilarRelationQueueFeatureTest extends FeatureTestCase
         $relationAB = (new Relation())
             ->setStartNode($nodeA)
             ->setEndNode($nodeB)
-            ->setRelationType(new RelationType('RELATION'))
-            ->addProperty(new PropertyName('id'), 2000)
-            ->addProperty(new PropertyName('name'), 'ab')
-            ->addIdentifier(new PropertyName('id'));
+            ->setType('RELATION')
+            ->addProperty('id', 2000)
+            ->addProperty('name', 'ab')
+            ->addIdentifier('id');
 
         $relationBC = (new Relation())
             ->setStartNode($nodeB)
             ->setEndNode($nodeC)
-            ->setRelationType(new RelationType('RELATION'))
-            ->addProperty(new PropertyName('id'), 2001)
-            ->addProperty(new PropertyName('name'), 'bc')
-            ->addIdentifier(new PropertyName('id'));
+            ->setType('RELATION')
+            ->addProperty('id', 2001)
+            ->addProperty('name', 'bc')
+            ->addIdentifier('id');
 
         $relationCD = (new Relation())
             ->setStartNode($nodeC)
             ->setEndNode($nodeD)
-            ->setRelationType(new RelationType('RELATION'))
-            ->addProperty(new PropertyName('id'), 2002)
-            ->addProperty(new PropertyName('name'), 'cd')
-            ->addIdentifier(new PropertyName('id'));
+            ->setType('RELATION')
+            ->addProperty('id', 2002)
+            ->addProperty('name', 'cd')
+            ->addIdentifier('id');
 
         $relationDA = (new Relation())
             ->setStartNode($nodeD)
             ->setEndNode($nodeA)
-            ->setRelationType(new RelationType('RELATION'))
-            ->addProperty(new PropertyName('id'), 2003)
-            ->addProperty(new PropertyName('name'), 'da')
-            ->addIdentifier(new PropertyName('id'));
+            ->setType('RELATION')
+            ->addProperty('id', 2003)
+            ->addProperty('name', 'da')
+            ->addIdentifier('id');
 
         $relationAC = (new Relation())
             ->setStartNode($nodeA)
             ->setEndNode($nodeC)
-            ->setRelationType(new RelationType('RELATION'))
-            ->addProperty(new PropertyName('id'), 2004)
-            ->addProperty(new PropertyName('name'), 'ac')
-            ->addIdentifier(new PropertyName('id'));
+            ->setType('RELATION')
+            ->addProperty('id', 2004)
+            ->addProperty('name', 'ac')
+            ->addIdentifier('id');
 
         $similarRelationQueue = (new SimilarRelationQueue())
             ->enqueue($relationAB)
@@ -110,11 +107,11 @@ class SimilarRelationQueueFeatureTest extends FeatureTestCase
         $this->assertNodeCount(4);
         $this->assertRelationCount(3);
 
-        $relationAB->addProperty(new PropertyName('test'), 'merge');
-        $relationBC->addProperty(new PropertyName('test'), 'merge');
-        $relationCD->addProperty(new PropertyName('test'), 'merge');
-        $relationDA->addProperty(new PropertyName('test'), 'merge');
-        $relationAC->addProperty(new PropertyName('test'), 'merge');
+        $relationAB->addProperty('test', 'merge');
+        $relationBC->addProperty('test', 'merge');
+        $relationCD->addProperty('test', 'merge');
+        $relationDA->addProperty('test', 'merge');
+        $relationAC->addProperty('test', 'merge');
         $similarRelationQueue = (new SimilarRelationQueue())
             ->enqueue($relationAB)
             ->enqueue($relationBC)

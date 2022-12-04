@@ -7,8 +7,6 @@ namespace Syndesi\CypherEntityManager\Tests\Type;
 use PHPUnit\Framework\TestCase;
 use Syndesi\CypherDataStructures\Contract\NodeInterface;
 use Syndesi\CypherDataStructures\Type\Node;
-use Syndesi\CypherDataStructures\Type\NodeLabel;
-use Syndesi\CypherDataStructures\Type\PropertyName;
 use Syndesi\CypherEntityManager\Exception\InvalidArgumentException;
 use Syndesi\CypherEntityManager\Type\SimilarNodeQueue;
 
@@ -18,22 +16,22 @@ class SimilarNodeQueueTest extends TestCase
     {
         $nodeA = new Node();
         $nodeA
-            ->addNodeLabel(new NodeLabel('Node'))
-            ->addProperty(new PropertyName('id'), 1)
-            ->addIdentifier(new PropertyName('id'))
-            ->addProperty(new PropertyName('name'), 'A');
+            ->addLabel('Node')
+            ->addProperty('id', 1)
+            ->addIdentifier('id')
+            ->addProperty('name', 'A');
         $nodeB = new Node();
         $nodeB
-            ->addNodeLabel(new NodeLabel('Node'))
-            ->addProperty(new PropertyName('id'), 2)
-            ->addIdentifier(new PropertyName('id'))
-            ->addProperty(new PropertyName('name'), 'B');
+            ->addLabel('Node')
+            ->addProperty('id', 2)
+            ->addIdentifier('id')
+            ->addProperty('name', 'B');
         $nodeC = new Node();
         $nodeC
-            ->addNodeLabel(new NodeLabel('Node'))
-            ->addProperty(new PropertyName('id'), 3)
-            ->addIdentifier(new PropertyName('id'))
-            ->addProperty(new PropertyName('name'), 'C');
+            ->addLabel('Node')
+            ->addProperty('id', 3)
+            ->addIdentifier('id')
+            ->addProperty('name', 'C');
         $queue = new SimilarNodeQueue();
         $this->assertCount(0, $queue);
         $queue->enqueue($nodeA);
@@ -54,22 +52,22 @@ class SimilarNodeQueueTest extends TestCase
     {
         $nodeA = new Node();
         $nodeA
-            ->addNodeLabel(new NodeLabel('Node'))
-            ->addProperty(new PropertyName('id'), 1)
-            ->addIdentifier(new PropertyName('id'))
-            ->addProperty(new PropertyName('name'), 'A');
+            ->addLabel('Node')
+            ->addProperty('id', 1)
+            ->addIdentifier('id')
+            ->addProperty('name', 'A');
         $nodeB = new Node();
         $nodeB
-            ->addNodeLabel(new NodeLabel('Node'))
-            ->addProperty(new PropertyName('id'), 2)
-            ->addIdentifier(new PropertyName('id'))
-            ->addProperty(new PropertyName('name'), 'B');
+            ->addLabel('Node')
+            ->addProperty('id', 2)
+            ->addIdentifier('id')
+            ->addProperty('name', 'B');
         $nodeC = new Node();
         $nodeC
-            ->addNodeLabel(new NodeLabel('Node'))
-            ->addProperty(new PropertyName('id'), 3)
-            ->addIdentifier(new PropertyName('id'))
-            ->addProperty(new PropertyName('name'), 'C');
+            ->addLabel('Node')
+            ->addProperty('id', 3)
+            ->addIdentifier('id')
+            ->addProperty('name', 'C');
         $queue = new SimilarNodeQueue();
         $queue->enqueue($nodeA);
         $queue->enqueue($nodeB);
@@ -91,16 +89,16 @@ class SimilarNodeQueueTest extends TestCase
         }
         $nodeA = new Node();
         $nodeA
-            ->addNodeLabel(new NodeLabel('NodeA'))
-            ->addProperty(new PropertyName('id'), 1)
-            ->addIdentifier(new PropertyName('id'))
-            ->addProperty(new PropertyName('name'), 'A');
+            ->addLabel('NodeA')
+            ->addProperty('id', 1)
+            ->addIdentifier('id')
+            ->addProperty('name', 'A');
         $nodeB = new Node();
         $nodeB
-            ->addNodeLabel(new NodeLabel('NodeB'))
-            ->addProperty(new PropertyName('id'), 2)
-            ->addIdentifier(new PropertyName('id'))
-            ->addProperty(new PropertyName('name'), 'B');
+            ->addLabel('NodeB')
+            ->addProperty('id', 2)
+            ->addIdentifier('id')
+            ->addProperty('name', 'B');
         $queue = new SimilarNodeQueue();
         $this->assertTrue($queue->supports($nodeA));
         $this->assertTrue($queue->supports($nodeB));

@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Syndesi\CypherEntityManager\Tests\FeatureTest;
 
 use Syndesi\CypherDataStructures\Type\Node;
-use Syndesi\CypherDataStructures\Type\NodeLabel;
-use Syndesi\CypherDataStructures\Type\PropertyName;
 use Syndesi\CypherEntityManager\Tests\FeatureTestCase;
 use Syndesi\CypherEntityManager\Type\EntityManager;
 use Syndesi\CypherEntityManager\Type\SimilarNodeQueue;
@@ -17,24 +15,24 @@ class SimilarNodeQueueFeatureTest extends FeatureTestCase
     {
         $nodeA = new Node();
         $nodeA
-            ->addNodeLabel(new NodeLabel('Node'))
-            ->addProperty(new PropertyName('identifier'), 1001)
-            ->addProperty(new PropertyName('name'), 'a')
-            ->addIdentifier(new PropertyName('identifier'));
+            ->addLabel('Node')
+            ->addProperty('identifier', 1001)
+            ->addProperty('name', 'a')
+            ->addIdentifier('identifier');
 
         $nodeB = new Node();
         $nodeB
-            ->addNodeLabel(new NodeLabel('Node'))
-            ->addProperty(new PropertyName('identifier'), 1002)
-            ->addProperty(new PropertyName('name'), 'b')
-            ->addIdentifier(new PropertyName('identifier'));
+            ->addLabel('Node')
+            ->addProperty('identifier', 1002)
+            ->addProperty('name', 'b')
+            ->addIdentifier('identifier');
 
         $nodeC = new Node();
         $nodeC
-            ->addNodeLabel(new NodeLabel('Node'))
-            ->addProperty(new PropertyName('identifier'), 1003)
-            ->addProperty(new PropertyName('name'), 'c')
-            ->addIdentifier(new PropertyName('identifier'));
+            ->addLabel('Node')
+            ->addProperty('identifier', 1003)
+            ->addProperty('name', 'c')
+            ->addIdentifier('identifier');
 
         $similarNodeQueue = (new SimilarNodeQueue())
             ->enqueue($nodeA)
@@ -48,7 +46,7 @@ class SimilarNodeQueueFeatureTest extends FeatureTestCase
         $this->assertNodeCount(3);
 
         $nodeB = $nodeB
-            ->addProperty(new PropertyName('newProperty'), 'some value');
+            ->addProperty('newProperty', 'some value');
 
         $newQueue = (new SimilarNodeQueue())
             ->enqueue($nodeA)

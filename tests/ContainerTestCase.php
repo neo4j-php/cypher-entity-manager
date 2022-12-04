@@ -18,6 +18,10 @@ use Syndesi\CypherEntityManager\EventListener\Neo4j\NodeConstraintCreateToStatem
 use Syndesi\CypherEntityManager\EventListener\Neo4j\NodeConstraintDeleteToStatementEventListener;
 use Syndesi\CypherEntityManager\EventListener\Neo4j\NodeIndexCreateToStatementEventListener;
 use Syndesi\CypherEntityManager\EventListener\Neo4j\NodeIndexDeleteToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\Neo4j\RelationConstraintCreateToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\Neo4j\RelationConstraintDeleteToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\Neo4j\RelationIndexCreateToStatementEventListener;
+use Syndesi\CypherEntityManager\EventListener\Neo4j\RelationIndexDeleteToStatementEventListener;
 use Syndesi\CypherEntityManager\EventListener\OpenCypher\NodeCreateToStatementEventListener;
 use Syndesi\CypherEntityManager\EventListener\OpenCypher\NodeDeleteToStatementEventListener;
 use Syndesi\CypherEntityManager\EventListener\OpenCypher\NodeMergeToStatementEventListener;
@@ -68,6 +72,10 @@ class ContainerTestCase extends ProphesizeTestCase
         $listenerProvider->addSubscriber(NodeIndexDeleteToStatementEventListener::class, NodeIndexDeleteToStatementEventListener::class);
         $listenerProvider->addSubscriber(NodeConstraintCreateToStatementEventListener::class, NodeConstraintCreateToStatementEventListener::class);
         $listenerProvider->addSubscriber(NodeConstraintDeleteToStatementEventListener::class, NodeConstraintDeleteToStatementEventListener::class);
+        $listenerProvider->addSubscriber(RelationIndexCreateToStatementEventListener::class, RelationIndexCreateToStatementEventListener::class);
+        $listenerProvider->addSubscriber(RelationIndexDeleteToStatementEventListener::class, RelationIndexDeleteToStatementEventListener::class);
+        $listenerProvider->addSubscriber(RelationConstraintCreateToStatementEventListener::class, RelationConstraintCreateToStatementEventListener::class);
+        $listenerProvider->addSubscriber(RelationConstraintDeleteToStatementEventListener::class, RelationConstraintDeleteToStatementEventListener::class);
         $this->container->set(ListenerProviderInterface::class, $listenerProvider);
         $this->container->set(EventDispatcherInterface::class, new Dispatcher(
             $this->container->get(ListenerProviderInterface::class),

@@ -25,7 +25,7 @@ class StructureHelper
     {
         $internalIdentifiers = [];
         $publicIdentifiers = [];
-        foreach ($identifiers as $key) {
+        foreach ($identifiers as $key => $value) {
             if (str_starts_with($key, '_')) {
                 $internalIdentifiers[] = $key;
             } else {
@@ -61,11 +61,15 @@ class StructureHelper
     {
         $startNode = $relation->getStartNode();
         if (!$startNode) {
-            throw new InvalidArgumentException('start node can not be null');
+            throw InvalidArgumentException::createForStartNodeIsNull();
         }
         $endNode = $relation->getEndNode();
         if (!$endNode) {
-            throw new InvalidArgumentException('end node can not be null');
+            throw InvalidArgumentException::createForEndNodeIsNull();
+        }
+        $type = $relation->getType();
+        if (!$type) {
+            throw InvalidArgumentException::createForRelationTypeIsNull();
         }
         if (0 === count($relation->getIdentifiers())) {
             throw new InvalidArgumentException('at least one relation identifier is required');
@@ -74,7 +78,7 @@ class StructureHelper
         $parts[] = self::getNodeStructure($startNode);
         $parts[] = sprintf(
             "-[%s %s]->",
-            $relation->getType(),
+            $type,
             self::identifiersToStructure($relation->getIdentifiers())
         );
         $parts[] = self::getNodeStructure($endNode);

@@ -8,13 +8,8 @@ use Laudis\Neo4j\Databags\Statement;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
-use Syndesi\CypherDataStructures\Type\Constraint;
-use Syndesi\CypherDataStructures\Type\ConstraintName;
-use Syndesi\CypherDataStructures\Type\ConstraintType;
 use Syndesi\CypherDataStructures\Type\Node;
-use Syndesi\CypherDataStructures\Type\NodeLabel;
-use Syndesi\CypherDataStructures\Type\PropertyName;
-use Syndesi\CypherDataStructures\Type\RelationType;
+use Syndesi\CypherDataStructures\Type\NodeConstraint;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
 use Syndesi\CypherEntityManager\EventListener\Neo4j\NodeConstraintCreateToStatementEventListener;
 use Syndesi\CypherEntityManager\Exception\InvalidArgumentException;
@@ -22,15 +17,15 @@ use Syndesi\CypherEntityManager\Tests\ProphesizeTestCase;
 use Syndesi\CypherEntityManager\Type\ActionCypherElement;
 use Syndesi\CypherEntityManager\Type\ActionType;
 
-class ConstraintCreateToStatementEventListenerTest extends ProphesizeTestCase
+class NodeConstraintCreateToStatementEventListenerTest extends ProphesizeTestCase
 {
     public function testOnActionCypherElementToStatementEvent(): void
     {
-        $constraint = (new Constraint())
-            ->setFor(new NodeLabel('Node'))
-            ->setConstraintType(ConstraintType::UNIQUE)
-            ->setConstraintName(new ConstraintName('constraint_node'))
-            ->addProperty(new PropertyName('id'));
+        $constraint = (new NodeConstraint())
+            ->setFor('Node')
+            ->setType('UNIQUE')
+            ->setName('constraint_node')
+            ->addProperty('id');
         $actionCypherElement = new ActionCypherElement(ActionType::CREATE, $constraint);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
         $loggerHandler = new TestHandler();
@@ -44,14 +39,14 @@ class ConstraintCreateToStatementEventListenerTest extends ProphesizeTestCase
         $this->assertInstanceOf(Statement::class, $event->getStatement());
         $this->assertCount(1, $loggerHandler->getRecords());
         $logMessage = $loggerHandler->getRecords()[0];
-        $this->assertSame('Acting on ActionCypherElementToStatementEvent: Created constraint-create-statement and stopped propagation.', $logMessage->message);
+        $this->assertSame('Acting on ActionCypherElementToStatementEvent: Created node-constraint-create-statement and stopped propagation.', $logMessage->message);
         $this->assertArrayHasKey('element', $logMessage->context);
         $this->assertArrayHasKey('statement', $logMessage->context);
     }
 
     public function testOnActionCypherElementToStatementEventWithWrongAction(): void
     {
-        $constraint = new Constraint();
+        $constraint = new NodeConstraint();
         $actionCypherElement = new ActionCypherElement(ActionType::MERGE, $constraint);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
 
@@ -77,23 +72,14 @@ class ConstraintCreateToStatementEventListenerTest extends ProphesizeTestCase
 
     public function testConstraintStatement(): void
     {
-        $nodeConstraint = (new Constraint())
-            ->setFor(new NodeLabel('Node'))
-            ->setConstraintType(ConstraintType::UNIQUE)
-            ->setConstraintName(new ConstraintName('constraint_node'))
-            ->addProperty(new PropertyName('id'));
+        $nodeConstraint = (new NodeConstraint())
+            ->setFor('Node')
+            ->setType('UNIQUE')
+            ->setName('constraint_node')
+            ->addProperty('id');
 
-        $nodeStatement = NodeConstraintCreateToStatementEventListener::constraintStatement($nodeConstraint);
+        $nodeStatement = NodeConstraintCreateToStatementEventListener::nodeConstraintStatement($nodeConstraint);
         $this->assertSame('CREATE CONSTRAINT constraint_node FOR (e:Node) REQUIRE (e.id) IS UNIQUE', $nodeStatement->getText());
-
-        $relationConstraint = (new Constraint())
-            ->setFor(new RelationType('RELATION'))
-            ->setConstraintType(ConstraintType::NOT_NULL)
-            ->setConstraintName(new ConstraintName('constraint_relation'))
-            ->addProperty(new PropertyName('id'));
-
-        $relationStatement = NodeConstraintCreateToStatementEventListener::constraintStatement($relationConstraint);
-        $this->assertSame('CREATE CONSTRAINT constraint_relation FOR ()-[e:RELATION]-() REQUIRE (e.id) IS NOT NULL', $relationStatement->getText());
     }
 
     public function testInvalidIndexStatementWithEmptyConstraintName(): void
@@ -101,14 +87,14 @@ class ConstraintCreateToStatementEventListenerTest extends ProphesizeTestCase
         if (false !== getenv("LEAK")) {
             $this->markTestSkipped();
         }
-        $constraint = (new Constraint())
-            ->setFor(new NodeLabel('Node'))
-            ->setConstraintType(ConstraintType::UNIQUE)
-            ->addProperty(new PropertyName('id'));
+        $constraint = (new NodeConstraint())
+            ->setFor('Node')
+            ->setType('UNIQUE')
+            ->addProperty('id');
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Constraint name can not be null');
-        NodeConstraintCreateToStatementEventListener::constraintStatement($constraint);
+        NodeConstraintCreateToStatementEventListener::nodeConstraintStatement($constraint);
     }
 
     public function testInvalidIndexStatementWithEmptyElementLabel(): void
@@ -116,14 +102,14 @@ class ConstraintCreateToStatementEventListenerTest extends ProphesizeTestCase
         if (false !== getenv("LEAK")) {
             $this->markTestSkipped();
         }
-        $constraint = (new Constraint())
-            ->setConstraintType(ConstraintType::UNIQUE)
-            ->setConstraintName(new ConstraintName('constraint_node'))
-            ->addProperty(new PropertyName('id'));
+        $constraint = (new NodeConstraint())
+            ->setType('UNIQUE')
+            ->setName('constraint_node')
+            ->addProperty('id');
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Constraint for (node label / relation type) can not be null');
-        NodeConstraintCreateToStatementEventListener::constraintStatement($constraint);
+        NodeConstraintCreateToStatementEventListener::nodeConstraintStatement($constraint);
     }
 
     public function testInvalidIndexStatementWithEmptyConstraintType(): void
@@ -131,13 +117,13 @@ class ConstraintCreateToStatementEventListenerTest extends ProphesizeTestCase
         if (false !== getenv("LEAK")) {
             $this->markTestSkipped();
         }
-        $constraint = (new Constraint())
-            ->setFor(new NodeLabel('Node'))
-            ->setConstraintName(new ConstraintName('constraint_node'))
-            ->addProperty(new PropertyName('id'));
+        $constraint = (new NodeConstraint())
+            ->setFor('Node')
+            ->setName('constraint_node')
+            ->addProperty('id');
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Constraint type can not be null');
-        NodeConstraintCreateToStatementEventListener::constraintStatement($constraint);
+        NodeConstraintCreateToStatementEventListener::nodeConstraintStatement($constraint);
     }
 }

@@ -7,10 +7,7 @@ namespace Syndesi\CypherEntityManager\Tests\Type;
 use PHPUnit\Framework\TestCase;
 use Syndesi\CypherDataStructures\Contract\RelationInterface;
 use Syndesi\CypherDataStructures\Type\Node;
-use Syndesi\CypherDataStructures\Type\NodeLabel;
-use Syndesi\CypherDataStructures\Type\PropertyName;
 use Syndesi\CypherDataStructures\Type\Relation;
-use Syndesi\CypherDataStructures\Type\RelationType;
 use Syndesi\CypherEntityManager\Exception\InvalidArgumentException;
 use Syndesi\CypherEntityManager\Type\SimilarRelationQueue;
 
@@ -20,57 +17,57 @@ class SimilarRelationQueueTest extends TestCase
     {
         $nodeAStart = new Node();
         $nodeAStart
-            ->addNodeLabel(new NodeLabel('StartNode'))
-            ->addProperty(new PropertyName('id'), 1)
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('StartNode')
+            ->addProperty('id', 1)
+            ->addIdentifier('id');
         $nodeAEnd = new Node();
         $nodeAEnd
-            ->addNodeLabel(new NodeLabel('EndNode'))
-            ->addProperty(new PropertyName('id'), 2)
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('EndNode')
+            ->addProperty('id', 2)
+            ->addIdentifier('id');
         $relationA = new Relation();
         $relationA
             ->setStartNode($nodeAStart)
             ->setEndNode($nodeAEnd)
-            ->setRelationType(new RelationType('RELATION'))
-            ->addProperty(new PropertyName('id'), 3)
-            ->addIdentifier(new PropertyName('id'));
+            ->setType('RELATION')
+            ->addProperty('id', 3)
+            ->addIdentifier('id');
 
         $nodeBStart = new Node();
         $nodeBStart
-            ->addNodeLabel(new NodeLabel('StartNode'))
-            ->addProperty(new PropertyName('id'), 4)
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('StartNode')
+            ->addProperty('id', 4)
+            ->addIdentifier('id');
         $nodeBEnd = new Node();
         $nodeBEnd
-            ->addNodeLabel(new NodeLabel('EndNode'))
-            ->addProperty(new PropertyName('id'), 5)
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('EndNode')
+            ->addProperty('id', 5)
+            ->addIdentifier('id');
         $relationB = new Relation();
         $relationB
             ->setStartNode($nodeBStart)
             ->setEndNode($nodeBEnd)
-            ->setRelationType(new RelationType('RELATION'))
-            ->addProperty(new PropertyName('id'), 6)
-            ->addIdentifier(new PropertyName('id'));
+            ->setType('RELATION')
+            ->addProperty('id', 6)
+            ->addIdentifier('id');
 
         $nodeCStart = new Node();
         $nodeCStart
-            ->addNodeLabel(new NodeLabel('StartNode'))
-            ->addProperty(new PropertyName('id'), 7)
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('StartNode')
+            ->addProperty('id', 7)
+            ->addIdentifier('id');
         $nodeCEnd = new Node();
         $nodeCEnd
-            ->addNodeLabel(new NodeLabel('EndNode'))
-            ->addProperty(new PropertyName('id'), 8)
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('EndNode')
+            ->addProperty('id', 8)
+            ->addIdentifier('id');
         $relationC = new Relation();
         $relationC
             ->setStartNode($nodeCStart)
             ->setEndNode($nodeCEnd)
-            ->setRelationType(new RelationType('RELATION'))
-            ->addProperty(new PropertyName('id'), 9)
-            ->addIdentifier(new PropertyName('id'));
+            ->setType('RELATION')
+            ->addProperty('id', 9)
+            ->addIdentifier('id');
 
         $queue = new SimilarRelationQueue();
         $this->assertCount(0, $queue);
@@ -92,57 +89,57 @@ class SimilarRelationQueueTest extends TestCase
     {
         $nodeAStart = new Node();
         $nodeAStart
-            ->addNodeLabel(new NodeLabel('StartNode'))
-            ->addProperty(new PropertyName('id'), 1)
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('StartNode')
+            ->addProperty('id', 1)
+            ->addIdentifier('id');
         $nodeAEnd = new Node();
         $nodeAEnd
-            ->addNodeLabel(new NodeLabel('EndNode'))
-            ->addProperty(new PropertyName('id'), 2)
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('EndNode')
+            ->addProperty('id', 2)
+            ->addIdentifier('id');
         $relationA = new Relation();
         $relationA
             ->setStartNode($nodeAStart)
             ->setEndNode($nodeAEnd)
-            ->setRelationType(new RelationType('RELATION'))
-            ->addProperty(new PropertyName('id'), 3)
-            ->addIdentifier(new PropertyName('id'));
+            ->setType('RELATION')
+            ->addProperty('id', 3)
+            ->addIdentifier('id');
 
         $nodeBStart = new Node();
         $nodeBStart
-            ->addNodeLabel(new NodeLabel('StartNode'))
-            ->addProperty(new PropertyName('id'), 4)
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('StartNode')
+            ->addProperty('id', 4)
+            ->addIdentifier('id');
         $nodeBEnd = new Node();
         $nodeBEnd
-            ->addNodeLabel(new NodeLabel('EndNode'))
-            ->addProperty(new PropertyName('id'), 5)
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('EndNode')
+            ->addProperty('id', 5)
+            ->addIdentifier('id');
         $relationB = new Relation();
         $relationB
             ->setStartNode($nodeBStart)
             ->setEndNode($nodeBEnd)
-            ->setRelationType(new RelationType('RELATION'))
-            ->addProperty(new PropertyName('id'), 6)
-            ->addIdentifier(new PropertyName('id'));
+            ->setType('RELATION')
+            ->addProperty('id', 6)
+            ->addIdentifier('id');
 
         $nodeCStart = new Node();
         $nodeCStart
-            ->addNodeLabel(new NodeLabel('StartNode'))
-            ->addProperty(new PropertyName('id'), 7)
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('StartNode')
+            ->addProperty('id', 7)
+            ->addIdentifier('id');
         $nodeCEnd = new Node();
         $nodeCEnd
-            ->addNodeLabel(new NodeLabel('EndNode'))
-            ->addProperty(new PropertyName('id'), 8)
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('EndNode')
+            ->addProperty('id', 8)
+            ->addIdentifier('id');
         $relationC = new Relation();
         $relationC
             ->setStartNode($nodeCStart)
             ->setEndNode($nodeCEnd)
-            ->setRelationType(new RelationType('RELATION'))
-            ->addProperty(new PropertyName('id'), 9)
-            ->addIdentifier(new PropertyName('id'));
+            ->setType('RELATION')
+            ->addProperty('id', 9)
+            ->addIdentifier('id');
         $queue = new SimilarRelationQueue();
         $queue->enqueue($relationA);
         $queue->enqueue($relationB);
@@ -165,39 +162,39 @@ class SimilarRelationQueueTest extends TestCase
 
         $nodeAStart = new Node();
         $nodeAStart
-            ->addNodeLabel(new NodeLabel('StartNode'))
-            ->addProperty(new PropertyName('id'), 1)
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('StartNode')
+            ->addProperty('id', 1)
+            ->addIdentifier('id');
         $nodeAEnd = new Node();
         $nodeAEnd
-            ->addNodeLabel(new NodeLabel('EndNode'))
-            ->addProperty(new PropertyName('id'), 2)
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('EndNode')
+            ->addProperty('id', 2)
+            ->addIdentifier('id');
         $relationA = new Relation();
         $relationA
             ->setStartNode($nodeAStart)
             ->setEndNode($nodeAEnd)
-            ->setRelationType(new RelationType('RELATION'))
-            ->addProperty(new PropertyName('id'), 3)
-            ->addIdentifier(new PropertyName('id'));
+            ->setType('RELATION')
+            ->addProperty('id', 3)
+            ->addIdentifier('id');
 
         $nodeBStart = new Node();
         $nodeBStart
-            ->addNodeLabel(new NodeLabel('OtherStartNode'))
-            ->addProperty(new PropertyName('id'), 4)
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('OtherStartNode')
+            ->addProperty('id', 4)
+            ->addIdentifier('id');
         $nodeBEnd = new Node();
         $nodeBEnd
-            ->addNodeLabel(new NodeLabel('EndNode'))
-            ->addProperty(new PropertyName('id'), 5)
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('EndNode')
+            ->addProperty('id', 5)
+            ->addIdentifier('id');
         $relationB = new Relation();
         $relationB
             ->setStartNode($nodeBStart)
             ->setEndNode($nodeBEnd)
-            ->setRelationType(new RelationType('RELATION'))
-            ->addProperty(new PropertyName('id'), 6)
-            ->addIdentifier(new PropertyName('id'));
+            ->setType('RELATION')
+            ->addProperty('id', 6)
+            ->addIdentifier('id');
         $queue = new SimilarRelationQueue();
         $this->assertTrue($queue->supports($relationA));
         $this->assertTrue($queue->supports($relationB));

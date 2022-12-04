@@ -6,10 +6,7 @@ namespace Syndesi\CypherEntityManager\Tests\FeatureTest;
 
 use Syndesi\CypherDataStructures\Contract\RelationInterface;
 use Syndesi\CypherDataStructures\Type\Node;
-use Syndesi\CypherDataStructures\Type\NodeLabel;
-use Syndesi\CypherDataStructures\Type\PropertyName;
 use Syndesi\CypherDataStructures\Type\Relation;
-use Syndesi\CypherDataStructures\Type\RelationType;
 use Syndesi\CypherEntityManager\Tests\FeatureTestCase;
 use Syndesi\CypherEntityManager\Type\EntityManager;
 
@@ -18,23 +15,23 @@ class RelationFeatureTest extends FeatureTestCase
     public function testRelation(): void
     {
         $nodeA = (new Node())
-            ->addNodeLabel(new NodeLabel('NodeA'))
-            ->addProperty(new PropertyName('id'), 1000)
-            ->addProperty(new PropertyName('name'), 'A')
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('NodeA')
+            ->addProperty('id', 1000)
+            ->addProperty('name', 'A')
+            ->addIdentifier('id');
         $nodeB = (new Node())
-            ->addNodeLabel(new NodeLabel('NodeB'))
-            ->addProperty(new PropertyName('id'), 1001)
-            ->addProperty(new PropertyName('name'), 'B')
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('NodeB')
+            ->addProperty('id', 1001)
+            ->addProperty('name', 'B')
+            ->addIdentifier('id');
 
         /** @var RelationInterface $relation */
         $relation = (new Relation())
             ->setStartNode($nodeA)
             ->setEndNode($nodeB)
-            ->setRelationType(new RelationType('RELATION'))
-            ->addProperty(new PropertyName('id'), 2001)
-            ->addIdentifier(new PropertyName('id'));
+            ->setType('RELATION')
+            ->addProperty('id', 2001)
+            ->addIdentifier('id');
 
         $em = $this->container->get(EntityManager::class);
         $this->assertNodeCount(0);
@@ -45,7 +42,7 @@ class RelationFeatureTest extends FeatureTestCase
         $em->flush();
         $this->assertNodeCount(2);
         $this->assertRelationCount(1);
-        $relation->addProperty(new PropertyName('newProperty'), 'some value');
+        $relation->addProperty('newProperty', 'some value');
         $em->merge($relation);
         $em->flush();
         $this->assertNodeCount(2);

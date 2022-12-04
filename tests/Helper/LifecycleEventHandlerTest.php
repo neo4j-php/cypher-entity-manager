@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Syndesi\CypherEntityManager\Tests\Helper;
 
 use PHPUnit\Framework\TestCase;
-use Syndesi\CypherDataStructures\Type\Constraint;
-use Syndesi\CypherDataStructures\Type\Index;
 use Syndesi\CypherDataStructures\Type\Node;
+use Syndesi\CypherDataStructures\Type\NodeConstraint;
+use Syndesi\CypherDataStructures\Type\NodeIndex;
 use Syndesi\CypherDataStructures\Type\Relation;
+use Syndesi\CypherDataStructures\Type\RelationConstraint;
+use Syndesi\CypherDataStructures\Type\RelationIndex;
 use Syndesi\CypherEntityManager\Event\NodeConstraintPostCreateEvent;
 use Syndesi\CypherEntityManager\Event\NodeConstraintPostDeleteEvent;
 use Syndesi\CypherEntityManager\Event\NodeConstraintPreCreateEvent;
@@ -23,6 +25,14 @@ use Syndesi\CypherEntityManager\Event\NodePostMergeEvent;
 use Syndesi\CypherEntityManager\Event\NodePreCreateEvent;
 use Syndesi\CypherEntityManager\Event\NodePreDeleteEvent;
 use Syndesi\CypherEntityManager\Event\NodePreMergeEvent;
+use Syndesi\CypherEntityManager\Event\RelationConstraintPostCreateEvent;
+use Syndesi\CypherEntityManager\Event\RelationConstraintPostDeleteEvent;
+use Syndesi\CypherEntityManager\Event\RelationConstraintPreCreateEvent;
+use Syndesi\CypherEntityManager\Event\RelationConstraintPreDeleteEvent;
+use Syndesi\CypherEntityManager\Event\RelationIndexPostCreateEvent;
+use Syndesi\CypherEntityManager\Event\RelationIndexPostDeleteEvent;
+use Syndesi\CypherEntityManager\Event\RelationIndexPreCreateEvent;
+use Syndesi\CypherEntityManager\Event\RelationIndexPreDeleteEvent;
 use Syndesi\CypherEntityManager\Event\RelationPostCreateEvent;
 use Syndesi\CypherEntityManager\Event\RelationPostDeleteEvent;
 use Syndesi\CypherEntityManager\Event\RelationPostMergeEvent;
@@ -123,59 +133,115 @@ class LifecycleEventHandlerTest extends TestCase
                 ],
             ],
             [
-                new ActionCypherElement(ActionType::CREATE, new Index()),
+                new ActionCypherElement(ActionType::CREATE, new NodeIndex()),
                 true,
                 [
                     NodeIndexPreCreateEvent::class,
                 ],
             ],
             [
-                new ActionCypherElement(ActionType::CREATE, new Index()),
+                new ActionCypherElement(ActionType::CREATE, new NodeIndex()),
                 false,
                 [
                     NodeIndexPostCreateEvent::class,
                 ],
             ],
             [
-                new ActionCypherElement(ActionType::DELETE, new Index()),
+                new ActionCypherElement(ActionType::DELETE, new NodeIndex()),
                 true,
                 [
                     NodeIndexPreDeleteEvent::class,
                 ],
             ],
             [
-                new ActionCypherElement(ActionType::DELETE, new Index()),
+                new ActionCypherElement(ActionType::DELETE, new NodeIndex()),
                 false,
                 [
                     NodeIndexPostDeleteEvent::class,
                 ],
             ],
             [
-                new ActionCypherElement(ActionType::CREATE, new Constraint()),
+                new ActionCypherElement(ActionType::CREATE, new RelationIndex()),
+                true,
+                [
+                    RelationIndexPreCreateEvent::class,
+                ],
+            ],
+            [
+                new ActionCypherElement(ActionType::CREATE, new RelationIndex()),
+                false,
+                [
+                    RelationIndexPostCreateEvent::class,
+                ],
+            ],
+            [
+                new ActionCypherElement(ActionType::DELETE, new RelationIndex()),
+                true,
+                [
+                    RelationIndexPreDeleteEvent::class,
+                ],
+            ],
+            [
+                new ActionCypherElement(ActionType::DELETE, new RelationIndex()),
+                false,
+                [
+                    RelationIndexPostDeleteEvent::class,
+                ],
+            ],
+            [
+                new ActionCypherElement(ActionType::CREATE, new NodeConstraint()),
                 true,
                 [
                     NodeConstraintPreCreateEvent::class,
                 ],
             ],
             [
-                new ActionCypherElement(ActionType::CREATE, new Constraint()),
+                new ActionCypherElement(ActionType::CREATE, new NodeConstraint()),
                 false,
                 [
                     NodeConstraintPostCreateEvent::class,
                 ],
             ],
             [
-                new ActionCypherElement(ActionType::DELETE, new Constraint()),
+                new ActionCypherElement(ActionType::DELETE, new NodeConstraint()),
                 true,
                 [
                     NodeConstraintPreDeleteEvent::class,
                 ],
             ],
             [
-                new ActionCypherElement(ActionType::DELETE, new Constraint()),
+                new ActionCypherElement(ActionType::DELETE, new NodeConstraint()),
                 false,
                 [
                     NodeConstraintPostDeleteEvent::class,
+                ],
+            ],
+            [
+                new ActionCypherElement(ActionType::CREATE, new RelationConstraint()),
+                true,
+                [
+                    RelationConstraintPreCreateEvent::class,
+                ],
+            ],
+            [
+                new ActionCypherElement(ActionType::CREATE, new RelationConstraint()),
+                false,
+                [
+                    RelationConstraintPostCreateEvent::class,
+                ],
+            ],
+            [
+                new ActionCypherElement(ActionType::DELETE, new RelationConstraint()),
+                true,
+                [
+                    RelationConstraintPreDeleteEvent::class,
+                ],
+            ],
+            [
+                new ActionCypherElement(ActionType::DELETE, new RelationConstraint()),
+                false,
+                [
+                    RelationConstraintPostDeleteEvent::class,
                 ],
             ],
         ];

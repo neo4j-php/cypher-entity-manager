@@ -50,7 +50,7 @@ class NodeConstraintCreateToStatementEventListener implements OnActionCypherElem
             throw InvalidArgumentException::createForConstraintForIsNull();
         }
         $properties = [];
-        foreach ($nodeConstraint->getProperties() as $propertyName) {
+        foreach ($nodeConstraint->getProperties() as $propertyName => $propertyValue) {
             $properties[] = sprintf("e.%s", $propertyName);
         }
         $type = $nodeConstraint->getType();

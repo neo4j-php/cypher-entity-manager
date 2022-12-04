@@ -8,13 +8,8 @@ use Laudis\Neo4j\Databags\Statement;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
-use Syndesi\CypherDataStructures\Type\Index;
-use Syndesi\CypherDataStructures\Type\IndexName;
-use Syndesi\CypherDataStructures\Type\IndexType;
 use Syndesi\CypherDataStructures\Type\Node;
-use Syndesi\CypherDataStructures\Type\NodeLabel;
-use Syndesi\CypherDataStructures\Type\PropertyName;
-use Syndesi\CypherDataStructures\Type\RelationType;
+use Syndesi\CypherDataStructures\Type\NodeIndex;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
 use Syndesi\CypherEntityManager\EventListener\Neo4j\NodeIndexDeleteToStatementEventListener;
 use Syndesi\CypherEntityManager\Exception\InvalidArgumentException;
@@ -22,15 +17,15 @@ use Syndesi\CypherEntityManager\Tests\ProphesizeTestCase;
 use Syndesi\CypherEntityManager\Type\ActionCypherElement;
 use Syndesi\CypherEntityManager\Type\ActionType;
 
-class IndexDeleteToStatementEventListenerTest extends ProphesizeTestCase
+class NodeIndexDeleteToStatementEventListenerTest extends ProphesizeTestCase
 {
     public function testOnActionCypherElementToStatementEvent(): void
     {
-        $index = (new Index())
-            ->setFor(new NodeLabel('Node'))
-            ->setIndexType(IndexType::BTREE)
-            ->setIndexName(new IndexName('index_node'))
-            ->addProperty(new PropertyName('id'));
+        $index = (new NodeIndex())
+            ->setFor('Node')
+            ->setType('BTREE')
+            ->setName('index_node')
+            ->addProperty('id');
         $actionCypherElement = new ActionCypherElement(ActionType::DELETE, $index);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
         $loggerHandler = new TestHandler();
@@ -44,14 +39,14 @@ class IndexDeleteToStatementEventListenerTest extends ProphesizeTestCase
         $this->assertInstanceOf(Statement::class, $event->getStatement());
         $this->assertCount(1, $loggerHandler->getRecords());
         $logMessage = $loggerHandler->getRecords()[0];
-        $this->assertSame('Acting on ActionCypherElementToStatementEvent: Created index-delete-statement and stopped propagation.', $logMessage->message);
+        $this->assertSame('Acting on ActionCypherElementToStatementEvent: Created node-index-delete-statement and stopped propagation.', $logMessage->message);
         $this->assertArrayHasKey('element', $logMessage->context);
         $this->assertArrayHasKey('statement', $logMessage->context);
     }
 
     public function testOnActionCypherElementToStatementEventWithWrongAction(): void
     {
-        $index = new Index();
+        $index = new NodeIndex();
         $actionCypherElement = new ActionCypherElement(ActionType::CREATE, $index);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
 
@@ -77,23 +72,14 @@ class IndexDeleteToStatementEventListenerTest extends ProphesizeTestCase
 
     public function testIndexStatement(): void
     {
-        $nodeIndex = (new Index())
-            ->setFor(new NodeLabel('Node'))
-            ->setIndexType(IndexType::BTREE)
-            ->setIndexName(new IndexName('index_node'))
-            ->addProperty(new PropertyName('id'));
+        $nodeIndex = (new NodeIndex())
+            ->setFor('Node')
+            ->setType('BTREE')
+            ->setName('index_node')
+            ->addProperty('id');
 
-        $nodeStatement = NodeIndexDeleteToStatementEventListener::indexStatement($nodeIndex);
+        $nodeStatement = NodeIndexDeleteToStatementEventListener::nodeIndexStatement($nodeIndex);
         $this->assertSame('DROP INDEX index_node IF EXISTS', $nodeStatement->getText());
-
-        $relationIndex = (new Index())
-            ->setFor(new RelationType('RELATION'))
-            ->setIndexType(IndexType::BTREE)
-            ->setIndexName(new IndexName('index_relation'))
-            ->addProperty(new PropertyName('id'));
-
-        $relationStatement = NodeIndexDeleteToStatementEventListener::indexStatement($relationIndex);
-        $this->assertSame('DROP INDEX index_relation IF EXISTS', $relationStatement->getText());
     }
 
     public function testInvalidIndexStatementWithEmptyIndexName(): void
@@ -101,13 +87,13 @@ class IndexDeleteToStatementEventListenerTest extends ProphesizeTestCase
         if (false !== getenv("LEAK")) {
             $this->markTestSkipped();
         }
-        $nodeIndex = (new Index())
-            ->setFor(new NodeLabel('Node'))
-            ->setIndexType(IndexType::BTREE)
-            ->addProperty(new PropertyName('id'));
+        $nodeIndex = (new NodeIndex())
+            ->setFor('Node')
+            ->setType('BTREE')
+            ->addProperty('id');
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Index name can not be null');
-        NodeIndexDeleteToStatementEventListener::indexStatement($nodeIndex);
+        NodeIndexDeleteToStatementEventListener::nodeIndexStatement($nodeIndex);
     }
 }

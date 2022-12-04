@@ -10,10 +10,7 @@ use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Syndesi\CypherDataStructures\Contract\RelationInterface;
 use Syndesi\CypherDataStructures\Type\Node;
-use Syndesi\CypherDataStructures\Type\NodeLabel;
-use Syndesi\CypherDataStructures\Type\PropertyName;
 use Syndesi\CypherDataStructures\Type\Relation;
-use Syndesi\CypherDataStructures\Type\RelationType;
 use Syndesi\CypherEntityManager\Event\ActionCypherElementToStatementEvent;
 use Syndesi\CypherEntityManager\EventListener\OpenCypher\RelationCreateToStatementEventListener;
 use Syndesi\CypherEntityManager\Exception\InvalidArgumentException;
@@ -26,23 +23,23 @@ class RelationCreateToStatementEventListenerTest extends ProphesizeTestCase
     public function testOnActionCypherElementToStatementEvent(): void
     {
         $nodeA = (new Node())
-            ->addNodeLabel(new NodeLabel('NodeA'))
-            ->addProperty(new PropertyName('id'), 1000)
-            ->addProperty(new PropertyName('name'), 'A')
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('NodeA')
+            ->addProperty('id', 1000)
+            ->addProperty('name', 'A')
+            ->addIdentifier('id');
         $nodeB = (new Node())
-            ->addNodeLabel(new NodeLabel('NodeB'))
-            ->addProperty(new PropertyName('id'), 1001)
-            ->addProperty(new PropertyName('name'), 'B')
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('NodeB')
+            ->addProperty('id', 1001)
+            ->addProperty('name', 'B')
+            ->addIdentifier('id');
 
         /** @var RelationInterface $relation */
         $relation = (new Relation())
             ->setStartNode($nodeA)
             ->setEndNode($nodeB)
-            ->setRelationType(new RelationType('RELATION'))
-            ->addProperty(new PropertyName('id'), 2001)
-            ->addIdentifier(new PropertyName('id'));
+            ->setType('RELATION')
+            ->addProperty('id', 2001)
+            ->addIdentifier('id');
         $actionCypherElement = new ActionCypherElement(ActionType::CREATE, $relation);
         $event = new ActionCypherElementToStatementEvent($actionCypherElement);
         $loggerHandler = new TestHandler();
@@ -93,17 +90,17 @@ class RelationCreateToStatementEventListenerTest extends ProphesizeTestCase
             $this->markTestSkipped();
         }
         $nodeB = (new Node())
-            ->addNodeLabel(new NodeLabel('NodeB'))
-            ->addProperty(new PropertyName('id'), 1001)
-            ->addProperty(new PropertyName('name'), 'B')
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('NodeB')
+            ->addProperty('id', 1001)
+            ->addProperty('name', 'B')
+            ->addIdentifier('id');
 
         /** @var RelationInterface $relation */
         $relation = (new Relation())
             ->setEndNode($nodeB)
-            ->setRelationType(new RelationType('RELATION'))
-            ->addProperty(new PropertyName('id'), 2001)
-            ->addIdentifier(new PropertyName('id'));
+            ->setType('RELATION')
+            ->addProperty('id', 2001)
+            ->addIdentifier('id');
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Start node of relation can not be null');
@@ -116,17 +113,17 @@ class RelationCreateToStatementEventListenerTest extends ProphesizeTestCase
             $this->markTestSkipped();
         }
         $nodeA = (new Node())
-            ->addNodeLabel(new NodeLabel('NodeA'))
-            ->addProperty(new PropertyName('id'), 1000)
-            ->addProperty(new PropertyName('name'), 'A')
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('NodeA')
+            ->addProperty('id', 1000)
+            ->addProperty('name', 'A')
+            ->addIdentifier('id');
 
         /** @var RelationInterface $relation */
         $relation = (new Relation())
             ->setStartNode($nodeA)
-            ->setRelationType(new RelationType('RELATION'))
-            ->addProperty(new PropertyName('id'), 2001)
-            ->addIdentifier(new PropertyName('id'));
+            ->setType('RELATION')
+            ->addProperty('id', 2001)
+            ->addIdentifier('id');
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('End node of relation can not be null');
@@ -136,23 +133,23 @@ class RelationCreateToStatementEventListenerTest extends ProphesizeTestCase
     public function testRelationStatement(): void
     {
         $nodeA = (new Node())
-            ->addNodeLabel(new NodeLabel('NodeA'))
-            ->addProperty(new PropertyName('id'), 1000)
-            ->addProperty(new PropertyName('name'), 'A')
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('NodeA')
+            ->addProperty('id', 1000)
+            ->addProperty('name', 'A')
+            ->addIdentifier('id');
         $nodeB = (new Node())
-            ->addNodeLabel(new NodeLabel('NodeB'))
-            ->addProperty(new PropertyName('id'), 1001)
-            ->addProperty(new PropertyName('name'), 'B')
-            ->addIdentifier(new PropertyName('id'));
+            ->addLabel('NodeB')
+            ->addProperty('id', 1001)
+            ->addProperty('name', 'B')
+            ->addIdentifier('id');
 
         /** @var RelationInterface $relation */
         $relation = (new Relation())
             ->setStartNode($nodeA)
             ->setEndNode($nodeB)
-            ->setRelationType(new RelationType('RELATION'))
-            ->addProperty(new PropertyName('id'), 2001)
-            ->addIdentifier(new PropertyName('id'));
+            ->setType('RELATION')
+            ->addProperty('id', 2001)
+            ->addIdentifier('id');
 
         $statement = RelationCreateToStatementEventListener::relationStatement($relation);
 
