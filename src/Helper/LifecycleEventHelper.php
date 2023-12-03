@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Syndesi\CypherEntityManager\Helper;
 
+use Syndesi\CypherEntityManager\Contract\ActionCypherElementInterface;
 use Syndesi\CypherEntityManager\Contract\Event\LifecycleEventInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarNodeQueueInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarRelationQueueInterface;
@@ -35,7 +36,6 @@ use Syndesi\CypherEntityManager\Event\RelationPostMergeEvent;
 use Syndesi\CypherEntityManager\Event\RelationPreCreateEvent;
 use Syndesi\CypherEntityManager\Event\RelationPreDeleteEvent;
 use Syndesi\CypherEntityManager\Event\RelationPreMergeEvent;
-use Syndesi\CypherEntityManager\Type\ActionCypherElement;
 use Syndesi\CypherEntityManager\Type\ActionCypherElementType;
 use Syndesi\CypherEntityManager\Type\ActionType;
 
@@ -44,7 +44,7 @@ class LifecycleEventHelper
     /**
      * @return LifecycleEventInterface[]
      */
-    public static function getLifecycleEventForCypherActionElement(ActionCypherElement $actionCypherElement, bool $isPre): array
+    public static function getLifecycleEventForCypherActionElement(ActionCypherElementInterface $actionCypherElement, bool $isPre): array
     {
         $eventClasses = [
             ActionCypherElementType::NODE->name => [
@@ -132,11 +132,13 @@ class LifecycleEventHelper
         $element = $actionCypherElement->getElement();
         if ($element instanceof SimilarNodeQueueInterface) {
             $events = [];
+
             // todo build events
             return $events;
         }
         if ($element instanceof SimilarRelationQueueInterface) {
             $events = [];
+
             // todo build events
             return $events;
         }

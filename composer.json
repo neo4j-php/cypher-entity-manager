@@ -7,9 +7,7 @@
     "authors": [
         {
             "name": "Syndesi (Sören Klein)",
-            "email": "soerenklein98@gmail.com",
-            "homepage": "https://syndesi.dev",
-            "role": "Developer"
+            "email": "soerenklein98@gmail.com"
         }
     ],
     "keywords": [
@@ -19,8 +17,8 @@
     ],
     "require": {
         "php": "^8.1",
-        "syndesi/cypher-data-structures": "^0.2.0",
-        "laudis/neo4j-php-client": "^2.8",
+        "syndesi/cypher-data-structures": "^0.3.0",
+        "laudis/neo4j-php-client": "^3.0",
         "psr/log": "^3.0",
         "psr/event-dispatcher": "^1.0"
     },
@@ -36,11 +34,11 @@
         }
     },
     "require-dev": {
-        "vimeo/psalm": "^4.23",
+        "vimeo/psalm": "^5.16",
         "boesing/psalm-plugin-stringf": "^1.1",
         "phpstan/phpstan": "^1.6",
         "phpunit/php-code-coverage": "^9.2",
-        "infection/infection": "^0.26.10",
+        "infection/infection": "^0.27.8",
         "friendsofphp/php-cs-fixer": "^3.8",
         "phpunit/phpunit": "^9.5",
         "roave/no-leaks": "^1.3",
@@ -69,7 +67,8 @@
     },
     "config": {
         "allow-plugins": {
-            "infection/extension-installer": true
+            "infection/extension-installer": true,
+            "php-http/discovery": true
         }
     }
 }

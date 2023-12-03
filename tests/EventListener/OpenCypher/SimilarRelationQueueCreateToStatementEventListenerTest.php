@@ -111,23 +111,23 @@ class SimilarRelationQueueCreateToStatementEventListenerTest extends ProphesizeT
         $this->assertSame('MATCH (n) LIMIT 0', $event->getStatement()->getText());
     }
 
-//    todo :)
-//    public function testOnActionCypherElementToStatementEventWithNoStartNode(): void
-//    {
-//        $node = $this->createNode(1000);
-//        $relation = $this->createRelation(2000, null, $node);
-//        $similarRelationQueue = (new SimilarRelationQueue())
-//            ->enqueue($relation);
-//
-//        $actionCypherElement = new ActionCypherElement(ActionType::CREATE, $similarRelationQueue);
-//        $event = new ActionCypherElementToStatementEvent($actionCypherElement);
-//
-//        $this->expectException(InvalidArgumentException::class);
-//        $this->expectExceptionMessage('---');
-//
-//        $eventListener = new SimilarRelationQueueCreateToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
-//        $eventListener->onActionCypherElementToStatementEvent($event);
-//    }
+    //    todo :)
+    //    public function testOnActionCypherElementToStatementEventWithNoStartNode(): void
+    //    {
+    //        $node = $this->createNode(1000);
+    //        $relation = $this->createRelation(2000, null, $node);
+    //        $similarRelationQueue = (new SimilarRelationQueue())
+    //            ->enqueue($relation);
+    //
+    //        $actionCypherElement = new ActionCypherElement(ActionType::CREATE, $similarRelationQueue);
+    //        $event = new ActionCypherElementToStatementEvent($actionCypherElement);
+    //
+    //        $this->expectException(InvalidArgumentException::class);
+    //        $this->expectExceptionMessage('---');
+    //
+    //        $eventListener = new SimilarRelationQueueCreateToStatementEventListener($this->prophet->prophesize(LoggerInterface::class)->reveal());
+    //        $eventListener->onActionCypherElementToStatementEvent($event);
+    //    }
 
     public function testNodeStatement(): void
     {

@@ -12,7 +12,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                php-version: ['8.1']
+                php-version: ['8.1', '8.2', '8.3']
         steps:
             - uses: actions/checkout@v2
             - name: Cache Composer dependencies
@@ -24,7 +24,7 @@ jobs:
               with:
                   php-version: ${{ matrix.php-version }}
                   tools: composer:v2
-            - run: composer install
+            - run: composer install --ignore-platform-req=php
               shell: bash
             - run: composer test:leak
               shell: bash
