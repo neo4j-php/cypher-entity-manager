@@ -30,7 +30,7 @@ class EntityManager implements EntityManagerInterface
     private ActionCypherElementQueueInterface $queue;
     private EventDispatcherInterface $dispatcher;
 
-    public function __construct(ClientInterface $client, EventDispatcherInterface $dispatcher, ?LoggerInterface $logger = null)
+    public function __construct(ClientInterface $client, EventDispatcherInterface $dispatcher, LoggerInterface $logger = null)
     {
         $this->client = $client;
         $this->dispatcher = $dispatcher;

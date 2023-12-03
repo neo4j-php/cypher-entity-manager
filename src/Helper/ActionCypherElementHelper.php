@@ -10,9 +10,9 @@ use Syndesi\CypherDataStructures\Contract\NodeInterface;
 use Syndesi\CypherDataStructures\Contract\RelationConstraintInterface;
 use Syndesi\CypherDataStructures\Contract\RelationIndexInterface;
 use Syndesi\CypherDataStructures\Contract\RelationInterface;
+use Syndesi\CypherEntityManager\Contract\ActionCypherElementInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarNodeQueueInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarRelationQueueInterface;
-use Syndesi\CypherEntityManager\Type\ActionCypherElement;
 use Syndesi\CypherEntityManager\Type\ActionCypherElementType;
 
 class ActionCypherElementHelper
@@ -20,7 +20,7 @@ class ActionCypherElementHelper
     /**
      * @psalm-suppress InvalidReturnType
      */
-    public static function getTypeFromActionCypherElement(ActionCypherElement $actionCypherElement): ActionCypherElementType
+    public static function getTypeFromActionCypherElement(ActionCypherElementInterface $actionCypherElement): ActionCypherElementType
     {
         $element = $actionCypherElement->getElement();
         if ($element instanceof NodeInterface) {
@@ -47,5 +47,6 @@ class ActionCypherElementHelper
         if ($element instanceof SimilarRelationQueueInterface) {
             return ActionCypherElementType::SIMILAR_RELATION_QUEUE;
         }
+        throw new \LogicException("Provided element can not be mapped to ActionCypherElementType.");
     }
 }

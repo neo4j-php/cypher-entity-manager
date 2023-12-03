@@ -13,8 +13,8 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                php-version: ['8.1', '8.2-rc']
-                neo4j-version: ['4.4', '5.1.0', '5.2.0']
+                php-version: ['8.1', '8.2', '8.3']
+                neo4j-version: ['4.4', '5.1.0', '5.13.0']
         env:
             ENABLE_FEATURE_TEST: true
             NEO4J_VERSION: ${{ matrix.neo4j-version }}
@@ -38,7 +38,7 @@ jobs:
               with:
                   php-version: ${{ matrix.php-version }}
                   tools: composer:v2
-            - run: composer install --ignore-platform-reqs
+            - run: composer install --ignore-platform-req=php
               shell: bash
             - run: composer test
               shell: bash

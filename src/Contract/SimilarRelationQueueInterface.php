@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Syndesi\CypherEntityManager\Contract;
 
+use Iterator;
 use Syndesi\CypherDataStructures\Contract\RelationInterface;
 
+/**
+ * @extends Iterator<int, RelationInterface>
+ */
 interface SimilarRelationQueueInterface extends \Iterator
 {
     public function enqueue(RelationInterface $relation): self;
