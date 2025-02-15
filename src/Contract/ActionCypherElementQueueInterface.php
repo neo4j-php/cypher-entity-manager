@@ -13,7 +13,7 @@ interface ActionCypherElementQueueInterface extends \Iterator
 {
     public function enqueue(ActionCypherElementInterface $element): self;
 
-    public function dequeue(): ?ActionCypherElementInterface;
+    public function dequeue(): ActionCypherElementInterface;
 
     public function preFlush(): self;
 

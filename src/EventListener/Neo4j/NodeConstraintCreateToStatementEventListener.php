@@ -42,11 +42,11 @@ class NodeConstraintCreateToStatementEventListener implements OnActionCypherElem
     public static function nodeConstraintStatement(NodeConstraintInterface $nodeConstraint): Statement
     {
         $name = $nodeConstraint->getName();
-        if (!$name) {
+        if (null === $name) {
             throw InvalidArgumentException::createForConstraintNameIsNull();
         }
         $label = $nodeConstraint->getFor();
-        if (!$label) {
+        if (null === $label) {
             throw InvalidArgumentException::createForConstraintForIsNull();
         }
         $properties = [];
@@ -54,7 +54,7 @@ class NodeConstraintCreateToStatementEventListener implements OnActionCypherElem
             $properties[] = sprintf("e.%s", $propertyName);
         }
         $type = $nodeConstraint->getType();
-        if (!$type) {
+        if (null === $type) {
             throw InvalidArgumentException::createForConstraintTypeIsNull();
         }
 

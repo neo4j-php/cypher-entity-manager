@@ -42,17 +42,17 @@ class NodeIndexCreateToStatementEventListener implements OnActionCypherElementTo
     public static function nodeIndexStatement(NodeIndexInterface $nodeIndex): Statement
     {
         $type = $nodeIndex->getType();
-        if (!$type) {
+        if (null === $type) {
             throw InvalidArgumentException::createForIndexTypeIsNull();
         }
 
         $name = $nodeIndex->getName();
-        if (!$name) {
+        if (null === $name) {
             throw InvalidArgumentException::createForIndexNameIsNull();
         }
 
         $label = $nodeIndex->getFor();
-        if (!$label) {
+        if (null === $label) {
             throw InvalidArgumentException::createForIndexForIsNull();
         }
 

@@ -75,15 +75,15 @@ class SimilarRelationQueueDeleteToStatementEventListener implements OnActionCyph
         }
 
         $type = $firstRelation->getType();
-        if (!$type) {
+        if (null === $type) {
             throw InvalidArgumentException::createForRelationTypeIsNull();
         }
 
-        if (!$firstRelationStartNode) {
+        if (null === $firstRelationStartNode) {
             throw InvalidArgumentException::createForStartNodeIsNull();
         }
 
-        if (!$firstRelationEndNode) {
+        if (null === $firstRelationEndNode) {
             throw InvalidArgumentException::createForEndNodeIsNull();
         }
 

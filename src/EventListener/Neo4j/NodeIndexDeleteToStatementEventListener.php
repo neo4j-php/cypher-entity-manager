@@ -42,7 +42,7 @@ class NodeIndexDeleteToStatementEventListener implements OnActionCypherElementTo
     public static function nodeIndexStatement(NodeIndexInterface $nodeIndex): Statement
     {
         $name = $nodeIndex->getName();
-        if (!$name) {
+        if (null === $name) {
             throw InvalidArgumentException::createForIndexNameIsNull();
         }
 

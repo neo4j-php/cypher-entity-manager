@@ -55,7 +55,7 @@ class SimilarNodeQueueCreateToStatementEventListener implements OnActionCypherEl
                 'property' => StructureHelper::getPropertiesWhichAreNotIdentifiers($node),
             ];
         }
-        if (!$firstNode) {
+        if (null === $firstNode) {
             return StructureHelper::getEmptyStatement();
         }
 

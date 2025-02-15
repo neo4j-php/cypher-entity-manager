@@ -13,7 +13,7 @@ class ActionCypherElementToStatementEvent extends Event
     private ?Statement $statement = null;
 
     public function __construct(
-        readonly private ActionCypherElementInterface $actionCypherElement
+        readonly private ActionCypherElementInterface $actionCypherElement,
     ) {
     }
 

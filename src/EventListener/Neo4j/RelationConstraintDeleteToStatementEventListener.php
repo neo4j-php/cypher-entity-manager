@@ -42,7 +42,7 @@ class RelationConstraintDeleteToStatementEventListener implements OnActionCypher
     public static function relationConstraintStatement(RelationConstraintInterface $relationConstraint): Statement
     {
         $name = $relationConstraint->getName();
-        if (!$name) {
+        if (null === $name) {
             throw InvalidArgumentException::createForConstraintNameIsNull();
         }
 

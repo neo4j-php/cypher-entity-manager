@@ -55,7 +55,7 @@ class SimilarNodeQueueMergeToStatementEventListener implements OnActionCypherEle
                 'property' => StructureHelper::getPropertiesWhichAreNotIdentifiers($node),
             ];
         }
-        if (!$firstNode) {
+        if (null === $firstNode) {
             return StructureHelper::getEmptyStatement();
         }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Syndesi\CypherEntityManager\Tests\Helper;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Syndesi\CypherDataStructures\Type\Node;
 use Syndesi\CypherDataStructures\Type\NodeConstraint;
@@ -20,7 +21,7 @@ use Syndesi\CypherEntityManager\Type\SimilarRelationQueue;
 
 class ActionCypherElementHelperTest extends TestCase
 {
-    public function provideActionCypherElementWithType()
+    public static function provideActionCypherElementWithType()
     {
         return [
             [
@@ -58,9 +59,7 @@ class ActionCypherElementHelperTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideActionCypherElementWithType
-     */
+    #[DataProvider("provideActionCypherElementWithType")]
     public function testGetTypeFromActionCypherElement(ActionCypherElement $object, ActionCypherElementType $expectedType): void
     {
         $foundType = ActionCypherElementHelper::getTypeFromActionCypherElement($object);

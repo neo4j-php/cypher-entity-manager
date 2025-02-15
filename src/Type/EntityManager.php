@@ -14,6 +14,7 @@ use Syndesi\CypherDataStructures\Contract\NodeInterface;
 use Syndesi\CypherDataStructures\Contract\RelationConstraintInterface;
 use Syndesi\CypherDataStructures\Contract\RelationIndexInterface;
 use Syndesi\CypherDataStructures\Contract\RelationInterface;
+use Syndesi\CypherEntityManager\Contract\ActionCypherElementInterface;
 use Syndesi\CypherEntityManager\Contract\ActionCypherElementQueueInterface;
 use Syndesi\CypherEntityManager\Contract\EntityManagerInterface;
 use Syndesi\CypherEntityManager\Contract\SimilarNodeQueueInterface;
@@ -25,12 +26,18 @@ use Syndesi\CypherEntityManager\Helper\LifecycleEventHelper;
 
 class EntityManager implements EntityManagerInterface
 {
+    /**
+     * @phpstan-ignore missingType.generics
+     */
     private ClientInterface $client;
     private ?LoggerInterface $logger;
     private ActionCypherElementQueueInterface $queue;
     private EventDispatcherInterface $dispatcher;
 
-    public function __construct(ClientInterface $client, EventDispatcherInterface $dispatcher, LoggerInterface $logger = null)
+    /**
+     * @phpstan-ignore missingType.generics
+     */
+    public function __construct(ClientInterface $client, EventDispatcherInterface $dispatcher, ?LoggerInterface $logger = null)
     {
         $this->client = $client;
         $this->dispatcher = $dispatcher;
@@ -97,6 +104,9 @@ class EntityManager implements EntityManagerInterface
         $this->logger?->debug("Dispatching PreFlushEvent");
         $this->dispatcher->dispatch(new PreFlushEvent());
         foreach ($this->queue as $actionCypherElement) {
+            /**
+             * @var ActionCypherElementInterface $actionCypherElement
+             */
             $events = LifecycleEventHelper::getLifecycleEventForCypherActionElement($actionCypherElement, true);
             foreach ($events as $event) {
                 $this->logger?->debug(sprintf("Dispatching %s", (new \ReflectionClass($event))->getShortName()));
@@ -149,6 +159,9 @@ class EntityManager implements EntityManagerInterface
     public function replaceQueue(ActionCypherElementQueueInterface $queue): self
     {
         foreach ($this->queue as $actionCypherElement) {
+            /**
+             * @var ActionCypherElementInterface $actionCypherElement
+             */
             $queue->enqueue($actionCypherElement);
         }
         $this->queue = $queue;
@@ -156,6 +169,9 @@ class EntityManager implements EntityManagerInterface
         return $this;
     }
 
+    /**
+     * @phpstan-ignore missingType.generics
+     */
     public function getClient(): ClientInterface
     {
         return $this->client;

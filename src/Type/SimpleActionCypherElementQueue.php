@@ -9,6 +9,9 @@ use Syndesi\CypherEntityManager\Contract\ActionCypherElementQueueInterface;
 
 class SimpleActionCypherElementQueue implements ActionCypherElementQueueInterface
 {
+    /**
+     * @var \SplQueue<ActionCypherElementInterface>
+     */
     private \SplQueue $queue;
 
     public function __construct()
@@ -23,7 +26,7 @@ class SimpleActionCypherElementQueue implements ActionCypherElementQueueInterfac
         return $this;
     }
 
-    public function dequeue(): ?ActionCypherElementInterface
+    public function dequeue(): ActionCypherElementInterface
     {
         return $this->queue->dequeue();
     }
