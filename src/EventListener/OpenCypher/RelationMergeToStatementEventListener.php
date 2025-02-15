@@ -44,17 +44,17 @@ class RelationMergeToStatementEventListener implements OnActionCypherElementToSt
     public static function relationStatement(RelationInterface $relation): Statement
     {
         $type = $relation->getType();
-        if (!$type) {
+        if (null === $type) {
             throw InvalidArgumentException::createForRelationTypeIsNull();
         }
 
         $startNode = $relation->getStartNode();
-        if (!$startNode) {
+        if (null === $startNode) {
             throw InvalidArgumentException::createForStartNodeIsNull();
         }
 
         $endNode = $relation->getEndNode();
-        if (!$endNode) {
+        if (null === $endNode) {
             throw InvalidArgumentException::createForEndNodeIsNull();
         }
 

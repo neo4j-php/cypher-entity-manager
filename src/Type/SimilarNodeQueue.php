@@ -11,6 +11,9 @@ use Syndesi\CypherEntityManager\Helper\StructureHelper;
 
 class SimilarNodeQueue implements SimilarNodeQueueInterface
 {
+    /**
+     * @var \SplQueue<NodeInterface>
+     */
     private \SplQueue $queue;
     private ?string $nodeStructure = null;
 
@@ -49,7 +52,7 @@ class SimilarNodeQueue implements SimilarNodeQueueInterface
      */
     public function enqueue(NodeInterface $node): SimilarNodeQueueInterface
     {
-        if (!$this->nodeStructure) {
+        if (null === $this->nodeStructure) {
             $this->nodeStructure = StructureHelper::getNodeStructure($node);
         }
         if (!$this->supports($node)) {
@@ -72,7 +75,7 @@ class SimilarNodeQueue implements SimilarNodeQueueInterface
 
     public function supports(NodeInterface $node): bool
     {
-        if (!$this->nodeStructure) {
+        if (null === $this->nodeStructure) {
             return true;
         }
 

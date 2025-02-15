@@ -42,11 +42,11 @@ class RelationConstraintCreateToStatementEventListener implements OnActionCypher
     public static function relationConstraintStatement(RelationConstraintInterface $relationConstraint): Statement
     {
         $name = $relationConstraint->getName();
-        if (!$name) {
+        if (null === $name) {
             throw InvalidArgumentException::createForConstraintNameIsNull();
         }
         $relationType = $relationConstraint->getFor();
-        if (!$relationType) {
+        if (null === $relationType) {
             throw InvalidArgumentException::createForConstraintForIsNull();
         }
         $properties = [];
@@ -54,7 +54,7 @@ class RelationConstraintCreateToStatementEventListener implements OnActionCypher
             $properties[] = sprintf("e.%s", $propertyName);
         }
         $constraintType = $relationConstraint->getType();
-        if (!$constraintType) {
+        if (null === $constraintType) {
             throw InvalidArgumentException::createForConstraintTypeIsNull();
         }
 

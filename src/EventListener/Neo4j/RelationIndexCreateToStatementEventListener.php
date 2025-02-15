@@ -42,17 +42,17 @@ class RelationIndexCreateToStatementEventListener implements OnActionCypherEleme
     public static function relationIndexStatement(RelationIndexInterface $relationIndex): Statement
     {
         $relationType = $relationIndex->getType();
-        if (!$relationType) {
+        if (null === $relationType) {
             throw InvalidArgumentException::createForIndexTypeIsNull();
         }
 
         $name = $relationIndex->getName();
-        if (!$name) {
+        if (null === $name) {
             throw InvalidArgumentException::createForIndexNameIsNull();
         }
 
         $indexType = $relationIndex->getFor();
-        if (!$indexType) {
+        if (null === $indexType) {
             throw InvalidArgumentException::createForIndexForIsNull();
         }
 

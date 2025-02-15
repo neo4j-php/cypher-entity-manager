@@ -11,6 +11,9 @@ use Syndesi\CypherEntityManager\Helper\StructureHelper;
 
 class SimilarRelationQueue implements SimilarRelationQueueInterface
 {
+    /**
+     * @var \SplQueue<RelationInterface>
+     */
     private \SplQueue $queue;
     private ?string $relationStructure = null;
 
@@ -49,7 +52,7 @@ class SimilarRelationQueue implements SimilarRelationQueueInterface
      */
     public function enqueue(RelationInterface $relation): SimilarRelationQueueInterface
     {
-        if (!$this->relationStructure) {
+        if (null === $this->relationStructure) {
             $this->relationStructure = StructureHelper::getRelationStructure($relation);
         }
         if (!$this->supports($relation)) {
@@ -67,7 +70,7 @@ class SimilarRelationQueue implements SimilarRelationQueueInterface
 
     public function supports(RelationInterface $relation): bool
     {
-        if (!$this->relationStructure) {
+        if (null === $this->relationStructure) {
             return true;
         }
 

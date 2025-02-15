@@ -12,7 +12,7 @@ class StoppableEventTraitTest extends TestCase
 {
     private function getTrait(): EventInterface
     {
-        return new class() implements EventInterface {
+        return new class implements EventInterface {
             use StoppableEventTrait;
         };
     }

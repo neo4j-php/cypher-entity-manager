@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Syndesi\CypherEntityManager\Tests\Helper;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Syndesi\CypherDataStructures\Type\Node;
 use Syndesi\CypherDataStructures\Type\NodeConstraint;
@@ -45,7 +46,7 @@ use Syndesi\CypherEntityManager\Type\ActionType;
 
 class LifecycleEventHandlerTest extends TestCase
 {
-    public function provideTestCases()
+    public static function provideTestCases()
     {
         return [
             [
@@ -247,9 +248,7 @@ class LifecycleEventHandlerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideTestCases
-     */
+    #[DataProvider("provideTestCases")]
     public function testCases(ActionCypherElement $actionCypherElement, bool $isPre, array $expectedEvents): void
     {
         $actualEvents = LifecycleEventHelper::getLifecycleEventForCypherActionElement($actionCypherElement, $isPre);

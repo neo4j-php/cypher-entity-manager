@@ -25,7 +25,7 @@ class ActionCypherElement implements ActionCypherElementInterface
         NodeIndexInterface|
         RelationIndexInterface|
         SimilarNodeQueueInterface|
-        SimilarRelationQueueInterface $element
+        SimilarRelationQueueInterface $element,
     ) {
     }
 

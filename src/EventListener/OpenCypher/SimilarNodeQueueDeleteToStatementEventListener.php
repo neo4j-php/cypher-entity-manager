@@ -52,7 +52,7 @@ class SimilarNodeQueueDeleteToStatementEventListener implements OnActionCypherEl
             }
             $batch[] = $node->getIdentifiers();
         }
-        if (!$firstNode) {
+        if (null === $firstNode) {
             return StructureHelper::getEmptyStatement();
         }
 

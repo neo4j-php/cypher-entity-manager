@@ -76,7 +76,7 @@ class SimilarRelationQueueMergeToStatementEventListener implements OnActionCyphe
         }
 
         $type = $firstRelation->getType();
-        if (!$type) {
+        if (null === $type) {
             throw InvalidArgumentException::createForRelationTypeIsNull();
         }
 

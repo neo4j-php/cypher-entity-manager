@@ -53,6 +53,9 @@ interface EntityManagerInterface
 
     public function replaceQueue(ActionCypherElementQueueInterface $queue): self;
 
+    /**
+     * @phpstan-ignore missingType.generics
+     */
     public function getClient(): ClientInterface;
 
     public function run(string $statement): mixed;

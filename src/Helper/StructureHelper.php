@@ -68,7 +68,7 @@ class StructureHelper
             throw InvalidArgumentException::createForEndNodeIsNull();
         }
         $type = $relation->getType();
-        if (!$type) {
+        if (null === $type) {
             throw InvalidArgumentException::createForRelationTypeIsNull();
         }
         if (0 === count($relation->getIdentifiers())) {

@@ -14,4 +14,9 @@
             <directory name="vendor"/>
         </ignoreFiles>
     </projectFiles>
-<plugins><pluginClass class="Boesing\PsalmPluginStringf\Plugin"/></plugins></psalm>
+    <issueHandlers>
+        <UnusedClass errorLevel="suppress" />
+        <PossiblyUnusedMethod errorLevel="suppress" />
+        <PossiblyUnusedReturnValue errorLevel="suppress" />
+    </issueHandlers>
+</psalm>
